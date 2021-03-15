@@ -12,19 +12,22 @@ if not os.path.isdir(virtual_environment_dir):
     print(virtual_environment_dir)
     print("\n\n")
 
+#%%
 
-print("-Installing python dependecies:\n")
-print(subprocess.run(['pipenv', 'install'],
-                     capture_output=True,
-                     text=True).stdout)
+print("-Installing python dependencies:\n")
+print(subprocess.check_output(['pipenv', 'install']).decode('utf-8'))
 print("\n\n")
 
+#%%
+# Get the Python interpreter path
+result = subprocess.check_output('pipenv run python -c "import sys; print(sys.executable)"', shell=True)
+python_interpreter = result.decode('utf-8').strip()
 
+
+#%%
 print("- Adding utils folder to python environment:\n")
 os.chdir("lib/utils")
-result = subprocess.check_output('pipenv run python -c "import sys; print(sys.executable)"', shell=True)
-python_interpreter = result.decode().strip()
-print(subprocess.run([f"{python_interpreter}", 'add_package.py'],
+print(subprocess.run([python_interpreter, 'add_package.py'],
                      capture_output=True,
                      text=True).stdout)
 
