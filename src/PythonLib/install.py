@@ -26,7 +26,7 @@ python_interpreter = result.decode('utf-8').strip()
 
 #%%
 print("- Adding utils folder to python environment:\n")
-os.chdir("lib/utils")
+os.chdir("./lib/utils")
 print(subprocess.run([python_interpreter, 'add_package.py'],
                      capture_output=True,
                      text=True).stdout)
