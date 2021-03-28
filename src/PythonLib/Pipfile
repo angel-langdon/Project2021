@@ -7,6 +7,8 @@ name = "pypi"
 pandas = "*"
 ipykernel = "*"
 boto3 = "*"
+autopep8 = "*"
+isort = "*"
 
 [dev-packages]
 
