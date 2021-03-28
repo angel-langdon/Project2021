@@ -1,4 +1,0 @@
-{
-  "python.pythonPath": "./src/PythonLib/.venv/bin/python3",
-  "python.analysis.extraPaths": ["./src/PythonLib/lib/"]
-}
