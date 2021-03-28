@@ -1,8 +1,8 @@
-#%%
 import os
 import site
 
 def add_packages(paths_to_add:list)->None:
+    
     """ Adds a list of paths to the environment
 
     Adds a list of paths to the environment in order to be
@@ -21,10 +21,10 @@ def add_packages(paths_to_add:list)->None:
         f.writelines(paths_to_add)
     for path in paths_to_add:
         print("Adding path to environment: "+path)
-
-
-#%%
+        
+        
 PATHS_TO_ADD = [".."]
-
+        
 if __name__ == "__main__":
     add_packages(PATHS_TO_ADD)
+

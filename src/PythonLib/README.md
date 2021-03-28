@@ -11,6 +11,10 @@ Chose pip3 or pip depending on your system
 
 - pip3/pip install pipenv
 
+  1.1º If you just downloaded the repository execute:
+
+- python3/python install.py
+
 2º Install all necessary packages:
 
 - Open a terminal/CMD
