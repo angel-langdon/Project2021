@@ -1,6 +1,10 @@
 # Datasets
 *.csv
 *.txt
+*.xlsx
+*.xls
+*.xlsb
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
