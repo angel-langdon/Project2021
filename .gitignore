@@ -5,6 +5,11 @@
 *.xls
 *.xlsb
 *.json
+*.gz
+
+
+# R stuff
+.Rhistory
 
 # For secrets and tokens
 secrets.py
