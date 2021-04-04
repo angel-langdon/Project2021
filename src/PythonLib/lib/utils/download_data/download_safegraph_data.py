@@ -2,6 +2,8 @@
 import sys
 
 import boto3
+import numpy as np
+import pandas as pd
 from utils.secrets.secrets import (SAFEGRAPH_ACCESS_KEY_ID, SAFEGRAPH_BUCKET,
                                    SAFEGRAPH_ENDPOINT_URL,
                                    SAFEGRAPH_REGION_NAME,
@@ -82,9 +84,3 @@ def filter_files_by_date(files):
 
 
 res = filter_files_by_date(files)
-
-# %%
-
-res["2021-02"]
-
-# %%
