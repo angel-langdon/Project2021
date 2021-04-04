@@ -6,6 +6,8 @@
 *.xlsb
 *.json
 *.gz
+*.zip
+*.rar
 
 
 # R stuff
