@@ -1,8 +1,10 @@
-#%%
+# %%
 import os
+
 from utils.list_utils import list_utils
 
-def get_absolute_path(paths):
+
+def get_absolute_path(paths: list):
     """ Returns the absolute path of given paths
     Arguments:
         paths (str or list): A str or a list of paths
@@ -13,5 +15,11 @@ def get_absolute_path(paths):
     paths = list_utils.listify(paths)
     paths = [os.path.abspath(path) for path in paths]
     return list_utils.unlistify(paths)
+
+
+def create_dir_if_necessary(path: str):
+    dir_name: str = os.path.dirname(path)
+    if not os.path.isdir(dir_name):
+        os.makedirs(dir_name)
 
 # %%
