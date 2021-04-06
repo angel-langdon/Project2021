@@ -1,10 +1,9 @@
 # %%
 import os
-import sys
 
 import boto3
-import numpy as np
 import pandas as pd
+from utils.download_data import data_dtypes
 from utils.path_utils import path_utils, paths
 from utils.secrets.secrets import (SAFEGRAPH_ACCESS_KEY_ID, SAFEGRAPH_BUCKET,
                                    SAFEGRAPH_ENDPOINT_URL,
@@ -91,7 +90,8 @@ class SafeGraphSession():
 
         if verbose:
             print(f"Saving file in: {dest_path}")
-        self.client.download_file(self.bucket_name, bucket_path, dest_path)
+        if not os.path.isdir(dest_path):
+            self.client.download_file(self.bucket_name, bucket_path, dest_path)
 
 
 prefix = 'monthly-patterns-2020-12'
@@ -103,7 +103,35 @@ files = session.list_all_files()
 # files_filtered_by_month = session.filter_files_by_month()
 # for file in files_filtered_by_month["2021-02"]:
 #     session.download_file(file)
-# %%
 
 # %%
+location = "Los Angeles"
+datasets_location = os.path.join(location, paths.DATASETS)
+files_filter_by_month = session.filter_files_by_month()
+files = [os.path.join(paths.DATASETS, f)
+         for f in files_filter_by_month["2021-02"] if "patterns-part" in f]
+
+for file in files:
+
+    print(file)
+# %%
+% % time
+chunks = []
+for file in files:
+    for i, chunk in enumerate(pd.read_csv(file,
+                                          sep=",",
+                                          chunksize=10000,
+                                          engine='c',
+                                          low_memory=False)):
+        chunks.append(chunk[chunk["city"] == location].copy())
+        if i == 10:
+            break
+    break
+# %%
+df_los_angeles = pd.concat(chunks, axis=0)
+df_los_angeles = df_los_angeles.astype(data_dtypes.mobility_dtypes)
+# %%
+df_los_angeles.memory_usage(deep=True)/1024**2
+# %%
+data_dtypes.mobility_dtypes
 # %%
