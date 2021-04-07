@@ -1,9 +1,12 @@
 # %%
 import os
+from datetime import datetime
 
 import boto3
 import pandas as pd
+from utils.date_utils.date_formats import DATE_FORMATS
 from utils.download_data import data_dtypes
+from utils.file_utils import file_type, file_utils
 from utils.path_utils import path_utils, paths
 from utils.secrets.secrets import (SAFEGRAPH_ACCESS_KEY_ID, SAFEGRAPH_BUCKET,
                                    SAFEGRAPH_ENDPOINT_URL,
@@ -34,16 +37,19 @@ class SafeGraphSession():
         self.bucket = self.session.resource(self.service_name,
                                             endpoint_url=self.endpoint).Bucket(bucket_name)
 
-    def list_all_files(self):
+    def list_all_files(self, list_everything=False):
         if self.all_files:
             return self.all_files
         else:
-            files = [elm.key for elm in self.bucket.objects.all() if elm.key.startswith(self.prefix)
-                     and (elm.key.endswith('.csv') or elm.key.endswith('.csv.gz'))]
+            if list_everything:
+                files = [elm.key for elm in self.bucket.objects.all()]
+            else:
+                files = [elm.key for elm in self.bucket.objects.all() if elm.key.startswith(self.prefix)
+                         and (elm.key.endswith('.csv') or elm.key.endswith('.gz'))]
             self.all_files = files
             return files
 
-    def filter_files_by_month(self, files=None):
+    def filter_files_by_month(self, files=None, as_dataframe=False):
         if self.files_filtered_by_month:
             return self.files_filtered_by_month
 
@@ -74,8 +80,13 @@ class SafeGraphSession():
                     date_dict[date] = date_dict[date] + [f]
                 else:
                     date_dict[date] = [f]
-
-        self.files_filtered_by_month = date_dict
+        if as_dataframe:
+            rows = [{"date": datetime.strptime(key, "%Y-%m"),
+                     "files": value}
+                    for key, value in date_dict.items()]
+            self.files_filtered_by_month = pd.DataFrame(rows)
+        else:
+            self.files_filtered_by_month = date_dict
         return self.files_filtered_by_month
 
     def download_file(self, bucket_path: str, dest_path: str = None,
@@ -85,53 +96,66 @@ class SafeGraphSession():
             dest_path = bucket_path
         if append_datasets_path:
             dest_path = os.path.join(paths.DATASETS, dest_path)
+        if not os.path.isfile(dest_path):
+            path_utils.create_dir_if_necessary(dest_path)
 
-        path_utils.create_dir_if_necessary(dest_path)
+            if verbose:
+                print(f"Saving file in: {dest_path}")
+            if not os.path.isdir(dest_path):
+                self.client.download_file(self.bucket_name,
+                                          bucket_path, dest_path)
 
-        if verbose:
-            print(f"Saving file in: {dest_path}")
-        if not os.path.isdir(dest_path):
-            self.client.download_file(self.bucket_name, bucket_path, dest_path)
+
+def download_census_data():
+    prefix = 'open-census-data'
+    bucket = "sg-c19-response"
+    session = SafeGraphSession(prefix, bucket)
+    files = session.list_all_files()
+    session.download_file(files[0])
 
 
-prefix = 'monthly-patterns-2020-12'
-bucket = "sg-c19-response"
-session = SafeGraphSession(prefix, bucket)
-files = session.list_all_files()
-# %%
+def download_monthly_patterns_city_data(target_city: str,
+                                        date_start: datetime,
+                                        date_end: datetime = None,
+                                        save_dataframe=True):
+    if not date_end:
+        date_end = datetime.now()
+    prefix = 'monthly-patterns-2020-12'
+    bucket = "sg-c19-response"
+    session = SafeGraphSession(prefix, bucket)
+    df = session.filter_files_by_month(as_dataframe=True)
 
-# files_filtered_by_month = session.filter_files_by_month()
-# for file in files_filtered_by_month["2021-02"]:
-#     session.download_file(file)
-
-# %%
-location = "Los Angeles"
-datasets_location = os.path.join(location, paths.DATASETS)
-files_filter_by_month = session.filter_files_by_month()
-files = [os.path.join(paths.DATASETS, f)
-         for f in files_filter_by_month["2021-02"] if "patterns-part" in f]
-
-for file in files:
-
-    print(file)
-# %%
-% % time
-chunks = []
-for file in files:
-    for i, chunk in enumerate(pd.read_csv(file,
-                                          sep=",",
-                                          chunksize=10000,
-                                          engine='c',
-                                          low_memory=False)):
-        chunks.append(chunk[chunk["city"] == location].copy())
-        if i == 10:
+    df = df[(df["date"] >= date_start) & (df["date"] <= date_end)]
+    files = [f for f in df.explode("files")["files"]
+             if file_type.is_mobility_pattern(f)]
+    dfs = []
+    for file in files:
+        temp_file = os.path.join(paths.temp_datasets, file)
+        session.download_file(file, temp_file, verbose=True)
+        # read the file in chunks filter it and store in a list of dataframes
+        print("Reading: "+file)
+        for chunk in pd.read_csv(temp_file, encoding="utf-8", sep=",", chunksize=10000):
+            filtered = chunk[chunk["city"] == target_city].copy()
+            dfs.append(filtered)
             break
-    break
-# %%
-df_los_angeles = pd.concat(chunks, axis=0)
-df_los_angeles = df_los_angeles.astype(data_dtypes.mobility_dtypes)
-# %%
-df_los_angeles.memory_usage(deep=True)/1024**2
-# %%
-data_dtypes.mobility_dtypes
+        # once readed delete the file to free memmory
+        print("Deleting: "+file)
+        break
+        os.remove(temp_file)
+
+    df = pd.concat(dfs)
+    if save_dataframe:
+        file_name = "mobility-patterns-backfilled_{}_{}".format(
+            datetime.strftime(date_start, DATE_FORMATS.DAY),
+            datetime.strftime(date_end, DATE_FORMATS.DAY))
+        file_name = os.path.join(paths.processed_datasets, file_name)
+        path_utils.create_dir_if_necessary(file_name)
+        print("Saved processed file: "+file_name)
+        df.to_csv(file_name, encoding='utf-8')
+
+    return pd.concat(dfs)
+
+
+# download_monthly_patterns_city_data("Houston",
+#                                     datetime(year=2021, month=2, day=1))
 # %%
