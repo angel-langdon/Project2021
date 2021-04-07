@@ -19,7 +19,7 @@ def get_absolute_path(paths: list):
 
 def create_dir_if_necessary(path: str):
     dir_name: str = os.path.dirname(path)
-    if not os.path.isdir(dir_name):
+    if dir_name != '' and not os.path.isdir(dir_name):
         os.makedirs(dir_name)
 
 # %%
