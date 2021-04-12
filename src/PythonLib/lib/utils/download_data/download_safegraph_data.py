@@ -121,16 +121,20 @@ def download_monthly_patterns_city_data(target_city: str,
                                         date_end: datetime = None,
                                         remove_original_files_after_download: bool = True,
                                         verbose: bool = True):
+    def get_file_name(date_start, date_end, target_city):
+        file_name = "{}/mobility-patterns-backfilled_{}_{}.csv".format(
+            target_city,
+            datetime.strftime(date_start, DATE_FORMATS.DAY),
+            datetime.strftime(date_end, DATE_FORMATS.DAY))
+        file_name = os.path.join(paths.processed_datasets, file_name)
+        return file_name
 
     if not date_end:
         # if no date_end is passed it infers to have the most recent data
         date_end = datetime.now()
 
-    file_name = "{}/mobility-patterns-backfilled_{}_{}".format(
-        target_city,
-        datetime.strftime(date_start, DATE_FORMATS.DAY),
-        datetime.strftime(date_end, DATE_FORMATS.DAY))
-    file_name = os.path.join(paths.processed_datasets, file_name)
+    file_name = get_file_name(date_start, date_end, target_city)
+
     if os.path.isfile(file_name):
         if verbose:
             print("File already exists:", file_name)
@@ -165,7 +169,7 @@ def download_monthly_patterns_city_data(target_city: str,
     path_utils.create_dir_if_necessary(file_name)
     if verbose:
         print("Saving processed file: "+file_name)
-    df.to_csv(file_name, encoding='utf-8')
+    df.to_csv(file_name, encoding='utf-8', index=False)
 
     return df
 
@@ -173,4 +177,10 @@ def download_monthly_patterns_city_data(target_city: str,
 download_monthly_patterns_city_data("Houston",
                                     datetime(year=2021, month=2, day=1),
                                     remove_original_files_after_download=False)
+# %%
+path = "/Users/angel/Desktop/Project2021/src/datasets/processed/Houston/mobility-patterns-backfilled_2021-02-01_2021-04-12.csv"
+df = pd.read_csv(path)
+
+# %%
+df.head().to_excel("prueba.xlsx")
 # %%
