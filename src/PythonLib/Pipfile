@@ -9,6 +9,7 @@ ipykernel = "*"
 boto3 = "*"
 autopep8 = "*"
 isort = "*"
+openpyxl = "*"
 
 [dev-packages]
 

@@ -1,5 +1,6 @@
 # %%
 import os
+import traceback
 from datetime import datetime
 
 import boto3
@@ -121,6 +122,14 @@ def download_monthly_patterns_city_data(target_city: str,
                                         date_end: datetime = None,
                                         remove_original_files_after_download: bool = True,
                                         verbose: bool = True):
+    """
+    Downloads montly patterns data given a target city and a 
+    window of time
+
+    >>> download_monthly_patterns_city_data("Houston",
+                                            datetime(year=2021, month=3, day=1),
+                                            remove_original_files_after_download=False)
+    """
     def get_file_name(date_start, date_end, target_city):
         file_name = "{}/mobility-patterns-backfilled_{}_{}.csv".format(
             target_city,
@@ -134,6 +143,7 @@ def download_monthly_patterns_city_data(target_city: str,
         date_end = datetime.now()
 
     file_name = get_file_name(date_start, date_end, target_city)
+    # In case the file exists return it
 
     if os.path.isfile(file_name):
         if verbose:
@@ -148,39 +158,39 @@ def download_monthly_patterns_city_data(target_city: str,
     files = [f for f in df.explode("files")["files"]
              if file_type.is_mobility_pattern(f)]
     dfs = []
-    for file in files:
-        temp_file = os.path.join(paths.temp_datasets, file)
-        session.download_file(file, temp_file)
-        # read the file in chunks filter it and store in a list of dataframes
-        if verbose:
-            print("Reading: "+file)
-        for chunk in pd.read_csv(temp_file, encoding="utf-8", sep=",", chunksize=10000):
-            filtered = chunk[chunk["city"] == target_city].copy()
-            dfs.append(filtered)
-
-        # once readed delete the file to free memmory
-        if remove_original_files_after_download:
+    try:
+        for i, file in enumerate(files):
+            temp_file = os.path.join(paths.temp_datasets, file)
+            session.download_file(file, temp_file)
+            # read the file in chunks filter it and store in a list of dataframes
             if verbose:
-                print("Deleting downloaded file: "+file)
-            os.remove(temp_file)
+                print("Reading: "+file)
+            for chunk in pd.read_csv(temp_file, encoding="utf-8", sep=",", chunksize=10000):
+                filtered = chunk[chunk["city"] == target_city].copy()
+                dfs.append(filtered)
 
-    df = pd.concat(dfs)
+            # once readed delete the file to free memmory
+            if remove_original_files_after_download:
+                if verbose:
+                    print("Deleting downloaded file: "+file)
+                os.remove(temp_file)
 
-    path_utils.create_dir_if_necessary(file_name)
-    if verbose:
-        print("Saving processed file: "+file_name)
-    df.to_csv(file_name, encoding='utf-8', index=False)
+        df = pd.concat(dfs)
 
-    return df
+        path_utils.create_dir_if_necessary(file_name)
+        if verbose:
+            print("Saving processed file: "+file_name)
+        df.to_csv(file_name, encoding='utf-8', index=False)
+
+        return df
+    except:
+        # In case anything fails return the current filtered data
+        # the files and the current downloaded file
+        traceback.print_exc()
+        return dfs, files, i
 
 
-download_monthly_patterns_city_data("Houston",
-                                    datetime(year=2021, month=2, day=1),
-                                    remove_original_files_after_download=False)
-# %%
-path = "/Users/angel/Desktop/Project2021/src/datasets/processed/Houston/mobility-patterns-backfilled_2021-02-01_2021-04-12.csv"
-df = pd.read_csv(path)
-
-# %%
-df.head().to_excel("prueba.xlsx")
+# res = download_monthly_patterns_city_data("Houston",
+#                                          datetime(year=2020, month=1, day=1),
+#                                          remove_original_files_after_download=True)
 # %%
