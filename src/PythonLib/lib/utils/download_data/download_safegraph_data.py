@@ -117,7 +117,9 @@ def download_census_data():
 def download_monthly_patterns_city_data(target_city: str,
                                         date_start: datetime,
                                         date_end: datetime = None,
-                                        save_dataframe=True):
+                                        remove_original_files_after_download: bool = True,
+                                        verbose: bool = True):
+
     if not date_end:
         date_end = datetime.now()
     prefix = 'monthly-patterns-2020-12'
@@ -131,31 +133,35 @@ def download_monthly_patterns_city_data(target_city: str,
     dfs = []
     for file in files:
         temp_file = os.path.join(paths.temp_datasets, file)
-        session.download_file(file, temp_file, verbose=True)
+        session.download_file(file, temp_file, verbose=verbose)
         # read the file in chunks filter it and store in a list of dataframes
-        print("Reading: "+file)
+        if verbose:
+            print("Reading: "+file)
+        temp_file_path = ""
         for chunk in pd.read_csv(temp_file, encoding="utf-8", sep=",", chunksize=10000):
             filtered = chunk[chunk["city"] == target_city].copy()
             dfs.append(filtered)
-            break
         # once readed delete the file to free memmory
-        print("Deleting: "+file)
-        break
-        os.remove(temp_file)
+        if remove_original_files_after_download:
+            if verbose:
+                print("Deleting downloaded file: "+file)
+            os.remove(temp_file)
 
     df = pd.concat(dfs)
-    if save_dataframe:
-        file_name = "mobility-patterns-backfilled_{}_{}".format(
-            datetime.strftime(date_start, DATE_FORMATS.DAY),
-            datetime.strftime(date_end, DATE_FORMATS.DAY))
-        file_name = os.path.join(paths.processed_datasets, file_name)
-        path_utils.create_dir_if_necessary(file_name)
-        print("Saved processed file: "+file_name)
-        df.to_csv(file_name, encoding='utf-8')
+    file_name = "mobility-patterns-backfilled_{}_{}".format(
+        datetime.strftime(date_start, DATE_FORMATS.DAY),
+        datetime.strftime(date_end, DATE_FORMATS.DAY))
+    file_name = os.path.join(paths.processed_datasets, file_name)
+    path_utils.create_dir_if_necessary(file_name)
+    if verbose:
+        print("Saving processed file: "+file_name)
+    df.to_csv(file_name, encoding='utf-8')
 
-    return pd.concat(dfs)
+    if return_readed_files:
+        return df, readed_files
+    return df
 
 
-# download_monthly_patterns_city_data("Houston",
-#                                     datetime(year=2021, month=2, day=1))
+download_monthly_patterns_city_data("Houston",
+                                    datetime(year=2021, month=2, day=1))
 # %%
