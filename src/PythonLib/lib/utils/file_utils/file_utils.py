@@ -1,4 +1,3 @@
-import os
 from typing import Iterable
 
 from utils.path_utils import path_utils
