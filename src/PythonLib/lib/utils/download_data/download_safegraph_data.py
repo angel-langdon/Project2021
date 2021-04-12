@@ -17,7 +17,7 @@ from utils.secrets.secrets import (SAFEGRAPH_ACCESS_KEY_ID, SAFEGRAPH_BUCKET,
 
 # %%
 class SafeGraphSession():
-    def __init__(self, prefix, bucket_name):
+    def __init__(self, prefix, bucket_name, verbose=True):
         self.access_key_id = SAFEGRAPH_ACCESS_KEY_ID
         self.secret_access_key = SAFEGRAPH_SECRET_ACCESS_KEY
         self.service_name = SAFEGRAPH_SERVICE_NAME
@@ -25,6 +25,7 @@ class SafeGraphSession():
         self.endpoint = SAFEGRAPH_ENDPOINT_URL
         self.region_name = SAFEGRAPH_REGION_NAME
         self.prefix = prefix
+        self.verbose = True
         self.all_files = None
         self.files_filtered_by_month = None
 
@@ -90,8 +91,7 @@ class SafeGraphSession():
         return self.files_filtered_by_month
 
     def download_file(self, bucket_path: str, dest_path: str = None,
-                      append_datasets_path: bool = True,
-                      verbose: bool = False):
+                      append_datasets_path: bool = True):
         if not dest_path:
             dest_path = bucket_path
         if append_datasets_path:
@@ -99,11 +99,13 @@ class SafeGraphSession():
         if not os.path.isfile(dest_path):
             path_utils.create_dir_if_necessary(dest_path)
 
-            if verbose:
+            if self.verbose:
                 print(f"Saving file in: {dest_path}")
-            if not os.path.isdir(dest_path):
-                self.client.download_file(self.bucket_name,
-                                          bucket_path, dest_path)
+            self.client.download_file(self.bucket_name,
+                                      bucket_path, dest_path)
+        else:
+            if self.verbose:
+                print("File already exists:", dest_path)
 
 
 def download_census_data():
@@ -121,7 +123,18 @@ def download_monthly_patterns_city_data(target_city: str,
                                         verbose: bool = True):
 
     if not date_end:
+        # if no date_end is passed it infers to have the most recent data
         date_end = datetime.now()
+
+    file_name = "{}/mobility-patterns-backfilled_{}_{}".format(
+        target_city,
+        datetime.strftime(date_start, DATE_FORMATS.DAY),
+        datetime.strftime(date_end, DATE_FORMATS.DAY))
+    file_name = os.path.join(paths.processed_datasets, file_name)
+    if os.path.isfile(file_name):
+        if verbose:
+            print("File already exists:", file_name)
+        return pd.read_csv(file_name, encoding="utf8")
     prefix = 'monthly-patterns-2020-12'
     bucket = "sg-c19-response"
     session = SafeGraphSession(prefix, bucket)
@@ -133,14 +146,14 @@ def download_monthly_patterns_city_data(target_city: str,
     dfs = []
     for file in files:
         temp_file = os.path.join(paths.temp_datasets, file)
-        session.download_file(file, temp_file, verbose=verbose)
+        session.download_file(file, temp_file)
         # read the file in chunks filter it and store in a list of dataframes
         if verbose:
             print("Reading: "+file)
-        temp_file_path = ""
         for chunk in pd.read_csv(temp_file, encoding="utf-8", sep=",", chunksize=10000):
             filtered = chunk[chunk["city"] == target_city].copy()
             dfs.append(filtered)
+
         # once readed delete the file to free memmory
         if remove_original_files_after_download:
             if verbose:
@@ -148,20 +161,16 @@ def download_monthly_patterns_city_data(target_city: str,
             os.remove(temp_file)
 
     df = pd.concat(dfs)
-    file_name = "mobility-patterns-backfilled_{}_{}".format(
-        datetime.strftime(date_start, DATE_FORMATS.DAY),
-        datetime.strftime(date_end, DATE_FORMATS.DAY))
-    file_name = os.path.join(paths.processed_datasets, file_name)
+
     path_utils.create_dir_if_necessary(file_name)
     if verbose:
         print("Saving processed file: "+file_name)
     df.to_csv(file_name, encoding='utf-8')
 
-    if return_readed_files:
-        return df, readed_files
     return df
 
 
 download_monthly_patterns_city_data("Houston",
-                                    datetime(year=2021, month=2, day=1))
+                                    datetime(year=2021, month=2, day=1),
+                                    remove_original_files_after_download=False)
 # %%
