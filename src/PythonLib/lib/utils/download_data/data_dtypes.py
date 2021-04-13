@@ -10,7 +10,5 @@ mobility_dtypes = {"placekey": "object",
                    "postal_code": "int32",
                    "safegraph_brand_ids": "object",
                    "brands": "category",
-                   "date_range_start": "object",
-                   "date_range_end": "object",
-                   "raw_visit_counts": "int64",
-                   "raw_visitor_counts": "int64"}
+                   "date_range_start": "category",
+                   "date_range_end": "category"}
