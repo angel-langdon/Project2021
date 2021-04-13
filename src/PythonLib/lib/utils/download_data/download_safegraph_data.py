@@ -184,13 +184,13 @@ def download_monthly_patterns_city_data(target_city: str,
 
         return df
     except:
+        # Print the exception
+        traceback.print_exc()
         # In case anything fails return the current filtered data
         # the files and the current downloaded file
-        traceback.print_exc()
         return dfs, files, i
 
 
 # res = download_monthly_patterns_city_data("Houston",
 #                                          datetime(year=2020, month=1, day=1),
 #                                          remove_original_files_after_download=True)
-# %%
