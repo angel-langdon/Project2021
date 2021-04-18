@@ -9,6 +9,7 @@ mobility_dtypes = {"placekey": "object",
                    "region": "category",
                    "postal_code": "int32",
                    "safegraph_brand_ids": "object",
+                   "poi_cbg": "category",
                    "brands": "category",
                    "date_range_start": "category",
                    "date_range_end": "category"}
