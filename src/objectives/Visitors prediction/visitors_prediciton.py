@@ -4,6 +4,7 @@ import os
 
 import pandas as pd
 from utils.download_data import data_dtypes as dtypes
+from utils.download_data import datasets
 from utils.path_utils import paths
 
 houston_folder = os.path.join(paths.processed_datasets,
@@ -16,6 +17,9 @@ houston_dataset_path = os.path.join(houston_folder,
 subway_path = os.path.join(houston_folder, "subway.csv")
 subway = pd.read_csv(subway_path, encoding="utf-8",
                      dtype=dtypes.mobility_dtypes)
+brand_info = datasets.get_brand_info_dataset()
+core_poi = datasets.get_core_poi_by_city("Houston", "TX")
+core_poi
 
 # %%
 
@@ -41,10 +45,12 @@ def explode_visits(visits_by_day):
 
 def mapping_visits_days(row, subway_by_days=subway_by_days):
     for (date, day), visit in zip(generate_days(row["date_range_start"], row["visits_by_day"]), explode_visits(row["visits_by_day"])):
-        subway_by_days = subway_by_days.append({'placekey': row['placekey'], 'safegraph_place_id': row['safegraph_place_id'], 'latitude': row['latitude'],
-                                                'longitude': row['longitude'], 'street_address': row['street_address'], 'postal_code': row['postal_code'],
-                                                'poi_cbg': row['poi_cbg'], 'naics_code': row['naics_code'], 'date': date, 'year': date[0:4], 'month': date[5:7],
-                                                'day': day, 'visits': visit}, ignore_index=True)
+        values_to_add = {'placekey': row['placekey'], 'safegraph_place_id': row['safegraph_place_id'], 'latitude': row['latitude'],
+                         'longitude': row['longitude'], 'street_address': row['street_address'], 'postal_code': row['postal_code'],
+                         'poi_cbg': row['poi_cbg'], 'naics_code': row['naics_code'], 'date': date, 'year': date[0:4], 'month': date[5:7],
+                         'day': day, 'visits': visit}
+        row_to_add = pd.Series(values_to_add)
+        subway_by_days = subway_by_days.append(row_to_add, ignore_index=True)
 
 
 # %%
@@ -64,7 +70,8 @@ subway_clean.apply(mapping_visits_days, axis=1)
 
 # %%
 
-subway_by_days.append({'placekey': row['placekey'], 'safegraph_place_id': row['safegraph_place_id'], 'latitude': row['latitude'],
-                       'longitude': row['longitude'], 'street_address': row['street_address'], 'postal_code': row['postal_code'],
-                       'poi_cbg': row['poi_cbg'], 'naics_code': row['naics_code'], 'date': date, 'year': date[0:4], 'month': date[5:7],
-                       'day': day, 'visits': visit}, ignore_index=True)
+subway_by_days = subway_by_days.append({'placekey': subway['placekey'][0], 'safegraph_place_id': subway['safegraph_place_id'][0], 'latitude': subway['latitude'][0],
+                                        'longitude': subway['longitude'][0], 'street_address': subway['street_address'][0], 'postal_code': subway['postal_code'][0],
+                                        'poi_cbg': subway['poi_cbg'][0], 'naics_code': subway['naics_code'][0], 'date': '12-23-23', 'year': 12, 'month': '02',
+                                        'day': 1, 'visits': 2}, ignore_index=True)
+subway_by_days
