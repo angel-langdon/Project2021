@@ -29,6 +29,7 @@ class SafeGraphSession():
         self.verbose = True
         self.all_files = None
         self.files_filtered_by_month = None
+        self.files_filtered_by_hour = None
 
         self.session = boto3.Session(
             aws_access_key_id=self.access_key_id,
@@ -52,9 +53,15 @@ class SafeGraphSession():
             return files
 
     def filter_files_by_month(self, files=None, as_dataframe=False):
+        def to_dataframe(date_dict):
+            rows = [{"date": datetime.strptime(key, "%Y-%m"),
+                     "files": value}
+                    for key, value in date_dict.items()]
+            return pd.DataFrame(rows)
+
         if self.files_filtered_by_month:
-            if as_dataframe:
-                return pd.DataFrame(self.files_filtered_by_month)
+            if as_dataframe and not isinstance(self.files_filtered_by_month, pd.DataFrame):
+                return to_dataframe(self.files_filtered_by_month)
             return self.files_filtered_by_month
 
         if not files:
@@ -84,14 +91,27 @@ class SafeGraphSession():
                     date_dict[date] = date_dict[date] + [f]
                 else:
                     date_dict[date] = [f]
+
+        self.files_filtered_by_month = date_dict
         if as_dataframe:
-            rows = [{"date": datetime.strptime(key, "%Y-%m"),
-                     "files": value}
-                    for key, value in date_dict.items()]
-            self.files_filtered_by_month = pd.DataFrame(rows)
-        else:
-            self.files_filtered_by_month = date_dict
+            return to_dataframe(date_dict)
         return self.files_filtered_by_month
+
+    def filter_files_by_hour(self):
+        if not self.all_files:
+            self.list_all_files()
+        date_format = "%Y/%m/%d/%H"
+        if self.files_filtered_by_hour:
+            return self.files_filtered_by_hour
+        rows = []
+        for file in self.all_files:
+            date_str = "/".join(file.split("/")[2:6])
+            date = datetime.strptime(date_str, date_format)
+            f_type = file_type.get_file_type(file)
+            row = {"date": date, "file": file, "type": f_type}
+            rows.append(row)
+        self.files_filtered_by_hour = pd.DataFrame(rows)
+        return self.files_filtered_by_hour
 
     def download_file(self, bucket_path: str, dest_path: str = None,
                       append_datasets_path: bool = True):
@@ -196,21 +216,26 @@ def download_monthly_patterns_city_data(target_city: str,
 # res = download_monthly_patterns_city_data("Houston",
 #                                          datetime(year=2020, month=1, day=1),
 #                                          remove_original_files_after_download=True)
+def download_core_poi():
+    prefix = 'core-places-delivery'
+    bucket = "sg-c19-response"
+    session = SafeGraphSession(prefix, bucket)
+    df_files = session.filter_files_by_hour()
+    recent_files_to_download = []
+    for _, group in df_files.groupby(by="type"):
+        group = group.sort_values(by="date")
+        most_recent_date = group["date"].iloc[-1]
+        group = group[group["date"] == most_recent_date]
+        recent_files_to_download.extend(group["file"])
+    for file in recent_files_to_download:
+        session.download_file(file)
+
+
+#files = download_core_poi()
+# %%
+# %%
+
 
 # %%
-prefix = 'core-places-delivery'
-bucket = "sg-c19-response"
-session = SafeGraphSession(prefix, bucket)
 
-# %%
-session.list_all_files()
-# %%
-df = session.filter_files_by_month(as_dataframe=True)
-
-
-df
-# %%
-df.sort_values("date")
-
-# %%
 # %%
