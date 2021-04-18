@@ -53,6 +53,8 @@ class SafeGraphSession():
 
     def filter_files_by_month(self, files=None, as_dataframe=False):
         if self.files_filtered_by_month:
+            if as_dataframe:
+                return pd.DataFrame(self.files_filtered_by_month)
             return self.files_filtered_by_month
 
         if not files:
@@ -194,3 +196,21 @@ def download_monthly_patterns_city_data(target_city: str,
 # res = download_monthly_patterns_city_data("Houston",
 #                                          datetime(year=2020, month=1, day=1),
 #                                          remove_original_files_after_download=True)
+
+# %%
+prefix = 'core-places-delivery'
+bucket = "sg-c19-response"
+session = SafeGraphSession(prefix, bucket)
+
+# %%
+session.list_all_files()
+# %%
+df = session.filter_files_by_month(as_dataframe=True)
+
+
+df
+# %%
+df.sort_values("date")
+
+# %%
+# %%
