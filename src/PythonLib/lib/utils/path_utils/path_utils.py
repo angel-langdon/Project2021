@@ -23,3 +23,13 @@ def create_dir_if_necessary(path: str):
         os.makedirs(dir_name)
 
 # %%
+
+
+def list_files_recursively(path):
+    fs = []
+    for root, _, files in os.walk(path):
+        for f in files:
+            if f != ".DS_Store":
+                f = os.path.join(root, f)
+                fs.append(f)
+    return fs

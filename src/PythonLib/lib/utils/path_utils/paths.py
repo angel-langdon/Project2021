@@ -25,5 +25,11 @@ def get_datasets_path(dir: str = ".", recursion_level: int = 0) -> str:
 DATASETS = get_datasets_path()
 temp_datasets = os.path.join(DATASETS, temp_folder_name)
 processed_datasets = os.path.join(DATASETS, processed_folder_name)
+core_places_delivery = os.path.join(DATASETS, "core-places-delivery")
+core_poi = os.path.join(core_places_delivery,
+                        "core_poi")
+brand_info = os.path.join(core_places_delivery,
+                          "brand_info")
+
 
 # %%
