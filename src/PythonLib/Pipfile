@@ -10,6 +10,7 @@ boto3 = "*"
 autopep8 = "*"
 isort = "*"
 openpyxl = "*"
+pandas-profiling = "*"
 
 [dev-packages]
 
