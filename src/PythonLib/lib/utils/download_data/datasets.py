@@ -35,6 +35,4 @@ def get_core_poi_by_city(city, region=None, save_data=True):
 
 #get_core_poi_by_city("Houston", "TX")
 
-
-# %%
 # %%
