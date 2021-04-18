@@ -11,6 +11,7 @@ autopep8 = "*"
 isort = "*"
 openpyxl = "*"
 pandas-profiling = "*"
+plotly = "*"
 
 [dev-packages]
 

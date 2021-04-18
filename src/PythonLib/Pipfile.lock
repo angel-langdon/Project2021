@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "d49cc1bd77c9061d1e69b20cea01a92af71ddb8d29721f35380ee30de098ed74"
+            "sha256": "746156b5c111fa1813eebdb1f5415e8356d17b8f91e73ef5c8bca325a4a4bb36"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -667,6 +667,14 @@
             ],
             "version": "==8.2.0"
         },
+        "plotly": {
+            "hashes": [
+                "sha256:7d8aaeed392e82fb8e0e48899f2d3d957b12327f9d38cdd5802bc574a8a39d91",
+                "sha256:d68fc15fcb49f88db27ab3e0c87110943e65fee02a47f33a8590f541b3042461"
+            ],
+            "index": "pypi",
+            "version": "==4.14.3"
+        },
         "prometheus-client": {
             "hashes": [
                 "sha256:030e4f9df5f53db2292eec37c6255957eb76168c6f974e4176c711cf91ed34aa",
@@ -861,6 +869,12 @@
             ],
             "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'",
             "version": "==2.25.1"
+        },
+        "retrying": {
+            "hashes": [
+                "sha256:08c039560a6da2fe4f2c426d0766e284d3b736e355f8dd24b37367b0bb41973b"
+            ],
+            "version": "==1.3.3"
         },
         "s3transfer": {
             "hashes": [
