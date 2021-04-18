@@ -22,8 +22,6 @@ def create_dir_if_necessary(path: str):
     if dir_name != '' and not os.path.isdir(dir_name):
         os.makedirs(dir_name)
 
-# %%
-
 
 def list_files_recursively(path):
     fs = []
