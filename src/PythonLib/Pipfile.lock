@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "746156b5c111fa1813eebdb1f5415e8356d17b8f91e73ef5c8bca325a4a4bb36"
+            "sha256": "3abcb7675361429bddde9a253da450b3ffa211e4eea120ea7662a5aa472d2451"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -167,6 +167,14 @@
             "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3' and python_version < '4'",
             "version": "==1.4.0"
         },
+        "convertdate": {
+            "hashes": [
+                "sha256:57df962a6047534f1452c390ad48e3dc5c83052ad83ad6dd78d60ae22f99214c",
+                "sha256:8f5e9efc2b71410d33217012c0a215f83463f765c94d5883bf656ce7a962b888"
+            ],
+            "markers": "python_version >= '3.5'",
+            "version": "==2.3.2"
+        },
         "cycler": {
             "hashes": [
                 "sha256:1d8a5ae1ff6c5cf9b93e8811e581232ad8920aeec647c37316ceac982b08cb2d",
@@ -203,6 +211,22 @@
                 "sha256:614d9722d572f6246302c4491846d2c393c199cfa4edc9af593437691683335b"
             ],
             "version": "==1.0.1"
+        },
+        "hijri-converter": {
+            "hashes": [
+                "sha256:7e121c2bda9d2ff022cd5aa9bf66c34efc4032f3f777b485b17541fe4c09b26d",
+                "sha256:969e9b1e844c854b752243f697b14884c5d9112195889d3d8aa07d61af37fb21"
+            ],
+            "markers": "python_version >= '3.6'",
+            "version": "==2.1.1"
+        },
+        "holidays": {
+            "hashes": [
+                "sha256:7fafd846f67f0eb7e1f9c19c38f4a7967bf07aed5ded2dd7a8aa2f937b0ea01b",
+                "sha256:c9cfb97088a588c2f0ec44a00aa5e2dcfe75ecee546d44b4157ef5fb0b9c0901"
+            ],
+            "index": "pypi",
+            "version": "==0.11.1"
         },
         "htmlmin": {
             "hashes": [
@@ -371,6 +395,13 @@
             ],
             "markers": "python_version >= '3.6'",
             "version": "==1.3.1"
+        },
+        "korean-lunar-calendar": {
+            "hashes": [
+                "sha256:12ce54b1392ed45a82dc6cea85ee5f7e33630556e82488f57e37a22482c8275d",
+                "sha256:a619ea88610129019267467b85cc9faf0fab6e1694b2e782d1aeb610cdd382d5"
+            ],
+            "version": "==0.2.1"
         },
         "markupsafe": {
             "hashes": [
@@ -722,6 +753,12 @@
             ],
             "markers": "python_version >= '3.5'",
             "version": "==2.8.1"
+        },
+        "pymeeus": {
+            "hashes": [
+                "sha256:bb9d670818d8b0594317b48a7dadea02a0594e5344263bf2054e1a011c8fed55"
+            ],
+            "version": "==0.5.11"
         },
         "pyparsing": {
             "hashes": [

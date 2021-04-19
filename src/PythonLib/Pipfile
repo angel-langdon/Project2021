@@ -12,6 +12,7 @@ isort = "*"
 openpyxl = "*"
 pandas-profiling = "*"
 plotly = "*"
+holidays = "*"
 
 [dev-packages]
 
