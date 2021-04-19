@@ -31,5 +31,7 @@ core_poi = os.path.join(core_places_delivery,
 brand_info = os.path.join(core_places_delivery,
                           "brand_info")
 
-
+open_census_dir = os.path.join(DATASETS,
+                               "open-census-data",
+                               "safegraph_open_census_data")
 # %%
