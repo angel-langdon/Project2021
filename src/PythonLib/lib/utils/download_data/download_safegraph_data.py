@@ -6,7 +6,7 @@ from datetime import datetime
 import boto3
 import pandas as pd
 from utils.date_utils.date_formats import DATE_FORMATS
-from utils.download_data import data_dtypes
+from utils.download_data import data_dtypes as dtypes
 from utils.file_utils import file_type, file_utils
 from utils.path_utils import path_utils, paths
 from utils.secrets.secrets import (SAFEGRAPH_ACCESS_KEY_ID, SAFEGRAPH_BUCKET,
@@ -143,7 +143,8 @@ def download_monthly_patterns_city_data(target_city: str,
                                         date_start: datetime,
                                         date_end: datetime = None,
                                         remove_original_files_after_download: bool = True,
-                                        verbose: bool = True):
+                                        verbose: bool = True,
+                                        target_region=None):
     """
     Downloads montly patterns data given a target city and a 
     window of time
@@ -187,8 +188,16 @@ def download_monthly_patterns_city_data(target_city: str,
             # read the file in chunks filter it and store in a list of dataframes
             if verbose:
                 print("Reading: "+file)
-            for chunk in pd.read_csv(temp_file, encoding="utf-8", sep=",", chunksize=10000):
-                filtered = chunk[chunk["city"] == target_city].copy()
+            for chunk in pd.read_csv(temp_file,
+                                     encoding="utf-8",
+                                     sep=",",
+                                     chunksize=10000,
+                                     dtype=dtypes.mobility_dtypes):
+                if target_region:
+                    filtered = chunk[(chunk["city"] == target_city) &
+                                     (chunk["region"] == target_region)].copy()
+                else:
+                    filtered = chunk[chunk["city"] == target_city]
                 dfs.append(filtered)
 
             # once readed delete the file to free memmory
