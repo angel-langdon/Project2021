@@ -10,10 +10,18 @@ def is_core_poi(file):
     return "core_poi" in file
 
 
+def is_census_data(file):
+    return any(t in file for t in ["cbg_b", "cbg_c"])
+
+
+def is_census_metadata(file):
+    return all(t in file for t in ["metadata", "cbg"])
+
+
 def get_file_type(file):
     if is_brand_info(file):
         return "brand_info"
     if is_core_poi(file):
         return "core_poi"
     if is_mobility_pattern(file):
-        return "mobility_patter"
+        return "mobility_pattern"
