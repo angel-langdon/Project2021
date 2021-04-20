@@ -11,30 +11,33 @@ from utils.download_data import datasets
 from utils.path_utils import paths
 
 
-def normalize_vists_by_day(df):
+def normalize_vists_by_day(df_old):
     def get_dictionary_list_visits_day(visits_list):
         return [{"visits": visits, "day": day + 1}
                 for day, visits in enumerate(visits_list)]
+    def dic_to_visits(row):
+        return row['visits_by_day']['visits'] 
 
-    df = df.copy()
+    def dic_to_days(row):
+        return row['visits_by_day']['day']
+    
+    def new_date(row):
+        date = ''+str(row['year']) +'-'+  str(row['month']) +'-'+ str(row['day']) 
+        date = datetime.strptime(date, "%Y-%m-%d")
+        return date
+
+    df = df_old.copy()
     df["visits_by_day"] = df["visits_by_day"].apply(json.loads)
     df["date"] = pd.to_datetime([d.split("T")[0] for d in df["date_range_start"]],
-                                format=DATE_FORMATS.DAY)
+                                format="%Y-%m-%d")
     df["month"] = df["date"].dt.month
     df["year"] = df["date"].dt.year
-    df["visits_by_day"] = [get_dictionary_list_visits_day(
-        l) for l in df["visits_by_day"]]
-    df = df.explode("visits_by_day")
-    info = pd.json_normalize(df["visits_by_day"])
-    for c in info.columns:
-        df[c] = info[c]
-    df["date"] = [f"{y}-{m:02}-{d:02}" for y, m, d in zip(df["year"],
-                                                          df["month"],
-                                                          df["day"])]
-    df["date"] = pd.to_datetime(df["date"],
-                                format=DATE_FORMATS.DAY)
+    df["visits_by_day"] = [get_dictionary_list_visits_day(l) for l in df["visits_by_day"]]
+    df = df.explode('visits_by_day', ignore_index=True)
+    df['visits']= df.apply(dic_to_visits, axis=1)
+    df['day'] = df.apply(dic_to_days, axis=1)
+    df['date'] = df.apply(new_date, axis=1)
     return df
-
 
 def filter_selected_cols(df):
     df = df.copy()
