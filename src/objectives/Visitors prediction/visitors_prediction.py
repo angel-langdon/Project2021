@@ -28,18 +28,16 @@ core_poi = datasets.get_core_poi_by_city("Houston", "TX")
 rain = pd.read_csv(rain_path)
 df_normalized = pd.read_csv(subway_normalized, dtype=dtypes.mobility_dtypes)
 # %%
-% % time
 
 
-def normalize_vists_by_day(df: pd.DataFrame):
-    def get_dictionary_list_visits_day(visits_list):
+def normalize_vists_by_day(df_old):
+   def get_dictionary_list_visits_day(visits_list):
         return [{"visits": visits, "day": day + 1}
                 for day, visits in enumerate(visits_list)]
-
-    df = df.copy()
+    df = df_old.copy()
     df["visits_by_day"] = df["visits_by_day"].apply(json.loads)
     df["date"] = pd.to_datetime([d.split("T")[0] for d in df["date_range_start"]],
-                                format=DATE_FORMATS.DAY)
+                                format="%Y-%m-%d")
     df["month"] = df["date"].dt.month
     df["year"] = df["date"].dt.year
     df["visits_by_day"] = [get_dictionary_list_visits_day(l)
