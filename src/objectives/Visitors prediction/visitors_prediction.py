@@ -30,7 +30,7 @@ rain = pd.read_csv(rain_path)
 
 
 def normalize_vists_by_day(df_old):
-   def get_dictionary_list_visits_day(visits_list):
+    def get_dictionary_list_visits_day(visits_list):
         return [{"visits": visits, "day": day + 1}
                 for day, visits in enumerate(visits_list)]
     df = df_old.copy()
