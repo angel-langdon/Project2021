@@ -32,8 +32,8 @@ df_normalized = pd.read_csv(subway_normalized, dtype=dtypes.mobility_dtypes)
 
 def normalize_vists_by_day(df_old):
    def get_dictionary_list_visits_day(visits_list):
-        return [{"visits": visits, "day": day + 1}
-                for day, visits in enumerate(visits_list)]
+        return [{"visits": visits, "day": day + 1} for day, visits in enumerate(visits_list)]
+        
     df = df_old.copy()
     df["visits_by_day"] = df["visits_by_day"].apply(json.loads)
     df["date"] = pd.to_datetime([d.split("T")[0] for d in df["date_range_start"]],
