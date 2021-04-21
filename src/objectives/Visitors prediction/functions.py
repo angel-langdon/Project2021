@@ -48,6 +48,7 @@ def last_day(df):
 
         if i == 0:
             old = new
+            i += 1
         else:
             old = pd.concat([old, new])
     return old
@@ -75,6 +76,7 @@ def last_week(df):
 
         if i == 0:
             old = new
+            i += 1
         else:
             old = pd.concat([old, new])
     return old
