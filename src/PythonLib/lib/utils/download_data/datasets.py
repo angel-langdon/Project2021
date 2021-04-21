@@ -37,16 +37,16 @@ def get_core_poi_by_city(city, region=None, save_data=True):
 
 
 # %%
-files = [f for f in path_utils.list_files_recursively(paths.open_census_dir)
-         if file_type.is_census_data(f)]
-houston_folder = os.path.join(paths.processed_datasets, "Houston")
-subway_normalized = os.path.join(houston_folder, "subway_normalized.csv")
-df_normalized = pd.read_csv(subway_normalized, dtype=dtypes.mobility_dtypes)
+# files = [f for f in path_utils.list_files_recursively(paths.open_census_dir)
+#         if file_type.is_census_data(f)]
+#houston_folder = os.path.join(paths.processed_datasets, "Houston")
+#subway_normalized = os.path.join(houston_folder, "subway_normalized.csv")
+#df_normalized = pd.read_csv(subway_normalized, dtype=dtypes.mobility_dtypes)
 # %%
-file = files[0]
-census = pd.read_csv(file, dtype=dtypes.census_dtypes)
+#file = files[0]
+#census = pd.read_csv(file, dtype=dtypes.census_dtypes)
 # %%
-census[census["census_block_group"].isin(df_normalized["poi_cbg"])]
+# census[census["census_block_group"].isin(df_normalized["poi_cbg"])]
 # %%
 
 
