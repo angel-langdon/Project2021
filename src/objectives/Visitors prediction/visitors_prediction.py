@@ -26,7 +26,6 @@ df_orginal = pd.read_csv(subway_path, encoding="utf-8",
 brand_info = datasets.get_brand_info_dataset()
 core_poi = datasets.get_core_poi_by_city("Houston", "TX")
 rain = pd.read_csv(rain_path)
-df_normalized = pd.read_csv(subway_normalized, dtype=dtypes.mobility_dtypes)
 # %%
 
 
