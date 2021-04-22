@@ -111,6 +111,8 @@ def population(df):
 
 
 """
+EXECUTION MODE
+
 subway = pd.read_csv('Subway_Houston_days.csv', encoding="utf-8") #Needed to filter by state TX.
 subway = is_weekend(subway)
 subway = is_holiday(subway)
