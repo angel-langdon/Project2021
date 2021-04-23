@@ -7,7 +7,6 @@ import holidays
 import pandas as pd
 from utils.date_utils.date_formats import DATE_FORMATS
 from utils.download_data import data_dtypes as dtypes
-from utils.download_data import datasets
 from utils.path_utils import paths
 
 houston_folder = os.path.join(paths.processed_datasets,
@@ -113,12 +112,21 @@ def add_last_visits(df: pd.DataFrame):
     return df
 
 
+def add_week_columns(df):
+    df = df.copy()
+    df['date'] = pd.to_datetime(df['date'])
+    df["week_day"] = df["date"].dt.day_name()
+    df['is_weekend'] = 0
+    weekends_day = ["Saturday", "Sunday"]
+    for day in weekends_day:
+        df.loc[df['week_day'] == day, 'is_weekend'] = 1
+    return df
+
+
 df = explode_vists_by_day(df_original)
 df = filter_selected_cols(df)
 df = add_last_visits(df)
-df
-# %%
-
+df = add_week_columns(df)
 
 # %%
 rain['date'] = pd.to_datetime(rain["date"], format=DATE_FORMATS.DAY)
@@ -127,3 +135,24 @@ df = df.merge(rain, on='date', how='left')
 # %%
 holi = holidays.CountryHoliday('US', prov="Houston", state='TX')
 df["is_holiday"] = [1 if d in holi else 0 for d in df["date"]]
+
+# %%
+for c in df.columns:
+    print(c)
+
+
+# %%
+
+def get_model_prepared_data(patterns_data: pd.DataFrame):
+    df = patterns_data.copy()
+    exclude_cols = ["placekey", "brands", "naics_code",
+                    "latitude", "longitude"]
+    df = df.drop(columns=exclude_cols)
+    visit_cols = [c for c in df.columns if "visits" in c]
+    df = df.dropna()
+    for col in visit_cols:
+        df[col] = df[col].astype("int32")
+    return df
+
+
+d = get_model_prepared_data(df)
