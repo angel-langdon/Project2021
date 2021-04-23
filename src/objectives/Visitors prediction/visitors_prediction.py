@@ -311,4 +311,11 @@ print(clf.score(X_test, y_test, sample_weight=None))
 df['placekey']
 # %%
 
+df = df[(df['date'] > '2020-03-15')]
+
+placekeys_series = df['placekey'].value_counts()
+placekeys_series = placekeys_series < 200
+placekeys_series
+
+
 
