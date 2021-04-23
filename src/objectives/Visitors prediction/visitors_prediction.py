@@ -19,9 +19,26 @@ subway_path = os.path.join(houston_folder, "subway.csv")
 rain_path = os.path.join(paths.processed_datasets,
                          "Houston",
                          "rain_houston.csv")
+
+
+def drop_duplicate_stores(patterns: pd.DataFrame):
+    """ Drops duplicated rows of patterns data
+    """
+
+    df = patterns.copy()
+    df = df.sort_values(by=["placekey",
+                            "date_range_start"])
+    df = df.drop_duplicates(subset=["placekey",
+                                    "date_range_start",
+                                    "date_range_end"],
+                            keep="last")
+    return df
+
+
 # %%
 df_orginal = pd.read_csv(subway_path, encoding="utf-8",
                          dtype=dtypes.mobility_dtypes)
+df_orginal = drop_duplicate_stores(df_orginal)
 brand_info = datasets.get_brand_info_dataset()
 core_poi = datasets.get_core_poi_by_city("Houston", "TX")
 rain = pd.read_csv(rain_path)
@@ -49,15 +66,6 @@ def explode_vists_by_day(df_old):
                                                     df["day"])]
     df["date"] = pd.to_datetime(df["date"],
                                 format=DATE_FORMATS.DAY)
-    # Once the dataframe is exploded there are duplicated values
-    # by store and date.
-    # We sort it by placekey, date and latitude because some
-    # the duplicated rows some of the have latitude and some not
-    df = df.sort_values(by=["placekey", "date", "latitude"])
-    # Then when it's sorted we remove duplicated values and
-    # keep the last, that is, keeping the row that have latitude
-    df = df.drop_duplicates(subset=["placekey", "date"],
-                            keep="last")
     return df
 
 
@@ -106,12 +114,12 @@ def add_last_visits(df: pd.DataFrame):
 df = explode_vists_by_day(df_orginal)
 df = filter_selected_cols(df)
 df = add_last_visits(df)
+df
 # %%
 
+
 # %%
-rain.columns = ['date', 'precip']
 rain['date'] = pd.to_datetime(rain["date"], format=DATE_FORMATS.DAY)
-# %%
 df = df.merge(rain, on='date', how='left')
 
 # %%
