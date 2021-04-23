@@ -4,6 +4,7 @@ import os
 from datetime import timedelta
 
 import holidays
+import numpy as np
 import pandas as pd
 from utils.date_utils.date_formats import DATE_FORMATS
 from utils.download_data import data_dtypes as dtypes
@@ -86,6 +87,7 @@ def add_last_visits(df: pd.DataFrame):
         The same patterns dataframe with the visits
     """
     df = df.copy()
+    df['date'] = pd.to_datetime(df['date'])
     df["placekey"] = df["placekey"].astype(str)
     # Define the data periods we want to add
     dict_last_visits = {"yesterday": -timedelta(days=1),
@@ -102,7 +104,7 @@ def add_last_visits(df: pd.DataFrame):
         # create the new date column to merge
         period_df["date"] = df["date"] - diff
         # assign to the peroid visits col the visits
-        period_df[period_visits_col] = df["visits"]
+        period_df[period_visits_col] = df["real_visits"]
         df = pd.merge(df, period_df, how="left",
                       on=["placekey", "date"])
         # drop the column from the auxiliar dataframe in case
@@ -222,7 +224,7 @@ def get_real_visits(df):
 
 df = explode_vists_by_day(df_original)
 df = filter_selected_cols(df)
-df = add_last_visits(df)
+
 df = add_week_columns(df)
 df = income(df)
 df = is_holiday(df)
@@ -230,7 +232,7 @@ df = rain(df)
 df = get_population(df)
 df = get_devices(df)
 df = get_real_visits(df)
-
+df = add_last_visits(df)
 
 # %%
 
@@ -267,7 +269,7 @@ def add_dummies_df(df_: pd.DataFrame):
     df = df.join(dummies)
 
     return df
-
+#%%
 df_model = add_dummies_df(df)
 
 # %%
@@ -308,14 +310,67 @@ print(clf.score(X_test, y_test, sample_weight=None))
 
 # %%
 
-df['placekey']
-# %%
+df = pd.read_csv(os.path.join(paths.processed_datasets,
+                         "Houston",
+                         "MODEL_SUBWAY.csv"))
 
 df = df[(df['date'] > '2020-03-15')]
 
 placekeys_series = df['placekey'].value_counts()
-placekeys_series = placekeys_series < 200
-placekeys_series
+placekeys_series = placekeys_series[placekeys_series >= 200]
+placekeys = list(placekeys_series.index)
+
+a = df[df['placekey'].isin(placekeys)]
+
+a = a[a['real_visits'] != 0]
+
+a = a.sort_values(by='date')
+# %%
+a['yesterday_visits'] = a['yesterday_visits'].replace(0.0, np.NaN)
+a['last_week_visits'] = a['last_week_visits'].replace(0.0, np.NaN)
+
+# %%
+
+"""
+
+----------------------M O D E L----------------------
+
+"""
 
 
+from sklearn.linear_model import Ridge
+from sklearn.metrics import mean_squared_error
+from sklearn.model_selection import train_test_split
 
+"""
+selection = ['placekey', 'year', 'month', 'day', 'yesterday_visits', 'last_week_visits',
+             'week_day', 'is_weekend', 'cbg_income', 'is_holiday', 'rain', 'population']
+"""
+selection = ['year_2020', 'year_2021', 'day', 'yesterday_visits', 'last_week_visits',
+             'is_weekend', 'cbg_income', 'is_holiday', 'rain', 'population', 'Monday', 'Tuesday', 
+             'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday', 
+             'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 
+             'September', 'October', 'November', 'December']
+
+a = add_dummies_df(a)
+df_model = a.fillna(method='backfill')
+df_model = df_model.fillna(method='ffill')
+
+
+y = df_model.pop('real_visits')
+X = df_model[selection]
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, shuffle=False,random_state=20)
+
+clf = Ridge(alpha=1.0)
+clf.fit(X_train, y_train)
+
+y_pred = clf.predict(X_test)
+
+mse = mean_squared_error(y_test, y_pred)
+
+print(mse)
+# %%
+print(clf.score(X_train, y_train))
+print(clf.score(X_test, y_test))
+# %%
