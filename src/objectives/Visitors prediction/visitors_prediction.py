@@ -182,33 +182,13 @@ def rain(df):
     # df['date'] = df['date'].map(int)
     df['date'] = pd.to_datetime(df['date'])
     df['date'] = df['date'].dt.strftime('%Y-%m-%d')
-    rain_['date'] = pd.to_datetime(rain_['date'])
-    rain_['date'] = rain_['date'].dt.strftime('%Y-%m-%d')
+    rain_['Dates'] = pd.to_datetime(rain_['Dates'])
+    rain_['Dates'] = rain_['Dates'].dt.strftime('%Y-%m-%d')
+    rain_.columns = ['date', 'rain']
+    #print(rain['date'])
     df = df.merge(rain_, on='date', how='left')
     return df
-    """
-    df['rain'] = 0
-    l = [rain_2020, rain_2021]
-    for rain_df in l:
-        for row in rain_df.iterrows():
-            df['rain'] = np.where(df['date'] == str(
-                row[1][0]), row[1][1], df['rain'])
 
-    return df
-    """
-
-"""
-def population(df):
-    dat = pd.read_csv('data/population.csv')
-    cbgs = set(df['poi_cbg'])
-    dat = dat[dat['census_block_group'].map(str).isin(cbgs)]
-    dat = dat[['census_block_group', 'B00001e1']]
-    df['cbg_population'] = 0
-    for row in dat.iterrows():
-        df['cbg_population'] = np.where(df['poi_cbg'].map(str) == str(
-            int(row[1][0])), row[1][1], df['cbg_population'])
-    return df
-"""
 #"NEEDED THE PATH OF THE POPULATION.CSV, DEVICES.CSV, SUBWAY_HOUSTON_DAYS (SUBWAY)"
 
 
@@ -218,7 +198,7 @@ def get_population(df):
                          "population.csv"))
     dat['poi_cbg'] = dat['poi_cbg'].astype(int).astype(str)
     df['poi_cbg'].astype(int).astype(str)
-    df = df.merge(nf, on='poi_cbg', how='left')
+    df = df.merge(dat, on='poi_cbg', how='left')
     return df
 
 
@@ -251,30 +231,8 @@ df = get_population(df)
 df = get_devices(df)
 df = get_real_visits(df)
 
-"""
-rain['date'] = pd.to_datetime(rain["date"], format=DATE_FORMATS.DAY)
-df = df.merge(rain, on='date', how='left')
 
-holi = holidays.CountryHoliday('US', prov="Houston", state='TX')
-df["is_holiday"] = [1 if d in holi else 0 for d in df["date"]]
+# %%
 
-
-for c in df.columns:
-    print(c)
-
-
-def get_model_prepared_data(patterns_data: pd.DataFrame):
-    df = patterns_data.copy()
-    exclude_cols = ["placekey", "brands", "naics_code",
-                    "latitude", "longitude"]
-    df = df.drop(columns=exclude_cols)
-    visit_cols = [c for c in df.columns if "visits" in c]
-    df = df.dropna()
-    for col in visit_cols:
-        df[col] = df[col].astype("int32")
-    return df
-
-
-d = get_model_prepared_data(df)
-"""
+df.to_csv('MODEL_SUBWAY.csv', index = False)
 # %%
