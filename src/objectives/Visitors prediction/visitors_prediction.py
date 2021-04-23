@@ -19,7 +19,7 @@ rain_path = os.path.join(paths.processed_datasets,
                          "Houston",
                          "rain_houston.csv")
 
-
+#%%
 def drop_duplicate_stores(patterns: pd.DataFrame):
     """ Drops duplicated rows of patterns data
     """
@@ -235,4 +235,80 @@ df = get_real_visits(df)
 # %%
 
 df.to_csv('MODEL_SUBWAY.csv', index = False)
+
+#%%
+
+df = pd.read_csv(os.path.join(paths.processed_datasets,
+                         "Houston",
+                         "MODEL_SUBWAY.csv"))
+# %% 
+
+def add_dummies_df(df_: pd.DataFrame):
+
+    df = df_.copy()
+    dummies = pd.get_dummies(df['year'], prefix='year')
+    # Drop column B as it is now encoded
+    df = df.drop('year', axis = 1)
+    # Join the encoded df
+    df = df.join(dummies)
+    
+    dummies = pd.get_dummies(df['month'])
+    # Drop column B as it is now encoded
+    df = df.drop('month', axis = 1)
+    # Join the encoded df
+    dummies.columns = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+    df = df.join(dummies)
+
+    dummies = pd.get_dummies(df['week_day'])
+    # Drop column B as it is now encoded
+    df = df.drop('week_day', axis = 1)
+    # Join the encoded df
+    dummies.columns = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+    df = df.join(dummies)
+
+    return df
+
+df_model = add_dummies_df(df)
+
 # %%
+# RIDGE LINEAR REGRESSION
+
+from sklearn.metrics import mean_squared_error
+from sklearn.model_selection import train_test_split
+
+"""
+selection = ['placekey', 'year', 'month', 'day', 'yesterday_visits', 'last_week_visits',
+             'week_day', 'is_weekend', 'cbg_income', 'is_holiday', 'rain', 'population']
+"""
+selection = ['year_2020', 'year_2021', 'day', 'yesterday_visits', 'last_week_visits',
+             'is_weekend', 'cbg_income', 'is_holiday', 'rain', 'population', 'Monday', 'Tuesday', 
+             'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday', 
+             'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 
+             'September', 'October', 'November', 'December']
+
+df_model = df_model.fillna(method='backfill')
+
+y = df_model.pop('real_visits')
+X = df_model[selection]
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, shuffle=False,random_state=20)
+
+clf = Ridge(alpha=1.0)
+clf.fit(X_train, y_train)
+
+y_pred = clf.predict(X_test)
+
+mse = mean_squared_error(y_test, y_pred)
+
+print(y_pred)
+
+
+# %%
+print(clf.score(X_test, y_test, sample_weight=None))
+
+# %%
+
+df['placekey']
+# %%
+
+

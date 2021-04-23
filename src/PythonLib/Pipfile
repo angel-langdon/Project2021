@@ -13,6 +13,7 @@ openpyxl = "*"
 pandas-profiling = "*"
 plotly = "*"
 holidays = "*"
+sklearn = "*"
 
 [dev-packages]
 
