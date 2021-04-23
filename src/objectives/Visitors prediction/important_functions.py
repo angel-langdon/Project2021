@@ -1,17 +1,18 @@
-# %%
+import json
 import os
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 import holidays
 import numpy as np
 import pandas as pd
-from utils.date_utils.date_formats import DATE_FORMATS
-from utils.download_data import data_dtypes as dtypes
-from utils.path_utils import paths
+
+# df filtered by houston, needed to filter by state = TX (NOT IMPLEMENTED)
+
+subway = pd.read_csv(
+    '/Users/mazcu/Downloads/Subway_Houston_days.csv', encoding="utf-8")
 
 
 def is_weekend(df):
-    df = df.copy()
     df['date'] = pd.to_datetime(df['date'])
 
     df['is_weekend'] = df['date'].dt.day_name()
@@ -27,32 +28,11 @@ def is_weekend(df):
 
 
 def is_holiday(df):
-    df.copy()
     holi = holidays.CountryHoliday('US', prov="Houston", state='TX')
     df["is_holiday"] = [1 if d in holi else 0 for d in df["date"]]
     return df
 
 
-def add_last_visits(df: pd.DataFrame):
-    df = df.copy()
-    dict_last_visits = {"yesterday": timedelta(days=1),
-                        "last_week": timedelta(days=7)}
-    suffix = "_visits"
-    for period, diff in dict_last_visits.items():
-        df[period] = df["date"] - diff
-        df[period+suffix] = 0
-
-    for placekey in df["placekey"].unique():
-        for period in dict_last_visits:
-            is_store = df["placekey"] == placekey
-            is_period = df["date"] == period
-
-            peroid_vists_col = (is_store) & (is_period)
-            df.loc[is_store, period+suffix] = df.loc[peroid_vists_col, "visits"]
-    return df
-
-
-# %%
 def last_day_n_week(df):
     stores = set(df['placekey'])
     i = 0
@@ -105,9 +85,9 @@ def income(df):
     cbgs = set(new['poi_cbg'])
 
     cosa = cosa[cosa['census_block_group'].isin(cbgs)]
-    # cosa = cosa[['census_block_group', 'B19013e1']]
+    #cosa = cosa[['census_block_group', 'B19013e1']]
 
-    new['cbg_income'] = [0]*91824
+    new['cbg_income'] = 0
     for row in cosa.iterrows():
         new['cbg_income'] = np.where(new['poi_cbg'] == str(
             row[1][0]), row[1][1], new['cbg_income'])
@@ -118,10 +98,10 @@ def income(df):
 def rain(df):
     rain_2020 = pd.read_csv('data/rain_houston_2020.csv', sep=';')
     rain_2021 = pd.read_csv('data/rain_houston_2021.csv', sep=';')
-    # df['date'] = df['date'].map(int)
+    #df['date'] = df['date'].map(int)
     df['date'] = pd.to_datetime(df['date'])
     df['date'] = df['date'].dt.strftime('%Y-%m-%d')
-    df['rain'] = [0]*91824
+    df['rain'] = 0
     l = [rain_2020, rain_2021]
     for rain_df in l:
         for row in rain_df.iterrows():
@@ -136,7 +116,7 @@ def population(df):
     cbgs = set(df['poi_cbg'])
     dat = dat[dat['census_block_group'].map(str).isin(cbgs)]
     dat = dat[['census_block_group', 'B00001e1']]
-    df['cbg_population'] = [0]*91824
+    df['cbg_population'] = 0
     for row in dat.iterrows():
         df['cbg_population'] = np.where(df['poi_cbg'].map(str) == str(
             int(row[1][0])), row[1][1], df['cbg_population'])
@@ -144,13 +124,70 @@ def population(df):
 
 
 """
-EXECUTION MODE
+df = df.merge(rain, on='date', how='left')
 
-subway = pd.read_csv('Subway_Houston_days.csv', encoding="utf-8") #Needed to filter by state TX.
+
+RUN EVERY FUNCTION (NOT UPDATED, THE PERFECT ONES ARE IN FUNCTIONS.PY)
+
 subway = is_weekend(subway)
 subway = is_holiday(subway)
 subway = last_day_n_week(subway)
 subway = income(subway)
 subway = rain(subway)
 subway = population(subway)
+
+subway
 """
+
+"""
+
+FUNCTION 2 KNOW IN WHICH CBG FILE IS THE VARIABLE WE WANTED TO OBTAIN
+
+import os
+
+for filename in os.listdir('/Users/mazcu/Downloads/safegraph_open_census_data/data/'): 
+    print(filename)
+    cosa = pd.read_csv('/Users/mazcu/Downloads/safegraph_open_census_data/data/'+filename, encoding="utf-8")
+    try:
+        print(filename, cosa['B19013e1'])
+    except:
+        pass
+        
+OTHER TEST 4 OTHER VAR
+    
+for csv in os.listdir('/Users/mazcu/Downloads/safegraph_open_census_data/data/'):
+    test = pd.read_csv(
+        '/Users/mazcu/Downloads/safegraph_open_census_data/data/cbg_b00.csv' + csv)
+    try:
+        print(csv, test['B00001e1'])
+    except:
+        print(csv, 'NO')
+
+"""
+
+cbgs = set(subway['poi_cbg'])
+
+# GETTING THE INCOME PER CBG
+cosa = pd.read_csv('/Users/mazcu/Downloads/safegraph_open_census_data/data/cbg_b19.csv',
+                   encoding="utf-8", dtype={"census_block_group": "category"})
+cosa = cosa[cosa['census_block_group'].isin(cbgs)]
+cosa = cosa[['census_block_group', 'B19013e1']]
+cosa.to_csv('income.csv', index=False)
+
+# GETTING THE POPULATION PER CBG
+dat = pd.read_csv(
+    '/Users/mazcu/Downloads/safegraph_open_census_data/data/cbg_b01.csv')
+dat = dat[dat['census_block_group'].map(str).isin(cbgs)]
+dat = dat[['census_block_group', 'B01001e1']]
+dat.to_csv('population.csv', index=False)
+
+# GETTING THE DEVICES PER CBG
+# esto me lo pasó el nacho, balones a él
+nf = pd.read_csv('/Users/mazcu/Downloads/home_panel_summary (3).csv')
+nf = nf[nf['census_block_group'].map(str).isin(cbgs)]
+nf = nf[['census_block_group', 'number_devices_residing']]
+nf.to_csv('devices.csv', index=False)
+
+# FORMULA 4 THE VISITS
+subway['real_visits'] = (subway['cbg_population'] //
+                         subway['cbg_devices'])*subway['visits']  # to avoid floats
