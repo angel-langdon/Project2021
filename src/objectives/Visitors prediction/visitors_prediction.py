@@ -236,13 +236,9 @@ df = add_last_visits(df)
 
 # %%
 
-df.to_csv('MODEL_SUBWAY.csv', index = False)
-
-#%%
-
-df = pd.read_csv(os.path.join(paths.processed_datasets,
+df.to_csv(os.path.join(paths.processed_datasets,
                          "Houston",
-                         "MODEL_SUBWAY.csv"))
+                         "MODEL_SUBWAY.csv"), index = False)
 # %% 
 
 def add_dummies_df(df_: pd.DataFrame):
@@ -269,46 +265,12 @@ def add_dummies_df(df_: pd.DataFrame):
     df = df.join(dummies)
 
     return df
-#%%
-df_model = add_dummies_df(df)
 
 # %%
-# RIDGE LINEAR REGRESSION
-
-from sklearn.metrics import mean_squared_error
-from sklearn.model_selection import train_test_split
 
 """
-selection = ['placekey', 'year', 'month', 'day', 'yesterday_visits', 'last_week_visits',
-             'week_day', 'is_weekend', 'cbg_income', 'is_holiday', 'rain', 'population']
+VERY IMPORTANT, CONTACT WITH n4choo, zMazcu or MikeKowalski for futher information
 """
-selection = ['year_2020', 'year_2021', 'day', 'yesterday_visits', 'last_week_visits',
-             'is_weekend', 'cbg_income', 'is_holiday', 'rain', 'population', 'Monday', 'Tuesday', 
-             'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday', 
-             'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 
-             'September', 'October', 'November', 'December']
-
-df_model = df_model.fillna(method='backfill')
-
-y = df_model.pop('real_visits')
-X = df_model[selection]
-
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, shuffle=False,random_state=20)
-
-clf = Ridge(alpha=1.0)
-clf.fit(X_train, y_train)
-
-y_pred = clf.predict(X_test)
-
-mse = mean_squared_error(y_test, y_pred)
-
-print(y_pred)
-
-
-# %%
-print(clf.score(X_test, y_test, sample_weight=None))
-
-# %%
 
 df = pd.read_csv(os.path.join(paths.processed_datasets,
                          "Houston",
@@ -320,30 +282,32 @@ placekeys_series = df['placekey'].value_counts()
 placekeys_series = placekeys_series[placekeys_series >= 200]
 placekeys = list(placekeys_series.index)
 
-a = df[df['placekey'].isin(placekeys)]
+df = df[df['placekey'].isin(placekeys)]
 
-a = a[a['real_visits'] != 0]
+df = df[df['real_visits'] != 0]
 
-a = a.sort_values(by='date')
+df = df.sort_values(by='date')
 # %%
-a['yesterday_visits'] = a['yesterday_visits'].replace(0.0, np.NaN)
-a['last_week_visits'] = a['last_week_visits'].replace(0.0, np.NaN)
+"""
+SEEMS STUPID, BUT IT IS CRUCIAL FOR THE MODEL
+"""
+df['yesterday_visits'] = df['yesterday_visits'].replace(0.0, np.NaN)
+df['last_week_visits'] = df['last_week_visits'].replace(0.0, np.NaN)
 
 # %%
 
 """
-
+-----------------------------------------------------
 ----------------------M O D E L----------------------
-
+-----------------------------------------------------
 """
-
 
 from sklearn.linear_model import Ridge
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
 
 """
-selection = ['placekey', 'year', 'month', 'day', 'yesterday_visits', 'last_week_visits',
+selection = ['year', 'month', 'day', 'yesterday_visits', 'last_week_visits',
              'week_day', 'is_weekend', 'cbg_income', 'is_holiday', 'rain', 'population']
 """
 selection = ['year_2020', 'year_2021', 'day', 'yesterday_visits', 'last_week_visits',
@@ -352,8 +316,8 @@ selection = ['year_2020', 'year_2021', 'day', 'yesterday_visits', 'last_week_vis
              'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 
              'September', 'October', 'November', 'December']
 
-a = add_dummies_df(a)
-df_model = a.fillna(method='backfill')
+df_model = add_dummies_df(df)
+df_model = df_model.fillna(method='backfill')
 df_model = df_model.fillna(method='ffill')
 
 
