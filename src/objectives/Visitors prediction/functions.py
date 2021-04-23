@@ -14,8 +14,7 @@ from visitors_prediction import (add_last_visits, drop_duplicate_stores,
                                  read_patterns_data)
 
 # %%
-df = read_patterns_data(
-    '/Users/mazcu/Projects/Project2021/src/datasets/processed/Houston/subway.csv')
+df = read_patterns_data('/Users/mazcu/Projects/Project2021/src/datasets/processed/Houston/subway.csv')
 df = drop_duplicate_stores
 df = explode_vists_by_day(df_original)
 df = filter_selected_cols(df)
@@ -108,8 +107,7 @@ subway = rain(subway)
 subway = population(subway)
 """
 
-"NEEDED THE PATH OF THE POPULATION.CSV, DEVICES.CSV, SUBWAY_HOUSTON_DAYS (SUBWAY)"
-
+#"NEEDED THE PATH OF THE POPULATION.CSV, DEVICES.CSV, SUBWAY_HOUSTON_DAYS (SUBWAY)"
 
 def get_population(df):
     dat = pd.read_csv('/Users/mazcu/Downloads/population.csv')

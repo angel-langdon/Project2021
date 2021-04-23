@@ -42,9 +42,8 @@ def read_patterns_data(path):
 
 # %%
 df_original = read_patterns_data(subway_path)
-rain = pd.read_csv(rain_path)
+#rain = pd.read_csv(rain_path)
 # %%
-
 
 def explode_vists_by_day(df_old):
     def get_dictionary_list_visits_day(visits_list):
@@ -122,26 +121,147 @@ def add_week_columns(df):
         df.loc[df['week_day'] == day, 'is_weekend'] = 1
     return df
 
+"""
+def is_weekend(df):
+    df = df.copy()
+    df['date'] = pd.to_datetime(df['date'])
+
+    df['is_weekend'] = df['date'].dt.day_name()
+    df.loc[df['is_weekend'] == "Saturday", 'is_weekend'] = 1
+    df.loc[df['is_weekend'] == "Sunday", 'is_weekend'] = 1
+    df.loc[df['is_weekend'] == "Monday", 'is_weekend'] = 0
+    df.loc[df['is_weekend'] == "Tuesday", 'is_weekend'] = 0
+    df.loc[df['is_weekend'] == "Wednesday", 'is_weekend'] = 0
+    df.loc[df['is_weekend'] == "Thursday", 'is_weekend'] = 0
+    df.loc[df['is_weekend'] == "Friday", 'is_weekend'] = 0
+
+    return df
+"""
+
+def is_holiday(df):
+    df.copy()
+    holi = holidays.CountryHoliday('US', prov="Houston", state='TX')
+    df["is_holiday"] = [1 if d in holi else 0 for d in df["date"]]
+    return df
+
+def income(df):
+    cosa = pd.read_csv(os.path.join(paths.processed_datasets,
+                         "Houston",
+                         "income.csv"), encoding="utf-8",
+                       dtype={"census_block_group": "category"})
+
+    df['poi_cbg'] = df['poi_cbg'].map(int)
+    df['poi_cbg'] = df['poi_cbg'].map(str)
+
+    #new = df[df['region'] == 'TX']
+    cbgs = set(df['poi_cbg'])
+
+    cosa = cosa[cosa['census_block_group'].map(int).map(str).isin(cbgs)]
+    # cosa = cosa[['census_block_group', 'B19013e1']]
+    cosa.columns = ['poi_cbg', 'cbg_income']
+    #cosa.rename({'census_block_group': 'poi_cbg', 'B19013e1': 'cbg_income'})
+    cosa['poi_cbg'] = cosa['poi_cbg'].astype(int).astype(str)
+    df = df.merge(cosa, on='poi_cbg', how='left')
+    return df
+
+    """
+    new['cbg_income'] = 0
+    for row in cosa.iterrows():
+        new['cbg_income'] = np.where(new['poi_cbg'] == str(
+            row[1][0]), row[1][1], new['cbg_income'])
+
+    return new
+    """
+
+"""ERROR"""
+
+def rain(df):
+    rain_ = pd.read_csv(rain_path)
+    #rain_2020 = pd.read_csv('data/rain_houston_2020.csv', sep=';')
+    #rain_2021 = pd.read_csv('data/rain_houston_2021.csv', sep=';')
+    # df['date'] = df['date'].map(int)
+    df['date'] = pd.to_datetime(df['date'])
+    df['date'] = df['date'].dt.strftime('%Y-%m-%d')
+    rain_['date'] = pd.to_datetime(rain_['date'])
+    rain_['date'] = rain_['date'].dt.strftime('%Y-%m-%d')
+    df = df.merge(rain_, on='date', how='left')
+    return df
+    """
+    df['rain'] = 0
+    l = [rain_2020, rain_2021]
+    for rain_df in l:
+        for row in rain_df.iterrows():
+            df['rain'] = np.where(df['date'] == str(
+                row[1][0]), row[1][1], df['rain'])
+
+    return df
+    """
+
+"""
+def population(df):
+    dat = pd.read_csv('data/population.csv')
+    cbgs = set(df['poi_cbg'])
+    dat = dat[dat['census_block_group'].map(str).isin(cbgs)]
+    dat = dat[['census_block_group', 'B00001e1']]
+    df['cbg_population'] = 0
+    for row in dat.iterrows():
+        df['cbg_population'] = np.where(df['poi_cbg'].map(str) == str(
+            int(row[1][0])), row[1][1], df['cbg_population'])
+    return df
+"""
+#"NEEDED THE PATH OF THE POPULATION.CSV, DEVICES.CSV, SUBWAY_HOUSTON_DAYS (SUBWAY)"
+
+
+def get_population(df):
+    dat = pd.read_csv(os.path.join(paths.processed_datasets,
+                         "Houston",
+                         "population.csv"))
+    dat['poi_cbg'] = dat['poi_cbg'].astype(int).astype(str)
+    df['poi_cbg'].astype(int).astype(str)
+    df = df.merge(nf, on='poi_cbg', how='left')
+    return df
+
+
+def get_devices(df):
+    # home_panel_summary
+    nf = pd.read_csv(os.path.join(paths.processed_datasets,
+                         "Houston",
+                         "devices.csv"))
+    nf['poi_cbg'] = nf['poi_cbg'].astype(int).astype(str)
+    df['poi_cbg'].astype(int).astype(str)
+    #print(type(df['poi_cbg']), type(nf['poi_cbg']))
+    df = df.merge(nf, on='poi_cbg', how='left')
+
+    return df
+
+
+def get_real_visits(df):
+    df['real_visits'] = (df['population'] // df['devices'])*df['visits']
+    return df
+
 
 df = explode_vists_by_day(df_original)
 df = filter_selected_cols(df)
 df = add_last_visits(df)
 df = add_week_columns(df)
+df = income(df)
+df = is_holiday(df)
+df = rain(df)
+df = get_population(df)
+df = get_devices(df)
+df = get_real_visits(df)
 
-# %%
+"""
 rain['date'] = pd.to_datetime(rain["date"], format=DATE_FORMATS.DAY)
 df = df.merge(rain, on='date', how='left')
 
-# %%
 holi = holidays.CountryHoliday('US', prov="Houston", state='TX')
 df["is_holiday"] = [1 if d in holi else 0 for d in df["date"]]
 
-# %%
+
 for c in df.columns:
     print(c)
 
-
-# %%
 
 def get_model_prepared_data(patterns_data: pd.DataFrame):
     df = patterns_data.copy()
@@ -156,3 +276,5 @@ def get_model_prepared_data(patterns_data: pd.DataFrame):
 
 
 d = get_model_prepared_data(df)
+"""
+# %%
