@@ -9,7 +9,17 @@ from utils.date_utils.date_formats import DATE_FORMATS
 from utils.download_data import data_dtypes as dtypes
 from utils.path_utils import paths
 
+from visitors_prediction import (add_last_visits, drop_duplicate_stores,
+                                 explode_vists_by_day, filter_selected_cols,
+                                 read_patterns_data)
 
+#%%
+df = read_patterns_data('/Users/mazcu/Projects/Project2021/src/datasets/processed/Houston/subway.csv')
+df = drop_duplicate_stores
+df = explode_vists_by_day(df_original)
+df = filter_selected_cols(df)
+df = add_last_visits(df)
+#%%
 def is_weekend(df):
     df = df.copy()
     df['date'] = pd.to_datetime(df['date'])
@@ -154,3 +164,32 @@ subway = income(subway)
 subway = rain(subway)
 subway = population(subway)
 """
+
+"NEEDED THE PATH OF THE POPULATION.CSV, DEVICES.CSV, SUBWAY_HOUSTON_DAYS (SUBWAY)"
+
+def get_population(df):
+    dat = pd.read_csv('/Users/mazcu/Downloads/population.csv')
+    dat['poi_cbg'] = dat['poi_cbg'].astype(int).astype(str)
+    df = df.merge(nf, on='poi_cbg', how='left')
+    return df
+        
+def get_devices(df):
+    nf = pd.read_csv('/Users/mazcu/Downloads/devices.csv') #home_panel_summary
+    nf['poi_cbg'] = nf['poi_cbg'].astype(int).astype(str)
+    df['poi_cbg'].astype(int).astype(str)
+    print(type(df['poi_cbg']), type(nf['poi_cbg']))
+    df = df.merge(nf, on='poi_cbg', how='left')
+    
+    return df
+
+def get_real_visits(df):
+    df['real_visits'] = (df['population'] // df['devices'])*df['visits']
+    return df
+
+
+
+
+
+
+
+
