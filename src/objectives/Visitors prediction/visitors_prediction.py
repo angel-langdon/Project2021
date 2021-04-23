@@ -24,7 +24,6 @@ rain_path = os.path.join(paths.processed_datasets,
 def drop_duplicate_stores(patterns: pd.DataFrame):
     """ Drops duplicated rows of patterns data
     """
-
     df = patterns.copy()
     df = df.sort_values(by=["placekey",
                             "date_range_start"])
@@ -35,12 +34,15 @@ def drop_duplicate_stores(patterns: pd.DataFrame):
     return df
 
 
+def read_patterns_data(path):
+    df = pd.read_csv(path, encoding="utf-8",
+                     dtype=dtypes.mobility_dtypes)
+    df = drop_duplicate_stores(df)
+    return df
+
+
 # %%
-df_orginal = pd.read_csv(subway_path, encoding="utf-8",
-                         dtype=dtypes.mobility_dtypes)
-df_orginal = drop_duplicate_stores(df_orginal)
-brand_info = datasets.get_brand_info_dataset()
-core_poi = datasets.get_core_poi_by_city("Houston", "TX")
+df_original = read_patterns_data(subway_path)
 rain = pd.read_csv(rain_path)
 # %%
 
@@ -111,7 +113,7 @@ def add_last_visits(df: pd.DataFrame):
     return df
 
 
-df = explode_vists_by_day(df_orginal)
+df = explode_vists_by_day(df_original)
 df = filter_selected_cols(df)
 df = add_last_visits(df)
 df
