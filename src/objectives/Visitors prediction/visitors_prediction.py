@@ -40,7 +40,7 @@ def read_patterns_data(city, state, brand):
     if os.path.isfile(possible_path):
         df = pd.read_csv(possible_path, encoding="utf-8",
                          dtype=dtypes.mobility_dtypes)
-        df["poi_cbg"] = df["poi_cbg"].astype(int).astype("category")
+        df["poi_cbg"] = df["poi_cbg"].astype("int64").astype("category")
         df = drop_duplicate_stores(df)
     else:
         msg = "Patterns data not found, should be here:\n"+possible_path

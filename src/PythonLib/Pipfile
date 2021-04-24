@@ -14,6 +14,7 @@ pandas-profiling = "*"
 plotly = "*"
 holidays = "*"
 sklearn = "*"
+pywin32 = "*"
 
 [dev-packages]
 
