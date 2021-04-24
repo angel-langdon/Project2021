@@ -80,40 +80,6 @@ def filter_selected_cols(df):
     return df[selected_cols]
 
 
-def add_last_visits(df: pd.DataFrame):
-    """ Adds new visits columns to patterns data
-    Arguments:
-        df : The patterns dataframe
-    Returns:
-        The same patterns dataframe with the visits
-    """
-    df = df.copy()
-    df['date'] = pd.to_datetime(df['date'])
-    df["placekey"] = df["placekey"].astype(str)
-    # Define the data periods we want to add
-    dict_last_visits = {"yesterday": -timedelta(days=1),
-                        "last_week": -timedelta(days=7)}
-    # Default suffix for new visits columns
-    suffix = "_visits"
-    # For each period
-    for period, diff in dict_last_visits.items():
-        # Auxiliar dataframe for left joining on place key and date
-        period_df = pd.DataFrame()
-        period_df["placekey"] = df["placekey"]
-        # new visits column
-        period_visits_col = period+suffix
-        # create the new date column to merge
-        period_df["date"] = df["date"] - diff
-        # assign to the peroid visits col the visits
-        period_df[period_visits_col] = df["real_visits"]
-        df = pd.merge(df, period_df, how="left",
-                      on=["placekey", "date"])
-        # drop the column from the auxiliar dataframe in case
-        # there are more date periods to add
-        period_df = period_df.drop(columns=[period_visits_col])
-    return df
-
-
 def add_week_columns(df):
     df = df.copy()
     df['date'] = pd.to_datetime(df['date'])
@@ -130,6 +96,19 @@ def is_holiday(df, city='Houston', state='TX', country='US'):
     holi = holidays.CountryHoliday(country, prov=city, state=state)
     df["is_holiday"] = [1 if d in holi else 0 for d in df["date"]]
     return df
+
+
+def add_rain(df, city="Houston", state="TX"):
+    possible_path = os.path.join(paths.processed_datasets,
+                                 state, city, "rain.csv")
+    if os.path.isfile(possible_path):
+        rain_df = pd.read_csv(possible_path)
+        rain_df['date'] = pd.to_datetime(rain_df['date'],
+                                         format=DATE_FORMATS.DAY)
+        return df.merge(rain_df, on='date', how='left')
+    else:
+        msg = "Rain data is missing it shoud be here: \n"+possible_path
+        raise(BaseException(msg))
 
 
 def add_income(df, city="Houston", state='TX'):
@@ -159,10 +138,7 @@ def add_income(df, city="Houston", state='TX'):
     return df.merge(income, on='poi_cbg', how='left')
 
 
-# "NEEDED THE PATH OF THE POPULATION.CSV, DEVICES.CSV, SUBWAY_HOUSTON_DAYS (SUBWAY)"
-
-
-def get_population(df, city, state):
+def add_population(df, city, state):
     df = df.copy()
     file_name = 'population.csv'
     possible_path = os.path.join(paths.processed_datasets,
@@ -172,8 +148,19 @@ def get_population(df, city, state):
         pop['poi_cbg'] = pop['poi_cbg'].astype(int).astype(str)
         return df.merge(pop, on='poi_cbg', how='left')
     else:
-        msg = 'Population dataset not found, should be here:\n'+possible_path
-        raise(FileNotFoundError(msg))
+        census_path = os.path.join(paths.open_census_dir,
+                                   "data",
+                                   "cbg_b01.csv")
+        pop_id = "B01001e1"
+        cbgs = df["poi_cbg"].unique()
+        pop = datasets.filter_census_df(census_path,
+                                        ["census_block_group", pop_id],
+                                        cbgs)
+        pop = pop.rename(columns={pop_id: 'population',
+                                  "census_block_group": 'poi_cbg'})
+        pop['poi_cbg'] = pop['poi_cbg'].astype(int).astype(str)
+        pop.to_csv(possible_path, index=False, encoding="utf-8")
+        return df.merge(pop, on='poi_cbg', how="left")
 
 
 def get_devices(df, city, state):
@@ -183,32 +170,54 @@ def get_devices(df, city, state):
                                  state, city, file_name)
     if os.path.isfile(possible_path):
         # home_panel_summary
-        nf = pd.read_csv(os.path.join(paths.processed_datasets,
-                                      "Houston",
-                                      "devices.csv"))
+        nf = pd.read_csv(possible_path)
         nf['poi_cbg'] = nf['poi_cbg'].astype(int).astype(str)
         return df.merge(nf, on='poi_cbg', how='left')
     else:
+        devices_id = ""
         msg = "Devices data not found, should be here:\n"+possible_path
         raise(FileNotFoundError(msg))
 
 
 def get_real_visits(df):
-    df['real_visits'] = (df['population'] // df['devices'])*df['visits']
+    """ Apply visits micro-normalization to get real visits"""
+    df = df.copy()
+    df['visits'] = (df['population'] // df['devices'])*df['visits']
     return df
 
 
-def add_rain(df, city="Houston", state="TX"):
-    possible_path = os.path.join(paths.processed_datasets,
-                                 state, city, "rain.csv")
-    if os.path.isfile(possible_path):
-        rain_df = pd.read_csv(possible_path)
-        rain_df['date'] = pd.to_datetime(rain_df['date'],
-                                         format=DATE_FORMATS.DAY)
-        return df.merge(rain_df, on='date', how='left')
-    else:
-        msg = "Rain data is missing it shoud be here: \n"+possible_path
-        raise(BaseException(msg))
+def add_last_visits(df: pd.DataFrame):
+    """ Adds new visits columns to patterns data
+    Arguments:
+        df : The patterns dataframe
+    Returns:
+        The same patterns dataframe with the visits
+    """
+    df = df.copy()
+    df['date'] = pd.to_datetime(df['date'])
+    df["placekey"] = df["placekey"].astype(str)
+    # Define the data periods we want to add
+    dict_last_visits = {"yesterday": -timedelta(days=1),
+                        "last_week": -timedelta(days=7)}
+    # Default suffix for new visits columns
+    suffix = "_visits"
+    # For each period
+    for period, diff in dict_last_visits.items():
+        # Auxiliar dataframe for left joining on place key and date
+        period_df = pd.DataFrame()
+        period_df["placekey"] = df["placekey"]
+        # new visits column
+        period_visits_col = period+suffix
+        # create the new date column to merge
+        period_df["date"] = df["date"] - diff
+        # assign to the peroid visits col the visits
+        period_df[period_visits_col] = df["visits"]
+        df = pd.merge(df, period_df, how="left",
+                      on=["placekey", "date"])
+        # drop the column from the auxiliar dataframe in case
+        # there are more date periods to add
+        period_df = period_df.drop(columns=[period_visits_col])
+    return df
 
 
 country = "US"
@@ -223,11 +232,12 @@ df = add_week_columns(df)
 df = add_income(df, city, state)
 df = is_holiday(df, city, state)
 df = add_rain(df, city, state)
-df
+df = add_population(df, city, state)
+# %%
+
+df = get_devices(df, city, state)
 
 # %%
-df = get_population(df)
-df = get_devices(df)
 df = get_real_visits(df)
 df = add_last_visits(df)
 
