@@ -72,15 +72,6 @@ def explode_vists_by_day(df_old):
     return df
 
 
-def filter_selected_cols(df):
-    df = df.copy()
-    selected_cols = ['placekey', "brands", 'latitude',
-                     'longitude', 'street_address', 'postal_code',
-                     'poi_cbg', 'naics_code', 'date', 'year', 'month',
-                     'day', 'visits']
-    return df[selected_cols]
-
-
 def add_week_columns(df):
     df = df.copy()
     df['date'] = pd.to_datetime(df['date'])
@@ -92,7 +83,7 @@ def add_week_columns(df):
     return df
 
 
-def is_holiday(df, city='Houston', state='TX', country='US'):
+def add_is_holiday(df, city='Houston', state='TX', country='US'):
     df = df.copy()
     holi = holidays.CountryHoliday(country, prov=city, state=state)
     df["is_holiday"] = [1 if d in holi else 0 for d in df["date"]]
@@ -133,7 +124,7 @@ def add_income(df, city="Houston", state='TX'):
                                        df["poi_cbg"].unique())
     # rename the cols for convenience
     income = income.rename(columns={"census_block_group": "poi_cbg",
-                                    'B19013e1': 'cbg_income'})
+                                    'B19013e1': 'income'})
     # save the dataframe to cache it for the next time
     income.to_csv(possible_path, index=False, encoding="utf-8")
     return df.merge(income, on='poi_cbg', how='left')
@@ -182,7 +173,7 @@ def add_devices(df, city, state):
         return df.merge(devices, on="poi_cbg", how="left")
 
 
-def get_real_visits(df):
+def compute_real_visits(df):
     """ Apply visits micro-normalization to get real visits"""
     df = df.copy()
     devices_col = "number_devices_residing"
@@ -235,74 +226,74 @@ def add_dummies(df):
     return df
 
 
+def filter_columns(df):
+    df = df.copy()
+    target_cols = ['placekey', "brands", 'latitude',
+                   'longitude', 'street_address', 'postal_code',
+                   'poi_cbg', 'date', 'year', 'month',
+                   'day', 'visits']
+    return df[target_cols]
+
+
 country = "US"
 city = "Houston"
 state = "TX"
 brand = "subway"
 df_original = read_patterns_data(city, state, brand)
 df = explode_vists_by_day(df_original)
-df = filter_selected_cols(df)
-
+df = filter_columns(df)
 df = add_week_columns(df)
 df = add_income(df, city, state)
-df = is_holiday(df, city, state)
+df = add_is_holiday(df, city, state)
 df = add_rain(df, city, state)
 df = add_population(df, city, state)
 df = add_devices(df, city, state)
-df = get_real_visits(df)
+df = compute_real_visits(df)
 df = add_last_visits(df)
 df = add_dummies(df)
+#df = filter_selected_cols(df)
 df
 # %%
-for c in df.columns:
-    print(c)
-
-
-# %%
 # Get rid of COVID window
-df = df[(df['date'] > datetime(year=2020, month=3, day=15)]
+df = df[df['date'] > datetime(year=2020, month=3, day=15)]
 # We delete the stores that have less than 200 observations
-df=df[df.groupby('placekey')['placekey'].transform('size') > 200]
+df = df[df.groupby('placekey')['placekey'].transform('size') > 200]
 # It makes no sense for the model trying to predict 0 visits
 # because 0 visits reflects that probably the store was closed
-df=df[df['visits'] != 0]
+df = df[df['visits'] != 0]
 # It is important to fill the values that have 0 with NAs
 # to backfill them later, if we delete the values that are 0
 # then we will loss 14000 rows more
-df['yesterday_visits']=df['yesterday_visits'].replace(0.0, np.NaN)
-df['last_week_visits']=df['last_week_visits'].replace(0.0, np.NaN)
+df['yesterday_visits'] = df['yesterday_visits'].replace(0.0, np.NaN)
+df['last_week_visits'] = df['last_week_visits'].replace(0.0, np.NaN)
+#
+df = df.sort_values(by='date')
+df = df.fillna(method='backfill')
+df = df.fillna(method='ffill')
 
 # %%
-"""
-selection = ['year', 'month', 'day', 'yesterday_visits', 'last_week_visits',
-             'week_day', 'is_weekend', 'cbg_income', 'is_holiday', 'rain', 'population']
-"""
-selection=['year_2020', 'year_2021', 'day', 'yesterday_visits', 'last_week_visits',
-             'is_weekend', 'cbg_income', 'is_holiday', 'rain', 'population', 'Monday', 'Tuesday',
-             'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday',
-             'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
-             'September', 'October', 'November', 'December']
+# selection=['year_2020', 'year_2021', 'day', 'yesterday_visits', 'last_week_visits',
+#             'is_weekend', 'cbg_income', 'is_holiday', 'rain', 'population', 'Monday', 'Tuesday',
+#             'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday',
+#             'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
+#             'September', 'October', 'November', 'December']
 
 # Sort the dataframe by date to create train test splits
-df=df.sort_values(by='date')
-# df_model = add_dummies_df(df)
-df_model=df.fillna(method='backfill')
-df_model=df_model.fillna(method='ffill')
 
 
-y=df_model.pop('visits')
-X=df_model
+y = df.pop('visits')
+X = df
 # %%
 
-X_train, X_test, y_train, y_test=train_test_split(
+X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, shuffle=False)
 
-regr=Lasso(alpha=1)
+regr = Lasso(alpha=1)
 regr.fit(X_train, y_train)
 
-y_pred=regr.predict(X_test)
+y_pred = regr.predict(X_test)
 
-mse=mean_squared_error(y_test, y_pred)
+mse = mean_squared_error(y_test, y_pred)
 print('-------------------')
 print(mse)
 print(regr.score(X_train, y_train))
