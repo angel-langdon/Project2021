@@ -133,7 +133,7 @@ class SafeGraphSession():
         return dest_path
 
 
-def download_census_data():
+def download_census_data_if_necessary():
     def delete_rare_files():
         for root, _, files in os.walk(os.path.dirname(paths.open_census_dir)):
             for file in files:
@@ -152,18 +152,17 @@ def download_census_data():
                                      "data")
     if os.path.isdir(decompressed_path):
         return
-    # not dir but there is the compressed file
-    if os.path.isfile(compressed_path):
-        decompress()
-    # not dir and there isn't the compressed path
     else:
-        print("Downlading open-census-data")
         prefix = 'open-census-data'
         bucket = "sg-c19-response"
         session = SafeGraphSession(prefix, bucket)
         files = session.list_all_files()
         session.download_file(files[0])
         decompress()
+
+
+# download_census_data_if_necessary()
+# %%
 
 
 def download_monthly_patterns_city_data(target_city: str,
