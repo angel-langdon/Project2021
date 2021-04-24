@@ -1,6 +1,7 @@
 # %%
 import os
 
+from utils.download_data import download_safegraph_data
 from utils.path_utils import path_utils
 
 datasets_folder_name = "datasets"
@@ -24,6 +25,13 @@ def get_datasets_path(dir: str = ".", recursion_level: int = 0) -> str:
 
 def get_processed_file_path(state, city, file_name):
     return os.path.join(processed_datasets, state, city, file_name)
+
+
+def get_census_path(file_name):
+    path = os.path.join(open_census_dir, "data", file_name)
+    if not os.path.isdir(open_census_dir):
+        download_safegraph_data.download_census_data()
+    return path
 
 
 DATASETS = get_datasets_path()

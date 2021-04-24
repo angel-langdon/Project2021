@@ -112,8 +112,7 @@ def add_income(df, city="Houston", state='TX'):
         return df.merge(income, on='poi_cbg', how="left")
 
     # else: In case the file doesn't exist
-    census_path = os.path.join(paths.open_census_dir, "data",
-                               "cbg_b19.csv")
+    census_path = paths.get_census_file_path("cbg_b19.csv")
     income = datasets.filter_census_df(census_path,
                                        ['census_block_group', 'B19013e1'],
                                        df["poi_cbg"].unique())

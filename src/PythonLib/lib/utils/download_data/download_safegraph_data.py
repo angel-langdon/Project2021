@@ -133,11 +133,13 @@ class SafeGraphSession():
 
 
 def download_census_data():
-    prefix = 'open-census-data'
-    bucket = "sg-c19-response"
-    session = SafeGraphSession(prefix, bucket)
-    files = session.list_all_files()
-    session.download_file(files[0])
+    if (not os.path.isdir(paths.open_census_dir) and
+            not os.path.isfile()):
+        prefix = 'open-census-data'
+        bucket = "sg-c19-response"
+        session = SafeGraphSession(prefix, bucket)
+        files = session.list_all_files()
+        session.download_file(files[0])
 
 
 def download_monthly_patterns_city_data(target_city: str,

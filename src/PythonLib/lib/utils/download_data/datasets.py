@@ -74,4 +74,6 @@ def get_lastest_home_pannel_summary(cbgs=None, donwload_most_recent=True):
                                 "number_devices_residing"],
                                 cbgs)
     return pd.read_csv(path, encoding="utf-8")
+
+
 # %%
