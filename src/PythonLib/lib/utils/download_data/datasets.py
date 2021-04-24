@@ -4,6 +4,7 @@ from typing import List
 
 import pandas as pd
 from utils.download_data import data_dtypes as dtypes
+from utils.download_data import download_safegraph_data
 from utils.file_utils import file_type
 from utils.path_utils import path_utils, paths
 
@@ -53,18 +54,6 @@ def filter_census_df(path: str, columns: List[str], cbgs: List[str]):
         dfs.append(chunk.copy())
     # concat the filtered chunks
     return pd.concat(dfs)
-# %%
-# files = [f for f in path_utils.list_files_recursively(paths.open_census_dir)
-#         if file_type.is_census_data(f)]
-#houston_folder = os.path.join(paths.processed_datasets, "Houston")
-#subway_normalized = os.path.join(houston_folder, "subway_normalized.csv")
-#df_normalized = pd.read_csv(subway_normalized, dtype=dtypes.mobility_dtypes)
-# %%
-#file = files[0]
-#census = pd.read_csv(file, dtype=dtypes.census_dtypes)
-# %%
-# census[census["census_block_group"].isin(df_normalized["poi_cbg"])]
-# %%
 
 
 def get_census_metadata():
@@ -76,6 +65,13 @@ def get_census_metadata():
     return pd.read_csv(file)
 
 
-# %%
+def get_lastest_home_pannel_summary(cbgs=None, donwload_most_recent=True):
+    if donwload_most_recent:
+        path = download_safegraph_data.download_lastest_home_pannel_summary()
 
+    if cbgs is not None:
+        return filter_census_df(path, ["census_block_group",
+                                "number_devices_residing"],
+                                cbgs)
+    return pd.read_csv(path, encoding="utf-8")
 # %%

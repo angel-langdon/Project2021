@@ -18,6 +18,10 @@ def is_census_metadata(file):
     return all(t in file for t in ["metadata", "cbg"])
 
 
+def is_home_panel_summary(file):
+    return "home_panel_summary/" in file
+
+
 def get_file_type(file):
     if is_brand_info(file):
         return "brand_info"
@@ -25,3 +29,5 @@ def get_file_type(file):
         return "core_poi"
     if is_mobility_pattern(file):
         return "mobility_pattern"
+    if is_home_panel_summary(file):
+        return "home_panel_summary"

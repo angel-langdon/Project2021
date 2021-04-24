@@ -101,7 +101,7 @@ class SafeGraphSession():
         if not self.all_files:
             self.list_all_files()
         date_format = "%Y/%m/%d/%H"
-        if self.files_filtered_by_hour:
+        if self.files_filtered_by_hour is not None:
             return self.files_filtered_by_hour
         rows = []
         for file in self.all_files:
@@ -129,6 +129,7 @@ class SafeGraphSession():
         else:
             if self.verbose:
                 print("File already exists:", dest_path)
+        return dest_path
 
 
 def download_census_data():
@@ -238,13 +239,21 @@ def download_core_poi():
         recent_files_to_download.extend(group["file"])
     for file in recent_files_to_download:
         session.download_file(file)
-
-
-#files = download_core_poi()
-# %%
 # %%
 
 
+def download_lastest_home_pannel_summary():
+    prefix = 'monthly-patterns'
+    bucket = "sg-c19-response"
+    session = SafeGraphSession(prefix, bucket)
+    df = session.filter_files_by_hour()
+    df = df[df["type"] == "home_panel_summary"]
+    df = df.sort_values("date", ascending=False)
+    file_path = df["file"].iloc[0]
+    return session.download_file(file_path)
+
+
 # %%
+
 
 # %%
