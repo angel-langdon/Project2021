@@ -243,8 +243,6 @@ df = add_devices(df, city, state)
 df = compute_real_visits(df)
 df = add_last_visits(df)
 df = add_dummies(df)
-df
-# %%
 # Get rid of COVID window
 df = df[df['date'] > datetime(year=2020, month=3, day=15)]
 # We delete the stores that have less than 200 observations
@@ -257,12 +255,9 @@ df = df[df['visits'] != 0]
 # then we will loss 14000 rows more
 df['yesterday_visits'] = df['yesterday_visits'].replace(0.0, np.NaN)
 df['last_week_visits'] = df['last_week_visits'].replace(0.0, np.NaN)
-# Sort the dataframe by date
-# Implementation of correct fill na is missing
-df = df.sort_values(by='date')
-df = df.fillna(method='backfill')
-df = df.fillna(method='ffill')
-
+# Implementation of correct fill na
+df = (df.sort_values(["placekey", "date"])
+      .groupby("placekey").bfill().ffill())
 # %%
 
 
@@ -284,11 +279,10 @@ def filter_model_columns(df: pd.DataFrame):
 #             'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday',
 #             'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
 #             'September', 'October', 'November', 'December']
+df = df.sort_values(by='date')
 df = filter_model_columns(df)
 # %%
-# %%
-
-
+# Sort the dataframe by date
 y = df.pop('visits')
 X = df
 # %%
