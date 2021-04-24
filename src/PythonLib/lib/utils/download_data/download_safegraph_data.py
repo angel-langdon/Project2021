@@ -1,5 +1,6 @@
 # %%
 import os
+import shutil
 import traceback
 from datetime import datetime
 
@@ -133,13 +134,36 @@ class SafeGraphSession():
 
 
 def download_census_data():
-    if (not os.path.isdir(paths.open_census_dir) and
-            not os.path.isfile()):
+    def delete_rare_files():
+        for root, _, files in os.walk(os.path.dirname(paths.open_census_dir)):
+            for file in files:
+                if "._" in file:
+                    os.remove(os.path.join(root, file))
+
+    def decompress():
+        print("Decompressing census data in:", paths.open_census_dir)
+        shutil.unpack_archive(compressed_path,
+                              os.path.dirname(paths.open_census_dir))
+        delete_rare_files()
+
+    compressed_path = os.path.join(os.path.dirname(paths.open_census_dir),
+                                   "safegraph_open_census_data.tar.gz")
+    decompressed_path = os.path.join(paths.open_census_dir,
+                                     "data")
+    if os.path.isdir(decompressed_path):
+        return
+    # not dir but there is the compressed file
+    if os.path.isfile(compressed_path):
+        decompress()
+    # not dir and there isn't the compressed path
+    else:
+        print("Downlading open-census-data")
         prefix = 'open-census-data'
         bucket = "sg-c19-response"
         session = SafeGraphSession(prefix, bucket)
         files = session.list_all_files()
         session.download_file(files[0])
+        decompress()
 
 
 def download_monthly_patterns_city_data(target_city: str,
