@@ -13,7 +13,11 @@ openpyxl = "*"
 pandas-profiling = "*"
 plotly = "*"
 holidays = "*"
+<<<<<<< HEAD
+pywin32 = "*"
+=======
 sklearn = "*"
+>>>>>>> 91c937c0507abb03befc579d940d821995d45992
 
 [dev-packages]
 
