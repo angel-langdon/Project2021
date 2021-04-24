@@ -33,23 +33,18 @@ def drop_duplicate_stores(patterns: pd.DataFrame):
     return df
 
 
-def read_patterns_data(path):
-    df = pd.read_csv(path, encoding="utf-8",
-                     dtype=dtypes.mobility_dtypes)
-    df = drop_duplicate_stores(df)
+def read_patterns_data(city, state, brand):
+    possible_path = os.path.join(paths.processed_datasets,
+                                 state, city, brand+".csv")
+    if os.path.isfile(possible_path):
+        df = pd.read_csv(possible_path, encoding="utf-8",
+                         dtype=dtypes.mobility_dtypes)
+        df["poi_cbg"] = df["poi_cbg"].astype(int).astype("category")
+        df = drop_duplicate_stores(df)
+    else:
+        msg = "Patterns data not found, should be here:\n"+possible_path
+        raise(FileNotFoundError(msg))
     return df
-
-
-houston_folder = os.path.join(paths.processed_datasets,
-                              "Houston")
-
-houston_dataset_path = os.path.join(houston_folder,
-                                    "mobility-patterns-backfilled_2020-01-01_2021-04-13.csv")
-subway_path = os.path.join(houston_folder, "subway.csv")
-rain_path = os.path.join(paths.processed_datasets,
-                         "Houston",
-                         "rain_houston.csv")
-df_original = read_patterns_data(subway_path)
 
 
 def explode_vists_by_day(df_old):
@@ -130,20 +125,19 @@ def add_week_columns(df):
     return df
 
 
-def is_holiday(df, country='US', city='Houston', state='TX'):
-    df.copy()
+def is_holiday(df, city='Houston', state='TX', country='US'):
+    df = df.copy()
     holi = holidays.CountryHoliday(country, prov=city, state=state)
     df["is_holiday"] = [1 if d in holi else 0 for d in df["date"]]
     return df
 
 
-def add_income(df, city="Houston"):
-
+def add_income(df, city="Houston", state='TX'):
     df = df.copy()
     df["poi_cbg"] = df["poi_cbg"].astype(int).astype(str)
     processed_file_name = "income.csv"
     possible_path = os.path.join(paths.processed_datasets,
-                                 city, processed_file_name)
+                                 state, city, processed_file_name)
     # In case the file exist
     if os.path.isfile(possible_path):
         income = pd.read_csv(possible_path, dtype=dtypes.census_dtypes,
@@ -165,50 +159,38 @@ def add_income(df, city="Houston"):
     return df.merge(income, on='poi_cbg', how='left')
 
 
-df = add_income(df_original, "Houston")
-# %%
-# %%
-# %%
+# "NEEDED THE PATH OF THE POPULATION.CSV, DEVICES.CSV, SUBWAY_HOUSTON_DAYS (SUBWAY)"
 
 
-"""ERROR"""
+def get_population(df, city, state):
+    df = df.copy()
+    file_name = 'population.csv'
+    possible_path = os.path.join(paths.processed_datasets,
+                                 state, city, file_name)
+    if os.path.isfile(possible_path):
+        pop = pd.read_csv(possible_path)
+        pop['poi_cbg'] = pop['poi_cbg'].astype(int).astype(str)
+        return df.merge(pop, on='poi_cbg', how='left')
+    else:
+        msg = 'Population dataset not found, should be here:\n'+possible_path
+        raise(FileNotFoundError(msg))
 
 
-def rain(df):
-    rain_ = pd.read_csv(rain_path)
-    df['date'] = pd.to_datetime(df['date'])
-    df['date'] = df['date'].dt.strftime('%Y-%m-%d')
-    rain_['Dates'] = pd.to_datetime(rain_['Dates'])
-    rain_['Dates'] = rain_['Dates'].dt.strftime('%Y-%m-%d')
-    rain_.columns = ['date', 'rain']
-    # print(rain['date'])
-    df = df.merge(rain_, on='date', how='left')
-    return df
-
-#"NEEDED THE PATH OF THE POPULATION.CSV, DEVICES.CSV, SUBWAY_HOUSTON_DAYS (SUBWAY)"
-
-
-def get_population(df):
-    dat = pd.read_csv(os.path.join(paths.processed_datasets,
-                                   "Houston",
-                                   "population.csv"))
-    dat['poi_cbg'] = dat['poi_cbg'].astype(int).astype(str)
-    df['poi_cbg'].astype(int).astype(str)
-    df = df.merge(dat, on='poi_cbg', how='left')
-    return df
-
-
-def get_devices(df):
-    # home_panel_summary
-    nf = pd.read_csv(os.path.join(paths.processed_datasets,
-                                  "Houston",
-                                  "devices.csv"))
-    nf['poi_cbg'] = nf['poi_cbg'].astype(int).astype(str)
-    df['poi_cbg'].astype(int).astype(str)
-    #print(type(df['poi_cbg']), type(nf['poi_cbg']))
-    df = df.merge(nf, on='poi_cbg', how='left')
-
-    return df
+def get_devices(df, city, state):
+    df = df.copy()
+    file_name = "devices.csv"
+    possible_path = os.path.join(paths.processed_datasets,
+                                 state, city, file_name)
+    if os.path.isfile(possible_path):
+        # home_panel_summary
+        nf = pd.read_csv(os.path.join(paths.processed_datasets,
+                                      "Houston",
+                                      "devices.csv"))
+        nf['poi_cbg'] = nf['poi_cbg'].astype(int).astype(str)
+        return df.merge(nf, on='poi_cbg', how='left')
+    else:
+        msg = "Devices data not found, should be here:\n"+possible_path
+        raise(FileNotFoundError(msg))
 
 
 def get_real_visits(df):
@@ -216,13 +198,34 @@ def get_real_visits(df):
     return df
 
 
+def add_rain(df, city="Houston", state="TX"):
+    possible_path = os.path.join(paths.processed_datasets,
+                                 state, city, "rain.csv")
+    if os.path.isfile(possible_path):
+        rain_df = pd.read_csv(possible_path)
+        rain_df['date'] = pd.to_datetime(rain_df['date'],
+                                         format=DATE_FORMATS.DAY)
+        return df.merge(rain_df, on='date', how='left')
+    else:
+        msg = "Rain data is missing it shoud be here: \n"+possible_path
+        raise(BaseException(msg))
+
+
+country = "US"
+city = "Houston"
+state = "TX"
+brand = "subway"
+df_original = read_patterns_data(city, state, brand)
 df = explode_vists_by_day(df_original)
 df = filter_selected_cols(df)
 
 df = add_week_columns(df)
-df = income(df)
-df = is_holiday(df)
-df = rain(df)
+df = add_income(df, city, state)
+df = is_holiday(df, city, state)
+df = add_rain(df, city, state)
+df
+
+# %%
 df = get_population(df)
 df = get_devices(df)
 df = get_real_visits(df)
