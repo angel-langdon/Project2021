@@ -12,7 +12,7 @@ from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.model_selection import GridSearchCV, train_test_split
 from utils.date_utils.date_formats import DATE_FORMATS
 from utils.download_data import data_dtypes as dtypes
-from utils.download_data import datasets
+from utils.download_data import datasets, download_safegraph_data
 from utils.path_utils import paths
 
 
@@ -102,6 +102,7 @@ def add_rain(df, city, state):
 
 def add_income(df, city="Houston", state='TX'):
     df = df.copy()
+    df["poi_cbg"] = df["poi_cbg"].astype(int).astype(str)
     file_name = "income.csv"
     path = paths.get_processed_file_path(state, city, file_name)
     # In case the file exist
@@ -113,6 +114,7 @@ def add_income(df, city="Houston", state='TX'):
 
     # else: In case the file doesn't exist
     census_path = paths.get_census_file_path("cbg_b19.csv")
+    download_safegraph_data.download_census_data_if_necessary()
     income = datasets.filter_census_df(census_path,
                                        ['census_block_group', 'B19013e1'],
                                        df["poi_cbg"].unique())
@@ -133,9 +135,7 @@ def add_population(df, city, state):
         pop['poi_cbg'] = pop['poi_cbg'].astype(int).astype(str)
         return df.merge(pop, on='poi_cbg', how='left')
     else:
-        census_path = os.path.join(paths.open_census_dir,
-                                   "data",
-                                   "cbg_b01.csv")
+        census_path = paths.get_census_path("cbg_b01.csv")
         pop_id = "B01001e1"
         cbgs = df["poi_cbg"].unique()
         pop = datasets.filter_census_df(census_path,
@@ -214,7 +214,7 @@ def add_dummies(df):
     df["month"] = df["date"].dt.month_name()
     df = pd.get_dummies(df, columns=["month"])
     df["day_aux"] = df["date"].dt.day_name()
-    df = pd.get_dummies(df, columns=["day_aux"])
+    df = pd.get_dummies(df, columns=["day_aux"], prefix="day")
     return df
 
 
@@ -243,6 +243,7 @@ df = add_devices(df, city, state)
 df = compute_real_visits(df)
 df = add_last_visits(df)
 df = add_dummies(df)
+df
 # %%
 # Get rid of COVID window
 df = df[df['date'] > datetime(year=2020, month=3, day=15)]
@@ -256,7 +257,8 @@ df = df[df['visits'] != 0]
 # then we will loss 14000 rows more
 df['yesterday_visits'] = df['yesterday_visits'].replace(0.0, np.NaN)
 df['last_week_visits'] = df['last_week_visits'].replace(0.0, np.NaN)
-#
+# Sort the dataframe by date
+# Implementation of correct fill na is missing
 df = df.sort_values(by='date')
 df = df.fillna(method='backfill')
 df = df.fillna(method='ffill')
@@ -286,8 +288,6 @@ df = filter_model_columns(df)
 # %%
 # %%
 
-# Sort the dataframe by date to create train test splits
-
 
 y = df.pop('visits')
 X = df
@@ -308,6 +308,7 @@ print(regr.score(X_train, y_train))
 print(regr.score(X_test, y_test))
 
 # %%
-{col: coef for col, coef in zip(df.columns, regr.coef_)}
+coefs = {col: coef for col, coef in zip(df.columns, regr.coef_)}
+dict(sorted(coefs.items(), key=lambda x: abs(x[1]), reverse=True))
 
 # %%
