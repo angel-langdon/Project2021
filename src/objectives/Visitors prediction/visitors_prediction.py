@@ -6,31 +6,30 @@ from datetime import timedelta
 import holidays
 import numpy as np
 import pandas as pd
+from sklearn.linear_model import Ridge
+from sklearn.metrics import mean_squared_error
+from sklearn.model_selection import train_test_split
 from utils.date_utils.date_formats import DATE_FORMATS
 from utils.download_data import data_dtypes as dtypes
+from utils.download_data import datasets
 from utils.path_utils import paths
 
-houston_folder = os.path.join(paths.processed_datasets,
-                              "Houston")
 
-houston_dataset_path = os.path.join(houston_folder,
-                                    "mobility-patterns-backfilled_2020-01-01_2021-04-13.csv")
-subway_path = os.path.join(houston_folder, "subway.csv")
-rain_path = os.path.join(paths.processed_datasets,
-                         "Houston",
-                         "rain_houston.csv")
-
-#%%
 def drop_duplicate_stores(patterns: pd.DataFrame):
     """ Drops duplicated rows of patterns data
     """
     df = patterns.copy()
+    # We sort the data frame by placekey, date and latitude
+    # to later drop the duplicates and keep the observations
+    # that contain latitude and longitude values
     df = df.sort_values(by=["placekey",
-                            "date_range_start"])
+                            "date_range_start",
+                            "latitude"])
     df = df.drop_duplicates(subset=["placekey",
                                     "date_range_start",
                                     "date_range_end"],
-                            keep="last")
+                            keep="first")
+
     return df
 
 
@@ -41,10 +40,17 @@ def read_patterns_data(path):
     return df
 
 
-# %%
+houston_folder = os.path.join(paths.processed_datasets,
+                              "Houston")
+
+houston_dataset_path = os.path.join(houston_folder,
+                                    "mobility-patterns-backfilled_2020-01-01_2021-04-13.csv")
+subway_path = os.path.join(houston_folder, "subway.csv")
+rain_path = os.path.join(paths.processed_datasets,
+                         "Houston",
+                         "rain_houston.csv")
 df_original = read_patterns_data(subway_path)
-#rain = pd.read_csv(rain_path)
-# %%
+
 
 def explode_vists_by_day(df_old):
     def get_dictionary_list_visits_day(visits_list):
@@ -123,71 +129,59 @@ def add_week_columns(df):
         df.loc[df['week_day'] == day, 'is_weekend'] = 1
     return df
 
-"""
-def is_weekend(df):
-    df = df.copy()
-    df['date'] = pd.to_datetime(df['date'])
 
-    df['is_weekend'] = df['date'].dt.day_name()
-    df.loc[df['is_weekend'] == "Saturday", 'is_weekend'] = 1
-    df.loc[df['is_weekend'] == "Sunday", 'is_weekend'] = 1
-    df.loc[df['is_weekend'] == "Monday", 'is_weekend'] = 0
-    df.loc[df['is_weekend'] == "Tuesday", 'is_weekend'] = 0
-    df.loc[df['is_weekend'] == "Wednesday", 'is_weekend'] = 0
-    df.loc[df['is_weekend'] == "Thursday", 'is_weekend'] = 0
-    df.loc[df['is_weekend'] == "Friday", 'is_weekend'] = 0
-
-    return df
-"""
-
-def is_holiday(df):
+def is_holiday(df, country='US', city='Houston', state='TX'):
     df.copy()
-    holi = holidays.CountryHoliday('US', prov="Houston", state='TX')
+    holi = holidays.CountryHoliday(country, prov=city, state=state)
     df["is_holiday"] = [1 if d in holi else 0 for d in df["date"]]
     return df
 
-def income(df):
-    cosa = pd.read_csv(os.path.join(paths.processed_datasets,
-                         "Houston",
-                         "income.csv"), encoding="utf-8",
-                       dtype={"census_block_group": "category"})
 
-    df['poi_cbg'] = df['poi_cbg'].map(int)
-    df['poi_cbg'] = df['poi_cbg'].map(str)
+def add_income(df, city="Houston"):
 
-    #new = df[df['region'] == 'TX']
-    cbgs = set(df['poi_cbg'])
+    df = df.copy()
+    df["poi_cbg"] = df["poi_cbg"].astype(int).astype(str)
+    processed_file_name = "income.csv"
+    possible_path = os.path.join(paths.processed_datasets,
+                                 city, processed_file_name)
+    # In case the file exist
+    if os.path.isfile(possible_path):
+        income = pd.read_csv(possible_path, dtype=dtypes.census_dtypes,
+                             encoding="utf-8")
+        income["poi_cbg"] = income["poi_cbg"].astype(int).astype(str)
+        return df.merge(income, on='poi_cbg', how="left")
 
-    cosa = cosa[cosa['census_block_group'].map(int).map(str).isin(cbgs)]
-    # cosa = cosa[['census_block_group', 'B19013e1']]
-    cosa.columns = ['poi_cbg', 'cbg_income']
-    #cosa.rename({'census_block_group': 'poi_cbg', 'B19013e1': 'cbg_income'})
-    cosa['poi_cbg'] = cosa['poi_cbg'].astype(int).astype(str)
-    df = df.merge(cosa, on='poi_cbg', how='left')
-    return df
+    # else: In case the file doesn't exist
+    census_path = os.path.join(paths.open_census_dir, "data",
+                               "cbg_b19.csv")
+    income = datasets.filter_census_df(census_path,
+                                       ['census_block_group', 'B19013e1'],
+                                       df["poi_cbg"].unique())
+    # rename the cols for convenience
+    income = income.rename(columns={"census_block_group": "poi_cbg",
+                                    'B19013e1': 'cbg_income'})
+    # save the dataframe to cache it for the next time
+    income.to_csv(possible_path, index=False, encoding="utf-8")
+    return df.merge(income, on='poi_cbg', how='left')
 
-    """
-    new['cbg_income'] = 0
-    for row in cosa.iterrows():
-        new['cbg_income'] = np.where(new['poi_cbg'] == str(
-            row[1][0]), row[1][1], new['cbg_income'])
 
-    return new
-    """
+df = add_income(df_original, "Houston")
+# %%
+# %%
+# %%
+
 
 """ERROR"""
 
+
 def rain(df):
     rain_ = pd.read_csv(rain_path)
-    #rain_2020 = pd.read_csv('data/rain_houston_2020.csv', sep=';')
-    #rain_2021 = pd.read_csv('data/rain_houston_2021.csv', sep=';')
-    # df['date'] = df['date'].map(int)
     df['date'] = pd.to_datetime(df['date'])
     df['date'] = df['date'].dt.strftime('%Y-%m-%d')
     rain_['Dates'] = pd.to_datetime(rain_['Dates'])
     rain_['Dates'] = rain_['Dates'].dt.strftime('%Y-%m-%d')
     rain_.columns = ['date', 'rain']
-    #print(rain['date'])
+    # print(rain['date'])
     df = df.merge(rain_, on='date', how='left')
     return df
 
@@ -196,8 +190,8 @@ def rain(df):
 
 def get_population(df):
     dat = pd.read_csv(os.path.join(paths.processed_datasets,
-                         "Houston",
-                         "population.csv"))
+                                   "Houston",
+                                   "population.csv"))
     dat['poi_cbg'] = dat['poi_cbg'].astype(int).astype(str)
     df['poi_cbg'].astype(int).astype(str)
     df = df.merge(dat, on='poi_cbg', how='left')
@@ -207,8 +201,8 @@ def get_population(df):
 def get_devices(df):
     # home_panel_summary
     nf = pd.read_csv(os.path.join(paths.processed_datasets,
-                         "Houston",
-                         "devices.csv"))
+                                  "Houston",
+                                  "devices.csv"))
     nf['poi_cbg'] = nf['poi_cbg'].astype(int).astype(str)
     df['poi_cbg'].astype(int).astype(str)
     #print(type(df['poi_cbg']), type(nf['poi_cbg']))
@@ -237,44 +231,48 @@ df = add_last_visits(df)
 # %%
 
 df.to_csv(os.path.join(paths.processed_datasets,
-                         "Houston",
-                         "MODEL_SUBWAY.csv"), index = False)
-# %% 
+                       "Houston",
+                       "MODEL_SUBWAY.csv"), index=False)
+# %%
+
 
 def add_dummies_df(df_: pd.DataFrame):
 
     df = df_.copy()
     dummies = pd.get_dummies(df['year'], prefix='year')
     # Drop column B as it is now encoded
-    df = df.drop('year', axis = 1)
+    df = df.drop('year', axis=1)
     # Join the encoded df
     df = df.join(dummies)
-    
+
     dummies = pd.get_dummies(df['month'])
     # Drop column B as it is now encoded
-    df = df.drop('month', axis = 1)
+    df = df.drop('month', axis=1)
     # Join the encoded df
-    dummies.columns = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+    dummies.columns = ['January', 'February', 'March', 'April', 'May', 'June',
+                       'July', 'August', 'September', 'October', 'November', 'December']
     df = df.join(dummies)
 
     dummies = pd.get_dummies(df['week_day'])
     # Drop column B as it is now encoded
-    df = df.drop('week_day', axis = 1)
+    df = df.drop('week_day', axis=1)
     # Join the encoded df
-    dummies.columns = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+    dummies.columns = ['Monday', 'Tuesday', 'Wednesday',
+                       'Thursday', 'Friday', 'Saturday', 'Sunday']
     df = df.join(dummies)
 
     return df
 
 # %%
 
+
 """
 VERY IMPORTANT, CONTACT WITH n4choo, zMazcu or MikeKowalski for futher information
 """
 
 df = pd.read_csv(os.path.join(paths.processed_datasets,
-                         "Houston",
-                         "MODEL_SUBWAY.csv"))
+                              "Houston",
+                              "MODEL_SUBWAY.csv"))
 
 df = df[(df['date'] > '2020-03-15')]
 
@@ -302,18 +300,15 @@ df['last_week_visits'] = df['last_week_visits'].replace(0.0, np.NaN)
 -----------------------------------------------------
 """
 
-from sklearn.linear_model import Ridge
-from sklearn.metrics import mean_squared_error
-from sklearn.model_selection import train_test_split
 
 """
 selection = ['year', 'month', 'day', 'yesterday_visits', 'last_week_visits',
              'week_day', 'is_weekend', 'cbg_income', 'is_holiday', 'rain', 'population']
 """
 selection = ['year_2020', 'year_2021', 'day', 'yesterday_visits', 'last_week_visits',
-             'is_weekend', 'cbg_income', 'is_holiday', 'rain', 'population', 'Monday', 'Tuesday', 
-             'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday', 
-             'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 
+             'is_weekend', 'cbg_income', 'is_holiday', 'rain', 'population', 'Monday', 'Tuesday',
+             'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday',
+             'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
              'September', 'October', 'November', 'December']
 
 df_model = add_dummies_df(df)
@@ -324,7 +319,8 @@ df_model = df_model.fillna(method='ffill')
 y = df_model.pop('real_visits')
 X = df_model[selection]
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, shuffle=False,random_state=20)
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, shuffle=False, random_state=20)
 
 clf = Ridge(alpha=1.0)
 clf.fit(X_train, y_train)
