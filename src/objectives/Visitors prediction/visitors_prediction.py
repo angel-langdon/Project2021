@@ -6,9 +6,10 @@ from datetime import timedelta
 import holidays
 import numpy as np
 import pandas as pd
-from sklearn.linear_model import Ridge
-from sklearn.metrics import mean_squared_error
-from sklearn.model_selection import train_test_split
+from sklearn.linear_model import (BayesianRidge, ElasticNet, HuberRegressor,
+                                  LassoLars, PoissonRegressor)
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.model_selection import GridSearchCV, train_test_split
 from utils.date_utils.date_formats import DATE_FORMATS
 from utils.download_data import data_dtypes as dtypes
 from utils.download_data import datasets
@@ -163,26 +164,30 @@ def add_population(df, city, state):
         return df.merge(pop, on='poi_cbg', how="left")
 
 
-def get_devices(df, city, state):
+def add_devices(df, city, state):
     df = df.copy()
     file_name = "devices.csv"
     possible_path = os.path.join(paths.processed_datasets,
                                  state, city, file_name)
     if os.path.isfile(possible_path):
         # home_panel_summary
-        nf = pd.read_csv(possible_path)
-        nf['poi_cbg'] = nf['poi_cbg'].astype(int).astype(str)
-        return df.merge(nf, on='poi_cbg', how='left')
+        devices = pd.read_csv(possible_path)
+        devices['poi_cbg'] = devices['poi_cbg'].astype(int).astype(str)
+        return df.merge(devices, on='poi_cbg', how='left')
     else:
-        devices_id = ""
-        msg = "Devices data not found, should be here:\n"+possible_path
-        raise(FileNotFoundError(msg))
+        devices = datasets.get_lastest_home_pannel_summary(df["poi_cbg"])
+        devices = devices.rename(columns={"census_block_group": "poi_cbg"})
+        devices["poi_cbg"] = devices["poi_cbg"].astype(int).astype(str)
+        devices.to_csv(possible_path, index=False, encoding="utf-8")
+        return df.merge(devices, on="poi_cbg", how="left")
 
 
 def get_real_visits(df):
     """ Apply visits micro-normalization to get real visits"""
     df = df.copy()
-    df['visits'] = (df['population'] // df['devices'])*df['visits']
+    devices_col = "number_devices_residing"
+    df['visits'] = (((df['population'] / df[devices_col]) * df['visits'])
+                    .round().astype(int))
     return df
 
 
@@ -233,19 +238,16 @@ df = add_income(df, city, state)
 df = is_holiday(df, city, state)
 df = add_rain(df, city, state)
 df = add_population(df, city, state)
-# %%
-
-df = get_devices(df, city, state)
-
-# %%
+df = add_devices(df, city, state)
 df = get_real_visits(df)
 df = add_last_visits(df)
-
+df
+# %%
 # %%
 
-df.to_csv(os.path.join(paths.processed_datasets,
-                       "Houston",
-                       "MODEL_SUBWAY.csv"), index=False)
+# df.to_csv(os.path.join(paths.processed_datasets,
+#                       "Houston",
+#                       "MODEL_SUBWAY.csv"), index=False)
 # %%
 
 
@@ -276,44 +278,22 @@ def add_dummies_df(df_: pd.DataFrame):
 
     return df
 
+
 # %%
-
-
-"""
-VERY IMPORTANT, CONTACT WITH n4choo, zMazcu or MikeKowalski for futher information
-"""
-
-df = pd.read_csv(os.path.join(paths.processed_datasets,
-                              "Houston",
-                              "MODEL_SUBWAY.csv"))
-
+# Get rid of COVID window
 df = df[(df['date'] > '2020-03-15')]
-
-placekeys_series = df['placekey'].value_counts()
-placekeys_series = placekeys_series[placekeys_series >= 200]
-placekeys = list(placekeys_series.index)
-
-df = df[df['placekey'].isin(placekeys)]
-
-df = df[df['real_visits'] != 0]
-
-df = df.sort_values(by='date')
-# %%
-"""
-SEEMS STUPID, BUT IT IS CRUCIAL FOR THE MODEL
-"""
+# We delete the stores that have less than 200 observations
+df = df[df.groupby('placekey')['placekey'].transform('size') > 200]
+# It makes no sense for the model trying to predict 0 visits
+# because 0 visits reflects that probably the store was closed
+df = df[df['visits'] != 0]
+# It is important to fill the values that have 0 with NAs
+# to backfill them later, if we delete the values that are 0
+# then we will loss 14000 rows more
 df['yesterday_visits'] = df['yesterday_visits'].replace(0.0, np.NaN)
 df['last_week_visits'] = df['last_week_visits'].replace(0.0, np.NaN)
 
 # %%
-
-"""
------------------------------------------------------
-----------------------M O D E L----------------------
------------------------------------------------------
-"""
-
-
 """
 selection = ['year', 'month', 'day', 'yesterday_visits', 'last_week_visits',
              'week_day', 'is_weekend', 'cbg_income', 'is_holiday', 'rain', 'population']
@@ -324,26 +304,52 @@ selection = ['year_2020', 'year_2021', 'day', 'yesterday_visits', 'last_week_vis
              'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
              'September', 'October', 'November', 'December']
 
+# Sort the dataframe by date to create train test splits
+df = df.sort_values(by='date')
 df_model = add_dummies_df(df)
 df_model = df_model.fillna(method='backfill')
 df_model = df_model.fillna(method='ffill')
 
 
-y = df_model.pop('real_visits')
+y = df_model.pop('visits')
 X = df_model[selection]
+# %%
 
 X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.3, shuffle=False, random_state=20)
+    X, y, test_size=0.2, shuffle=False)
 
-clf = Ridge(alpha=1.0)
-clf.fit(X_train, y_train)
+regr = LassoLars()
+regr.fit(X_train, y_train)
 
-y_pred = clf.predict(X_test)
+y_pred = regr.predict(X_test)
 
 mse = mean_squared_error(y_test, y_pred)
 
 print(mse)
 # %%
-print(clf.score(X_train, y_train))
-print(clf.score(X_test, y_test))
+print(regr.score(X_train, y_train))
+print(regr.score(X_test, y_test))
+# %%
+# %%
+# parameters = {'alpha': [0.001, 0.01, 0.05, 0.1, 0.25],
+#              'l1_ratio': [0, 0.5, 1]}
+# regr = GridSearchCV(estimator=ElasticNet(normalize=False),
+#                    param_grid=parameters)
+
+# %%
+regr.fit(X_train, y_train)
+
+y_pred = regr.predict(X_test)
+
+# %%
+
+mse = mean_squared_error(y_test, y_pred)
+print('-------------------')
+print(mse)
+print(regr.score(X_train, y_train))
+print(regr.score(X_test, y_test))
+
+# %%
+regr.best_params_
+
 # %%
