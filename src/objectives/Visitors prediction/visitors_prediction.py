@@ -7,7 +7,7 @@ import holidays
 import numpy as np
 import pandas as pd
 from sklearn.linear_model import (BayesianRidge, ElasticNet, HuberRegressor,
-                                  LassoLars, PoissonRegressor)
+                                  Lasso, Ridge)
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.model_selection import GridSearchCV, train_test_split
 from utils.date_utils.date_formats import DATE_FORMATS
@@ -318,7 +318,7 @@ X = df_model[selection]
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, shuffle=False)
 
-regr = LassoLars()
+regr = Lasso(alpha=1)
 regr.fit(X_train, y_train)
 
 y_pred = regr.predict(X_test)
@@ -353,3 +353,4 @@ print(regr.score(X_test, y_test))
 regr.best_params_
 
 # %%
+
