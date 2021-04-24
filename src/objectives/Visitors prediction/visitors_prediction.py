@@ -1,7 +1,7 @@
 # %%
 import json
 import os
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 import holidays
 import numpy as np
@@ -225,6 +225,16 @@ def add_last_visits(df: pd.DataFrame):
     return df
 
 
+def add_dummies(df):
+    df = df.copy()
+    df = pd.get_dummies(df, columns=["year"])
+    df["month"] = df["date"].dt.month_name()
+    df = pd.get_dummies(df, columns=["month"])
+    df["day"] = df["date"].dt.day_name()
+    df = pd.get_dummies(df, columns=["day"])
+    return df
+
+
 country = "US"
 city = "Houston"
 state = "TX"
@@ -241,116 +251,61 @@ df = add_population(df, city, state)
 df = add_devices(df, city, state)
 df = get_real_visits(df)
 df = add_last_visits(df)
+df = add_dummies(df)
 df
 # %%
-# %%
-
-# df.to_csv(os.path.join(paths.processed_datasets,
-#                       "Houston",
-#                       "MODEL_SUBWAY.csv"), index=False)
-# %%
-
-
-def add_dummies_df(df_: pd.DataFrame):
-
-    df = df_.copy()
-    dummies = pd.get_dummies(df['year'], prefix='year')
-    # Drop column B as it is now encoded
-    df = df.drop('year', axis=1)
-    # Join the encoded df
-    df = df.join(dummies)
-
-    dummies = pd.get_dummies(df['month'])
-    # Drop column B as it is now encoded
-    df = df.drop('month', axis=1)
-    # Join the encoded df
-    dummies.columns = ['January', 'February', 'March', 'April', 'May', 'June',
-                       'July', 'August', 'September', 'October', 'November', 'December']
-    df = df.join(dummies)
-
-    dummies = pd.get_dummies(df['week_day'])
-    # Drop column B as it is now encoded
-    df = df.drop('week_day', axis=1)
-    # Join the encoded df
-    dummies.columns = ['Monday', 'Tuesday', 'Wednesday',
-                       'Thursday', 'Friday', 'Saturday', 'Sunday']
-    df = df.join(dummies)
-
-    return df
+for c in df.columns:
+    print(c)
 
 
 # %%
 # Get rid of COVID window
-df = df[(df['date'] > '2020-03-15')]
+df = df[(df['date'] > datetime(year=2020, month=3, day=15)]
 # We delete the stores that have less than 200 observations
-df = df[df.groupby('placekey')['placekey'].transform('size') > 200]
+df=df[df.groupby('placekey')['placekey'].transform('size') > 200]
 # It makes no sense for the model trying to predict 0 visits
 # because 0 visits reflects that probably the store was closed
-df = df[df['visits'] != 0]
+df=df[df['visits'] != 0]
 # It is important to fill the values that have 0 with NAs
 # to backfill them later, if we delete the values that are 0
 # then we will loss 14000 rows more
-df['yesterday_visits'] = df['yesterday_visits'].replace(0.0, np.NaN)
-df['last_week_visits'] = df['last_week_visits'].replace(0.0, np.NaN)
+df['yesterday_visits']=df['yesterday_visits'].replace(0.0, np.NaN)
+df['last_week_visits']=df['last_week_visits'].replace(0.0, np.NaN)
 
 # %%
 """
 selection = ['year', 'month', 'day', 'yesterday_visits', 'last_week_visits',
              'week_day', 'is_weekend', 'cbg_income', 'is_holiday', 'rain', 'population']
 """
-selection = ['year_2020', 'year_2021', 'day', 'yesterday_visits', 'last_week_visits',
+selection=['year_2020', 'year_2021', 'day', 'yesterday_visits', 'last_week_visits',
              'is_weekend', 'cbg_income', 'is_holiday', 'rain', 'population', 'Monday', 'Tuesday',
              'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday',
              'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
              'September', 'October', 'November', 'December']
 
 # Sort the dataframe by date to create train test splits
-df = df.sort_values(by='date')
-df_model = add_dummies_df(df)
-df_model = df_model.fillna(method='backfill')
-df_model = df_model.fillna(method='ffill')
+df=df.sort_values(by='date')
+# df_model = add_dummies_df(df)
+df_model=df.fillna(method='backfill')
+df_model=df_model.fillna(method='ffill')
 
 
-y = df_model.pop('visits')
-X = df_model[selection]
+y=df_model.pop('visits')
+X=df_model
 # %%
 
-X_train, X_test, y_train, y_test = train_test_split(
+X_train, X_test, y_train, y_test=train_test_split(
     X, y, test_size=0.2, shuffle=False)
 
-regr = Lasso(alpha=1)
+regr=Lasso(alpha=1)
 regr.fit(X_train, y_train)
 
-y_pred = regr.predict(X_test)
+y_pred=regr.predict(X_test)
 
-mse = mean_squared_error(y_test, y_pred)
-
-print(mse)
-# %%
-print(regr.score(X_train, y_train))
-print(regr.score(X_test, y_test))
-# %%
-# %%
-# parameters = {'alpha': [0.001, 0.01, 0.05, 0.1, 0.25],
-#              'l1_ratio': [0, 0.5, 1]}
-# regr = GridSearchCV(estimator=ElasticNet(normalize=False),
-#                    param_grid=parameters)
-
-# %%
-regr.fit(X_train, y_train)
-
-y_pred = regr.predict(X_test)
-
-# %%
-
-mse = mean_squared_error(y_test, y_pred)
+mse=mean_squared_error(y_test, y_pred)
 print('-------------------')
 print(mse)
 print(regr.score(X_train, y_train))
 print(regr.score(X_test, y_test))
 
 # %%
-regr.best_params_
-
-# %%
-
