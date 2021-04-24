@@ -30,20 +30,18 @@ def drop_duplicate_stores(patterns: pd.DataFrame):
                                     "date_range_start",
                                     "date_range_end"],
                             keep="first")
-
     return df
 
 
 def read_patterns_data(city, state, brand):
-    possible_path = os.path.join(paths.processed_datasets,
-                                 state, city, brand+".csv")
-    if os.path.isfile(possible_path):
-        df = pd.read_csv(possible_path, encoding="utf-8",
+    path = paths.get_processed_file_path(state, city, brand+'.csv')
+    if os.path.isfile(path):
+        df = pd.read_csv(path, encoding="utf-8",
                          dtype=dtypes.mobility_dtypes)
         df["poi_cbg"] = df["poi_cbg"].astype("int64").astype("category")
         df = drop_duplicate_stores(df)
     else:
-        msg = "Patterns data not found, should be here:\n"+possible_path
+        msg = "Patterns data not found, should be here:\n"+path
         raise(FileNotFoundError(msg))
     return df
 
@@ -83,35 +81,32 @@ def add_week_columns(df):
     return df
 
 
-def add_is_holiday(df, city='Houston', state='TX', country='US'):
+def add_is_holiday(df, city, state, country):
     df = df.copy()
     holi = holidays.CountryHoliday(country, prov=city, state=state)
     df["is_holiday"] = [1 if d in holi else 0 for d in df["date"]]
     return df
 
 
-def add_rain(df, city="Houston", state="TX"):
-    possible_path = os.path.join(paths.processed_datasets,
-                                 state, city, "rain.csv")
-    if os.path.isfile(possible_path):
-        rain_df = pd.read_csv(possible_path)
+def add_rain(df, city, state):
+    path = paths.get_processed_file_path(state, city, 'rain.csv')
+    if os.path.isfile(path):
+        rain_df = pd.read_csv(path)
         rain_df['date'] = pd.to_datetime(rain_df['date'],
                                          format=DATE_FORMATS.DAY)
         return df.merge(rain_df, on='date', how='left')
     else:
-        msg = "Rain data is missing it shoud be here: \n"+possible_path
-        raise(BaseException(msg))
+        msg = "Rain data is missing it shoud be here: \n"+path
+        raise(FileNotFoundError(msg))
 
 
 def add_income(df, city="Houston", state='TX'):
     df = df.copy()
-    df["poi_cbg"] = df["poi_cbg"].astype(int).astype(str)
-    processed_file_name = "income.csv"
-    possible_path = os.path.join(paths.processed_datasets,
-                                 state, city, processed_file_name)
+    file_name = "income.csv"
+    path = paths.get_processed_file_path(state, city, file_name)
     # In case the file exist
-    if os.path.isfile(possible_path):
-        income = pd.read_csv(possible_path, dtype=dtypes.census_dtypes,
+    if os.path.isfile(path):
+        income = pd.read_csv(path, dtype=dtypes.census_dtypes,
                              encoding="utf-8")
         income["poi_cbg"] = income["poi_cbg"].astype(int).astype(str)
         return df.merge(income, on='poi_cbg', how="left")
@@ -126,17 +121,16 @@ def add_income(df, city="Houston", state='TX'):
     income = income.rename(columns={"census_block_group": "poi_cbg",
                                     'B19013e1': 'income'})
     # save the dataframe to cache it for the next time
-    income.to_csv(possible_path, index=False, encoding="utf-8")
+    income.to_csv(path, index=False, encoding="utf-8")
     return df.merge(income, on='poi_cbg', how='left')
 
 
 def add_population(df, city, state):
     df = df.copy()
     file_name = 'population.csv'
-    possible_path = os.path.join(paths.processed_datasets,
-                                 state, city, file_name)
-    if os.path.isfile(possible_path):
-        pop = pd.read_csv(possible_path)
+    path = paths.get_processed_file_path(state, city, file_name)
+    if os.path.isfile(path):
+        pop = pd.read_csv(path)
         pop['poi_cbg'] = pop['poi_cbg'].astype(int).astype(str)
         return df.merge(pop, on='poi_cbg', how='left')
     else:
@@ -151,25 +145,24 @@ def add_population(df, city, state):
         pop = pop.rename(columns={pop_id: 'population',
                                   "census_block_group": 'poi_cbg'})
         pop['poi_cbg'] = pop['poi_cbg'].astype(int).astype(str)
-        pop.to_csv(possible_path, index=False, encoding="utf-8")
+        pop.to_csv(path, index=False, encoding="utf-8")
         return df.merge(pop, on='poi_cbg', how="left")
 
 
 def add_devices(df, city, state):
     df = df.copy()
     file_name = "devices.csv"
-    possible_path = os.path.join(paths.processed_datasets,
-                                 state, city, file_name)
-    if os.path.isfile(possible_path):
+    path = paths.get_processed_file_path(state, city, file_name)
+    if os.path.isfile(path):
         # home_panel_summary
-        devices = pd.read_csv(possible_path)
+        devices = pd.read_csv(path)
         devices['poi_cbg'] = devices['poi_cbg'].astype(int).astype(str)
         return df.merge(devices, on='poi_cbg', how='left')
     else:
         devices = datasets.get_lastest_home_pannel_summary(df["poi_cbg"])
         devices = devices.rename(columns={"census_block_group": "poi_cbg"})
         devices["poi_cbg"] = devices["poi_cbg"].astype(int).astype(str)
-        devices.to_csv(possible_path, index=False, encoding="utf-8")
+        devices.to_csv(path, index=False, encoding="utf-8")
         return df.merge(devices, on="poi_cbg", how="left")
 
 
@@ -221,8 +214,8 @@ def add_dummies(df):
     df = pd.get_dummies(df, columns=["year"])
     df["month"] = df["date"].dt.month_name()
     df = pd.get_dummies(df, columns=["month"])
-    df["day"] = df["date"].dt.day_name()
-    df = pd.get_dummies(df, columns=["day"])
+    df["day_aux"] = df["date"].dt.day_name()
+    df = pd.get_dummies(df, columns=["day_aux"])
     return df
 
 
@@ -244,15 +237,13 @@ df = explode_vists_by_day(df_original)
 df = filter_columns(df)
 df = add_week_columns(df)
 df = add_income(df, city, state)
-df = add_is_holiday(df, city, state)
+df = add_is_holiday(df, city, state, country)
 df = add_rain(df, city, state)
 df = add_population(df, city, state)
 df = add_devices(df, city, state)
 df = compute_real_visits(df)
 df = add_last_visits(df)
 df = add_dummies(df)
-#df = filter_selected_cols(df)
-df
 # %%
 # Get rid of COVID window
 df = df[df['date'] > datetime(year=2020, month=3, day=15)]
@@ -272,11 +263,29 @@ df = df.fillna(method='backfill')
 df = df.fillna(method='ffill')
 
 # %%
+
+
+def filter_model_columns(df: pd.DataFrame):
+    exclude_cols = ['placekey',
+                    'brands',
+                    'latitude',
+                    'longitude',
+                    'street_address',
+                    'date',
+                    'week_day']
+    cols = [col for col in df.columns if col not in exclude_cols]
+    return df[cols]
+
+
+# %%
 # selection=['year_2020', 'year_2021', 'day', 'yesterday_visits', 'last_week_visits',
 #             'is_weekend', 'cbg_income', 'is_holiday', 'rain', 'population', 'Monday', 'Tuesday',
 #             'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday',
 #             'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
 #             'September', 'October', 'November', 'December']
+df = filter_model_columns(df)
+# %%
+# %%
 
 # Sort the dataframe by date to create train test splits
 
@@ -298,5 +307,8 @@ print('-------------------')
 print(mse)
 print(regr.score(X_train, y_train))
 print(regr.score(X_test, y_test))
+
+# %%
+{col: coef for col, coef in zip(df.columns, regr.coef_)}
 
 # %%

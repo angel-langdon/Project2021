@@ -22,6 +22,10 @@ def get_datasets_path(dir: str = ".", recursion_level: int = 0) -> str:
     return get_datasets_path(os.path.join("..", dir), recursion_level + 1)
 
 
+def get_processed_file_path(state, city, file_name):
+    return os.path.join(processed_datasets, state, city, file_name)
+
+
 DATASETS = get_datasets_path()
 temp_datasets = os.path.join(DATASETS, temp_folder_name)
 processed_datasets = os.path.join(DATASETS, processed_folder_name)
