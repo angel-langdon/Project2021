@@ -1,5 +1,6 @@
 # %%
 import os
+from typing import List
 
 import pandas as pd
 from utils.download_data import data_dtypes as dtypes
@@ -36,6 +37,22 @@ def get_core_poi_by_city(city, region=None, save_data=True):
     return final_df
 
 
+def filter_census_df(path: str, columns: List[str], cbgs: List[str]):
+    """ Filters census .csv given the columns and the cbgs
+    """
+    dfs = []
+    # read the file per parts because it is 1gb large
+    for chunk in pd.read_csv(path,
+                             encoding="utf-8",
+                             chunksize=10000,
+                             dtype=dtypes.census_dtypes):
+        chunk["census_block_group"] = (chunk["census_block_group"]
+                                       .astype(int).astype(str))
+        chunk = chunk[chunk["census_block_group"].isin(cbgs)]
+        chunk = chunk[columns]
+        dfs.append(chunk.copy())
+    # concat the filtered chunks
+    return pd.concat(dfs)
 # %%
 # files = [f for f in path_utils.list_files_recursively(paths.open_census_dir)
 #         if file_type.is_census_data(f)]
