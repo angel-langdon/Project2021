@@ -8,7 +8,7 @@ import holidays
 import numpy as np
 import pandas as pd
 from sklearn.linear_model import (BayesianRidge, ElasticNet, HuberRegressor,
-                                  Lasso, Ridge)
+                                  Lasso, LinearRegression, Ridge)
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.model_selection import GridSearchCV, train_test_split
 from utils.date_utils.date_formats import DATE_FORMATS
@@ -218,13 +218,14 @@ def add_last_visits(df: pd.DataFrame):
     return df
 
 
-def add_dummies(df):
+def add_dummies(df, drop_first=False):
     df = df.copy()
-    df = pd.get_dummies(df, columns=["year"])
+    df = pd.get_dummies(df, columns=["year"], drop_first=drop_first)
     df["month"] = df["date"].dt.month_name()
-    df = pd.get_dummies(df, columns=["month"])
+    df = pd.get_dummies(df, columns=["month"], drop_first=drop_first)
     df["day_aux"] = df["date"].dt.day_name()
-    df = pd.get_dummies(df, columns=["day_aux"], prefix="day")
+    df = pd.get_dummies(df, columns=["day_aux"],
+                        prefix="day", drop_first=drop_first)
     return df
 
 
@@ -252,7 +253,7 @@ df = add_population(df, city, state)
 df = add_devices(df, city, state)
 df = compute_real_visits(df)
 df = add_last_visits(df)
-df = add_dummies(df)
+df = add_dummies(df, drop_first=True)
 # Get rid of COVID window
 df = df[df['date'] > datetime(year=2020, month=3, day=15)]
 # We delete the stores that have less than 200 observations
