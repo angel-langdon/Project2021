@@ -1,6 +1,7 @@
 # %%
 import json
 import os
+from collections import Counter
 from datetime import datetime, timedelta
 
 import holidays
@@ -14,6 +15,13 @@ from utils.date_utils.date_formats import DATE_FORMATS
 from utils.download_data import data_dtypes as dtypes
 from utils.download_data import datasets, download_safegraph_data
 from utils.path_utils import paths
+
+
+def get_important_brands(df: pd.DataFrame):
+    dic = Counter(df["brands"])
+    dic = dict(sorted(dic.items(), key=lambda x: x[1], reverse=True))
+    brands = pd.DataFrame(dic.items(), columns=["brand", "count"])
+    return brands.dropna()
 
 
 def drop_duplicate_stores(patterns: pd.DataFrame):
@@ -38,6 +46,7 @@ def read_patterns_data(city, state, brand):
     if os.path.isfile(path):
         df = pd.read_csv(path, encoding="utf-8",
                          dtype=dtypes.mobility_dtypes)
+        df = df.dropna(subset=["poi_cbg"])
         df["poi_cbg"] = df["poi_cbg"].astype("int64").astype("category")
         df = drop_duplicate_stores(df)
     else:
@@ -259,8 +268,6 @@ df['last_week_visits'] = df['last_week_visits'].replace(0.0, np.NaN)
 # Implementation of correct fill na
 df = (df.sort_values(["placekey", "date"])
       .groupby("placekey").bfill().ffill())
-# %%
-df
 # %%
 
 
