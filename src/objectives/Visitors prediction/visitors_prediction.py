@@ -8,7 +8,7 @@ import holidays
 import numpy as np
 import pandas as pd
 from sklearn.linear_model import (BayesianRidge, ElasticNet, HuberRegressor,
-                                  Lasso, Ridge)
+                                  Lasso, LinearRegression, Ridge)
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.model_selection import GridSearchCV, train_test_split
 from utils.date_utils.date_formats import DATE_FORMATS
@@ -218,13 +218,14 @@ def add_last_visits(df: pd.DataFrame):
     return df
 
 
-def add_dummies(df):
+def add_dummies(df, drop_first=False):
     df = df.copy()
-    df = pd.get_dummies(df, columns=["year"])
+    df = pd.get_dummies(df, columns=["year"], drop_first=drop_first)
     df["month"] = df["date"].dt.month_name()
-    df = pd.get_dummies(df, columns=["month"])
+    df = pd.get_dummies(df, columns=["month"], drop_first=drop_first)
     df["day_aux"] = df["date"].dt.day_name()
-    df = pd.get_dummies(df, columns=["day_aux"], prefix="day")
+    df = pd.get_dummies(df, columns=["day_aux"],
+                        prefix="day", drop_first=drop_first)
     return df
 
 
@@ -252,7 +253,7 @@ df = add_population(df, city, state)
 df = add_devices(df, city, state)
 df = compute_real_visits(df)
 df = add_last_visits(df)
-df = add_dummies(df)
+df = add_dummies(df, drop_first=False)
 # Get rid of COVID window
 df = df[df['date'] > datetime(year=2020, month=3, day=15)]
 # We delete the stores that have less than 200 observations
@@ -283,6 +284,14 @@ def filter_model_columns(df: pd.DataFrame):
     return df[cols]
 
 
+def get_correlation_plot(df):
+    corr = df.corr().round(2)
+    return corr.style.background_gradient(cmap='coolwarm')
+
+
+get_correlation_plot(df)
+
+
 # %%
 # selection=['year_2020', 'year_2021', 'day', 'yesterday_visits', 'last_week_visits',
 #             'is_weekend', 'cbg_income', 'is_holiday', 'rain', 'population', 'Monday', 'Tuesday',
@@ -301,6 +310,7 @@ X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, shuffle=False)
 
 regr = Lasso(alpha=1)
+regr = LinearRegression()
 regr.fit(X_train, y_train)
 
 y_pred = regr.predict(X_test)
