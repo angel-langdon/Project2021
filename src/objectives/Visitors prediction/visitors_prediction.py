@@ -135,9 +135,10 @@ def add_population(df, city, state):
         pop['poi_cbg'] = pop['poi_cbg'].astype(int).astype(str)
         return df.merge(pop, on='poi_cbg', how='left')
     else:
-        census_path = paths.get_census_path("cbg_b01.csv")
+        census_path = paths.get_census_file_path("cbg_b01.csv")
         pop_id = "B01001e1"
         cbgs = df["poi_cbg"].unique()
+        download_safegraph_data.download_census_data_if_necessary()
         pop = datasets.filter_census_df(census_path,
                                         ["census_block_group", pop_id],
                                         cbgs)
@@ -259,6 +260,8 @@ df['last_week_visits'] = df['last_week_visits'].replace(0.0, np.NaN)
 df = (df.sort_values(["placekey", "date"])
       .groupby("placekey").bfill().ffill())
 # %%
+df
+# %%
 
 
 def filter_model_columns(df: pd.DataFrame):
@@ -303,6 +306,7 @@ print(regr.score(X_test, y_test))
 
 # %%
 coefs = {col: coef for col, coef in zip(df.columns, regr.coef_)}
-dict(sorted(coefs.items(), key=lambda x: abs(x[1]), reverse=True))
+coefs = dict(sorted(coefs.items(), key=lambda x: abs(x[1]), reverse=True))
+coefs
 
 # %%

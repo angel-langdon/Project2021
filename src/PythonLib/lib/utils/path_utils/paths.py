@@ -26,7 +26,7 @@ def get_processed_file_path(state, city, file_name):
     return os.path.join(processed_datasets, state, city, file_name)
 
 
-def get_census_path(file_name):
+def get_census_file_path(file_name):
     path = os.path.join(open_census_dir, "data", file_name)
     return path
 
