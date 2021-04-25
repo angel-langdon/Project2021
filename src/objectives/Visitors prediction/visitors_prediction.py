@@ -253,7 +253,7 @@ df = add_population(df, city, state)
 df = add_devices(df, city, state)
 df = compute_real_visits(df)
 df = add_last_visits(df)
-df = add_dummies(df, drop_first=True)
+df = add_dummies(df, drop_first=False)
 # Get rid of COVID window
 df = df[df['date'] > datetime(year=2020, month=3, day=15)]
 # We delete the stores that have less than 200 observations
@@ -282,6 +282,14 @@ def filter_model_columns(df: pd.DataFrame):
                     'week_day']
     cols = [col for col in df.columns if col not in exclude_cols]
     return df[cols]
+
+
+def get_correlation_plot(df):
+    corr = df.corr().round(2)
+    return corr.style.background_gradient(cmap='coolwarm')
+
+
+get_correlation_plot(df)
 
 
 # %%
