@@ -289,7 +289,13 @@ def get_correlation_plot(df):
     return corr.style.background_gradient(cmap='coolwarm')
 
 
-get_correlation_plot(df)
+def get_sorted_coefs(columns, coefficients):
+    coefs = {col: coef for col, coef in zip(columns, coefficients)}
+    coefs = dict(sorted(coefs.items(), key=lambda x: abs(x[1]), reverse=True))
+    return coefs
+
+
+# get_correlation_plot(df)
 
 
 # %%
@@ -310,7 +316,6 @@ X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, shuffle=False)
 
 regr = Lasso(alpha=1)
-regr = LinearRegression()
 regr.fit(X_train, y_train)
 
 y_pred = regr.predict(X_test)
@@ -320,10 +325,5 @@ print('-------------------')
 print(mse)
 print(regr.score(X_train, y_train))
 print(regr.score(X_test, y_test))
-
 # %%
-coefs = {col: coef for col, coef in zip(df.columns, regr.coef_)}
-coefs = dict(sorted(coefs.items(), key=lambda x: abs(x[1]), reverse=True))
-coefs
-
-# %%
+get_sorted_coefs(df.columns, regr.coef_)
