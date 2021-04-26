@@ -338,5 +338,50 @@ print(regr.score(X_test, y_test))
 get_sorted_coefs(df.columns, regr.coef_)
 
 # %%
+"""
+TESTING
+"""
 
+# %%
+from collections import Counter
+
+Counter(df['poi_cbg'])
+# %%
+aaa = df[df['poi_cbg'] == '482011000003']
+aaa.shape
+# %%
+aaa
+# %%
+bbb = df_original[df_original['poi_cbg'] == '482011000003']
+# %%
+bbb
+# %%
+df_original
+# %%
+test = explode_vists_by_day(df_original)
+bbb = test[test['poi_cbg'] == '482014103003']
+
+# %%
+bbb.shape
+# %%
+test
+# %%
+df_original = read_patterns_data(city, state, brand)
+df = explode_vists_by_day(df_original)
+df = filter_columns(df)
+df = add_week_columns(df)
+df = add_income(df, city, state)
+df = add_is_holiday(df, city, state, country)
+df = add_rain(df, city, state)
+df = add_population(df, city, state)
+df = add_devices(df, city, state)
+df = compute_real_visits(df)
+df = add_last_visits(df)
+df = add_dummies(df, drop_first=False)
+
+a = df[df['poi_cbg'] == '482014103003']
+# %%
+a.shape
+# %%
+Counter(a['date'])
 # %%
