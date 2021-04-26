@@ -18,7 +18,7 @@ from utils.path_utils import paths
 
 
 def get_important_brands(df: pd.DataFrame):
-    dic = Counter(df["brand"])
+    dic = Counter(df["brands"])
     dic = dict(sorted(dic.items(), key=lambda x: x[1], reverse=True))
     brands = pd.DataFrame(dic.items(), columns=["brand", "count"])
     return brands.dropna()
@@ -257,11 +257,11 @@ df = add_dummies(df, drop_first=False)
 # %%
 # Get rid of COVID window
 df = df[df['date'] > datetime(year=2020, month=3, day=15)]
-# We delete the stores that have less than 200 observations
-df = df[df.groupby('placekey')['placekey'].transform('size') > 200]
 # It makes no sense for the model trying to predict 0 visits
 # because 0 visits reflects that probably the store was closed
 df = df[df['visits'] != 0]
+# We delete the stores that have less than 200 observations
+df = df[df.groupby('placekey')['placekey'].transform('size') > 200]
 # It is important to fill the values that have 0 with NAs
 # to backfill them later, if we delete the values that are 0
 # then we will loss 14000 rows more
