@@ -18,7 +18,7 @@ from utils.path_utils import paths
 
 
 def get_important_brands(df: pd.DataFrame):
-    dic = Counter(df["brands"])
+    dic = Counter(df["brand"])
     dic = dict(sorted(dic.items(), key=lambda x: x[1], reverse=True))
     brands = pd.DataFrame(dic.items(), columns=["brand", "count"])
     return brands.dropna()
@@ -254,6 +254,7 @@ df = add_devices(df, city, state)
 df = compute_real_visits(df)
 df = add_last_visits(df)
 df = add_dummies(df, drop_first=False)
+# %%
 # Get rid of COVID window
 df = df[df['date'] > datetime(year=2020, month=3, day=15)]
 # We delete the stores that have less than 200 observations
@@ -269,6 +270,14 @@ df['last_week_visits'] = df['last_week_visits'].replace(0.0, np.NaN)
 # Implementation of correct fill na
 df = (df.sort_values(["placekey", "date"])
       .groupby("placekey").bfill().ffill())
+
+# %%
+
+
+def add_mean_visits():
+    pass
+
+
 # %%
 
 
@@ -327,3 +336,7 @@ print(regr.score(X_train, y_train))
 print(regr.score(X_test, y_test))
 # %%
 get_sorted_coefs(df.columns, regr.coef_)
+
+# %%
+
+# %%
