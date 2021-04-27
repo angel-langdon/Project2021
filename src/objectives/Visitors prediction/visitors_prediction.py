@@ -373,10 +373,24 @@ SVM
 from sklearn import svm
 from sklearn.ensemble import RandomForestRegressor
 
+params={'kernel':['poly', 'rbf', 'sigmoid'], 'degree':[1, 3, 5], 'C':[0.5, 1, 1.5]}
+model = GridSearchCV(svm.SVR(), params)
+
+model.fit(X_train, y_train)
+
+y_pred = model.predict(X = X_test)
+
+mse = mean_squared_error(y_test, y_pred)
+
+print(f"El error (mse) de test es: {mse}")
+print(model.score(X_train, y_train))
+print(model.score(X_test, y_test))
+print(model.get_params())
+
+
 # %%
 
-
-params={'n_estimators':[20, 50, 100, 150, 200], 'criterion'=['mse', 'mae'], ''}
+params={'n_estimators':[20, 50, 100, 150, 200], 'criterion':['mse', 'mae'], 'max_features':['auto', 'sqrt', 'log2']}
 model = GridSearchCV(RandomForestRegressor(n_jobs=-1), params)
 
 model.fit(X_train, y_train)
