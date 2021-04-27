@@ -14,7 +14,7 @@ pandas-profiling = "*"
 plotly = "*"
 holidays = "*"
 sklearn = "*"
-pywin32 = "*"
+pywin32 = {version = "*", sys_platform = "== 'win32'"}
 xgboost = "*"
 
 [dev-packages]
