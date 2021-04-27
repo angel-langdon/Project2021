@@ -239,7 +239,7 @@ def mean_30_days(test):
     df2 =(df_eee.shift().rolling(window=n, min_periods=1).mean().reset_index().drop_duplicates())
     #print(df2['index'])
     df3 = (pd.melt(df2, id_vars='index', value_name='visits').sort_values(['index', 'placekey']).reset_index(drop=True))
-    df3 = df3.rename(columns={'index':'date', 'visits':'mean_last_week'})
+    df3 = df3.rename(columns={'index':'date', 'visits':'mean_last_30_days'})
     test = test.merge(df3, on=['placekey', 'date'], how='left')
     return test
 
@@ -297,36 +297,8 @@ df = compute_real_visits(df)
 df = add_last_visits(df)
 df = mean_week(df)
 df = mean_30_days(df)
-#df = clean_stores(df)
+df = clean_stores(df)
 #df = add_dummies(df, drop_first=False)
-# %%
-
-
-# %%
-cols = ['date', 'visits']
-test_df = df[df['placekey'] == '222-222@8fc-8ct-47q']
-test_df = test_df[cols]
-test_df = test_df.resample('W', on='date').mean()
-test_df.head()
-
-
-def add_mean_visits(df):
-    df = df.sort_values(["placekey", "date"])
-
-    pass
-
-#%%
-
-#%%
-ccc
-#%%
-testing = ccc[ccc['placekey'] == '222-222@8fc-8ct-47q']
-
-testing['visits'][0:7].mean()
-#%%
-
-testing.head(8)
-
 #%%
 def filter_model_columns(df: pd.DataFrame):
     exclude_cols = ['placekey',
@@ -335,7 +307,16 @@ def filter_model_columns(df: pd.DataFrame):
                     'longitude',
                     'street_address',
                     'date',
-                    'week_day' ]
+                    'week_day',
+                    'is_weekend',
+                    'number_devices_residing',
+                    'postal_code',
+                    'cbg_income',
+                    'poi_cbg',
+                    'is_holiday',
+                    'population',
+                    'month',
+                    'year']
     cols = [col for col in df.columns if col not in exclude_cols]
     return df[cols]
 
@@ -387,8 +368,9 @@ get_sorted_coefs(df.columns, regr.coef_)
 
 # %%
 """
-TESTING
+XGBOOST
 """
 
-df
+
+
 # %%

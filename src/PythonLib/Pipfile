@@ -15,6 +15,7 @@ plotly = "*"
 holidays = "*"
 sklearn = "*"
 pywin32 = "*"
+xgboost = "*"
 
 [dev-packages]
 
