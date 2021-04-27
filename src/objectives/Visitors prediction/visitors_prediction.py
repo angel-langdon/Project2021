@@ -55,7 +55,7 @@ def read_patterns_data(city, state, brand):
     return df
 
 
-def explode_vists_by_day(df_old):
+def explode_visits_by_day(df_old):
     def get_dictionary_list_visits_day(visits_list):
         return [{"visits": visits, "day": day + 1}
                 for day, visits in enumerate(visits_list)]
@@ -217,6 +217,31 @@ def add_last_visits(df: pd.DataFrame):
         period_df = period_df.drop(columns=[period_visits_col])
     return df
 
+def mean_week(test):
+    n = 7
+    test['date'] = pd.to_datetime(test.date)
+    idx = pd.date_range(test.date.min(), test.date.max(), freq='D')
+    df_eee = test.pivot(index='date', values='visits', columns='placekey').reindex(idx)
+    #print(df_eee.iloc[0])
+    df2 =(df_eee.shift().rolling(window=n, min_periods=1).mean().reset_index().drop_duplicates())
+    #print(df2['index'])
+    df3 = (pd.melt(df2, id_vars='index', value_name='visits').sort_values(['index', 'placekey']).reset_index(drop=True))
+    df3 = df3.rename(columns={'index':'date', 'visits':'mean_last_week'})
+    test = test.merge(df3, on=['placekey', 'date'], how='left')
+    return test
+
+def mean_30_days(test):
+    n = 30
+    test['date'] = pd.to_datetime(test.date)
+    idx = pd.date_range(test.date.min(), test.date.max(), freq='D')
+    df_eee = test.pivot(index='date', values='visits', columns='placekey').reindex(idx)
+    #print(df_eee.iloc[0])
+    df2 =(df_eee.shift().rolling(window=n, min_periods=1).mean().reset_index().drop_duplicates())
+    #print(df2['index'])
+    df3 = (pd.melt(df2, id_vars='index', value_name='visits').sort_values(['index', 'placekey']).reset_index(drop=True))
+    df3 = df3.rename(columns={'index':'date', 'visits':'mean_last_week'})
+    test = test.merge(df3, on=['placekey', 'date'], how='left')
+    return test
 
 def add_dummies(df, drop_first=False):
     df = df.copy()
@@ -228,7 +253,6 @@ def add_dummies(df, drop_first=False):
                         prefix="day", drop_first=drop_first)
     return df
 
-
 def filter_columns(df):
     df = df.copy()
     target_cols = ['placekey', "brands", 'latitude',
@@ -237,13 +261,31 @@ def filter_columns(df):
                    'day', 'visits']
     return df[target_cols]
 
+def clean_stores(df):
+    # Get rid of COVID window
+    df = df[df['date'] > datetime(year=2020, month=3, day=15)]
+    # It makes no sense for the model trying to predict 0 visits
+    # because 0 visits reflects that probably the store was closed
+    df = df[df['visits'] != 0]
+    # We delete the stores that have less than 200 observations
+    df = df[df.groupby('placekey')['placekey'].transform('size') > 200]
+    # It is important to fill the values that have 0 with NAs
+    # to backfill them later, if we delete the values that are 0
+    # then we will loss 14000 rows more
+    df['yesterday_visits'] = df['yesterday_visits'].replace(0.0, np.NaN)
+    df['last_week_visits'] = df['last_week_visits'].replace(0.0, np.NaN)
+    # Implementation of correct fill na
+        
+    df = (df.sort_values(["placekey", "date"]).groupby("placekey", as_index=False).bfill().ffill())
+    
+    return df
 
 country = "US"
 city = "Houston"
 state = "TX"
 brand = "subway"
 df_original = read_patterns_data(city, state, brand)
-df = explode_vists_by_day(df_original)
+df = explode_visits_by_day(df_original)
 df = filter_columns(df)
 df = add_week_columns(df)
 df = add_income(df, city, state)
@@ -253,34 +295,39 @@ df = add_population(df, city, state)
 df = add_devices(df, city, state)
 df = compute_real_visits(df)
 df = add_last_visits(df)
-df = add_dummies(df, drop_first=False)
-# %%
-# Get rid of COVID window
-df = df[df['date'] > datetime(year=2020, month=3, day=15)]
-# It makes no sense for the model trying to predict 0 visits
-# because 0 visits reflects that probably the store was closed
-df = df[df['visits'] != 0]
-# We delete the stores that have less than 200 observations
-df = df[df.groupby('placekey')['placekey'].transform('size') > 200]
-# It is important to fill the values that have 0 with NAs
-# to backfill them later, if we delete the values that are 0
-# then we will loss 14000 rows more
-df['yesterday_visits'] = df['yesterday_visits'].replace(0.0, np.NaN)
-df['last_week_visits'] = df['last_week_visits'].replace(0.0, np.NaN)
-# Implementation of correct fill na
-df = (df.sort_values(["placekey", "date"])
-      .groupby("placekey").bfill().ffill())
-
+df = mean_week(df)
+df = mean_30_days(df)
+#df = clean_stores(df)
+#df = add_dummies(df, drop_first=False)
 # %%
 
 
-def add_mean_visits():
+# %%
+cols = ['date', 'visits']
+test_df = df[df['placekey'] == '222-222@8fc-8ct-47q']
+test_df = test_df[cols]
+test_df = test_df.resample('W', on='date').mean()
+test_df.head()
+
+
+def add_mean_visits(df):
+    df = df.sort_values(["placekey", "date"])
+
     pass
 
+#%%
 
-# %%
+#%%
+ccc
+#%%
+testing = ccc[ccc['placekey'] == '222-222@8fc-8ct-47q']
 
+testing['visits'][0:7].mean()
+#%%
 
+testing.head(8)
+
+#%%
 def filter_model_columns(df: pd.DataFrame):
     exclude_cols = ['placekey',
                     'brands',
@@ -288,7 +335,7 @@ def filter_model_columns(df: pd.DataFrame):
                     'longitude',
                     'street_address',
                     'date',
-                    'week_day']
+                    'week_day' ]
     cols = [col for col in df.columns if col not in exclude_cols]
     return df[cols]
 
@@ -317,6 +364,7 @@ df = df.sort_values(by='date')
 df = filter_model_columns(df)
 # %%
 # Sort the dataframe by date
+
 y = df.pop('visits')
 X = df
 # %%
@@ -342,46 +390,5 @@ get_sorted_coefs(df.columns, regr.coef_)
 TESTING
 """
 
-# %%
-from collections import Counter
-
-Counter(df['poi_cbg'])
-# %%
-aaa = df[df['poi_cbg'] == '482011000003']
-aaa.shape
-# %%
-aaa
-# %%
-bbb = df_original[df_original['poi_cbg'] == '482011000003']
-# %%
-bbb
-# %%
-df_original
-# %%
-test = explode_vists_by_day(df_original)
-bbb = test[test['poi_cbg'] == '482014103003']
-
-# %%
-bbb.shape
-# %%
-test
-# %%
-df_original = read_patterns_data(city, state, brand)
-df = explode_vists_by_day(df_original)
-df = filter_columns(df)
-df = add_week_columns(df)
-df = add_income(df, city, state)
-df = add_is_holiday(df, city, state, country)
-df = add_rain(df, city, state)
-df = add_population(df, city, state)
-df = add_devices(df, city, state)
-df = compute_real_visits(df)
-df = add_last_visits(df)
-df = add_dummies(df, drop_first=False)
-
-a = df[df['poi_cbg'] == '482014103003']
-# %%
-a.shape
-# %%
-Counter(a['date'])
+df
 # %%
