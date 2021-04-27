@@ -368,9 +368,25 @@ get_sorted_coefs(df.columns, regr.coef_)
 
 # %%
 """
-XGBOOST
+SVM
 """
+from sklearn import svm
+from sklearn.ensemble import RandomForestRegressor
+
+# %%
 
 
+params={'n_estimators':[20, 50, 100, 150, 200], 'criterion'=['mse', 'mae'], ''}
+model = GridSearchCV(RandomForestRegressor(n_jobs=-1), params)
 
+model.fit(X_train, y_train)
+
+y_pred = model.predict(X = X_test)
+
+mse = mean_squared_error(y_test, y_pred)
+
+print(f"El error (mse) de test es: {mse}")
+print(model.score(X_train, y_train))
+print(model.score(X_test, y_test))
+print(model.get_params())
 # %%
