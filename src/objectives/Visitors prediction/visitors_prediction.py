@@ -7,10 +7,13 @@ from datetime import datetime, timedelta
 import holidays
 import numpy as np
 import pandas as pd
+from sklearn import svm
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import (BayesianRidge, ElasticNet, HuberRegressor,
                                   Lasso, LinearRegression, Ridge)
 from sklearn.metrics import mean_squared_error, r2_score
-from sklearn.model_selection import GridSearchCV, train_test_split
+from sklearn.model_selection import (GridSearchCV, RandomizedSearchCV,
+                                     train_test_split)
 from utils.date_utils.date_formats import DATE_FORMATS
 from utils.download_data import data_dtypes as dtypes
 from utils.download_data import datasets, download_safegraph_data
@@ -217,31 +220,40 @@ def add_last_visits(df: pd.DataFrame):
         period_df = period_df.drop(columns=[period_visits_col])
     return df
 
+
 def mean_week(test):
     n = 7
     test['date'] = pd.to_datetime(test.date)
     idx = pd.date_range(test.date.min(), test.date.max(), freq='D')
-    df_eee = test.pivot(index='date', values='visits', columns='placekey').reindex(idx)
-    #print(df_eee.iloc[0])
-    df2 =(df_eee.shift().rolling(window=n, min_periods=1).mean().reset_index().drop_duplicates())
-    #print(df2['index'])
-    df3 = (pd.melt(df2, id_vars='index', value_name='visits').sort_values(['index', 'placekey']).reset_index(drop=True))
-    df3 = df3.rename(columns={'index':'date', 'visits':'mean_last_week'})
+    df_eee = test.pivot(index='date', values='visits',
+                        columns='placekey').reindex(idx)
+    # print(df_eee.iloc[0])
+    df2 = (df_eee.shift().rolling(
+        window=n, min_periods=1).mean().reset_index().drop_duplicates())
+    # print(df2['index'])
+    df3 = (pd.melt(df2, id_vars='index', value_name='visits').sort_values(
+        ['index', 'placekey']).reset_index(drop=True))
+    df3 = df3.rename(columns={'index': 'date', 'visits': 'mean_last_week'})
     test = test.merge(df3, on=['placekey', 'date'], how='left')
     return test
+
 
 def mean_30_days(test):
     n = 30
     test['date'] = pd.to_datetime(test.date)
     idx = pd.date_range(test.date.min(), test.date.max(), freq='D')
-    df_eee = test.pivot(index='date', values='visits', columns='placekey').reindex(idx)
-    #print(df_eee.iloc[0])
-    df2 =(df_eee.shift().rolling(window=n, min_periods=1).mean().reset_index().drop_duplicates())
-    #print(df2['index'])
-    df3 = (pd.melt(df2, id_vars='index', value_name='visits').sort_values(['index', 'placekey']).reset_index(drop=True))
-    df3 = df3.rename(columns={'index':'date', 'visits':'mean_last_30_days'})
+    df_eee = test.pivot(index='date', values='visits',
+                        columns='placekey').reindex(idx)
+    # print(df_eee.iloc[0])
+    df2 = (df_eee.shift().rolling(
+        window=n, min_periods=1).mean().reset_index().drop_duplicates())
+    # print(df2['index'])
+    df3 = (pd.melt(df2, id_vars='index', value_name='visits').sort_values(
+        ['index', 'placekey']).reset_index(drop=True))
+    df3 = df3.rename(columns={'index': 'date', 'visits': 'mean_last_30_days'})
     test = test.merge(df3, on=['placekey', 'date'], how='left')
     return test
+
 
 def add_dummies(df, drop_first=False):
     df = df.copy()
@@ -253,6 +265,7 @@ def add_dummies(df, drop_first=False):
                         prefix="day", drop_first=drop_first)
     return df
 
+
 def filter_columns(df):
     df = df.copy()
     target_cols = ['placekey', "brands", 'latitude',
@@ -260,6 +273,7 @@ def filter_columns(df):
                    'poi_cbg', 'date', 'year', 'month',
                    'day', 'visits']
     return df[target_cols]
+
 
 def clean_stores(df):
     # Get rid of COVID window
@@ -275,10 +289,13 @@ def clean_stores(df):
     df['yesterday_visits'] = df['yesterday_visits'].replace(0.0, np.NaN)
     df['last_week_visits'] = df['last_week_visits'].replace(0.0, np.NaN)
     # Implementation of correct fill na
-        
-    df = (df.sort_values(["placekey", "date"]).groupby("placekey", as_index=False).bfill().ffill())
-    
+
+    df = (df.sort_values(["placekey", "date"]).groupby(
+        "placekey", as_index=False).bfill().ffill())
+
     return df
+# %%
+
 
 country = "US"
 city = "Houston"
@@ -299,7 +316,9 @@ df = mean_week(df)
 df = mean_30_days(df)
 df = clean_stores(df)
 #df = add_dummies(df, drop_first=False)
-#%%
+# %%
+
+
 def filter_model_columns(df: pd.DataFrame):
     exclude_cols = ['placekey',
                     'brands',
@@ -370,15 +389,15 @@ get_sorted_coefs(df.columns, regr.coef_)
 """
 SVM
 """
-from sklearn import svm
-from sklearn.ensemble import RandomForestRegressor
 
-params={'kernel':['poly', 'rbf', 'sigmoid'], 'degree':[1, 3, 5], 'C':[0.5, 1, 1.5]}
+params = {'kernel': ['poly', 'rbf', 'sigmoid'],
+          'degree': [1, 3, 5],
+          'C': [0.5, 1, 1.5]}
 model = GridSearchCV(svm.SVR(), params)
 
 model.fit(X_train, y_train)
 
-y_pred = model.predict(X = X_test)
+y_pred = model.predict(X=X_test)
 
 mse = mean_squared_error(y_test, y_pred)
 
@@ -390,12 +409,17 @@ print(model.get_params())
 
 # %%
 
-params={'n_estimators':[20, 50, 100, 150, 200], 'criterion':['mse', 'mae'], 'max_features':['auto', 'sqrt', 'log2']}
-model = GridSearchCV(RandomForestRegressor(n_jobs=-1), params)
+params = {'n_estimators': [20, 50, 100, 150, 200],
+          'criterion': ['mse', 'mae'],
+          'max_features': ['auto', 'sqrt', 'log2']}
+model = RandomizedSearchCV(RandomForestRegressor(),
+                           params,
+                           cv=2,
+                           n_jobs=-1)
 
 model.fit(X_train, y_train)
 
-y_pred = model.predict(X = X_test)
+y_pred = model.predict(X=X_test)
 
 mse = mean_squared_error(y_test, y_pred)
 
