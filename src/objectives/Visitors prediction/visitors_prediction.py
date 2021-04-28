@@ -427,7 +427,8 @@ def get_sorted_coefs(columns, coefficients):
 #             'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
 #             'September', 'October', 'November', 'December']
 df = df.sort_values(by='date')
-df_model = filter_model_columns(df)
+df = filter_model_columns(df)
+df_model = df.copy()
 # %%
 # Sort the dataframe by date
 
@@ -454,7 +455,6 @@ get_sorted_coefs(df_model.columns, regr.coef_)
 
 #%%
 
-df
 # %%
 """
 SVM -> very very very slow
@@ -500,9 +500,4 @@ print(f"El error (mse) de test es: {mse}")
 print(model.score(X_train, y_train))
 print(model.score(X_test, y_test))
 print(model.get_params())
-# %%
-
-df_model.to_csv('df_model.csv', index=False)
-# %%
-pd.read_csv('/Users/mazcu/Desktop/df_model.csv')
 # %%
