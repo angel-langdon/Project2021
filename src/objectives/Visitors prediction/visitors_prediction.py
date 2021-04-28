@@ -147,7 +147,6 @@ def add_income(df, city="Houston", state='TX'):
     income.to_csv(path, index=False, encoding="utf-8")
     return df.merge(income, on='poi_cbg', how='left')
 
-
 def add_population(df, city, state):
     df = df.copy()
     file_name = 'population.csv'
@@ -230,24 +229,6 @@ def add_last_visits(df: pd.DataFrame):
         period_df = period_df.drop(columns=[period_visits_col])
     return df
 
-
-def mean_week(test):
-    n = 7
-    test['date'] = pd.to_datetime(test.date)
-    idx = pd.date_range(test.date.min(), test.date.max(), freq='D')
-    df_eee = test.pivot(index='date', values='visits',
-                        columns='placekey').reindex(idx)
-    # print(df_eee.iloc[0])
-    df2 = (df_eee.shift().rolling(
-        window=n, min_periods=1).mean().reset_index().drop_duplicates())
-    # print(df2['index'])
-    df3 = (pd.melt(df2, id_vars='index', value_name='visits').sort_values(
-        ['index', 'placekey']).reset_index(drop=True))
-    df3 = df3.rename(columns={'index': 'date', 'visits': 'mean_last_week'})
-    test = test.merge(df3, on=['placekey', 'date'], how='left')
-    return test
-
-
 def mean_n_days(test, n):
     test['date'] = pd.to_datetime(test.date)
     idx = pd.date_range(test.date.min(), test.date.max(), freq='D')
@@ -262,71 +243,6 @@ def mean_n_days(test, n):
     df3 = df3.rename(columns={'index': 'date', 'visits': f'mean_last_{n}_days'})
     test = test.merge(df3, on=['placekey', 'date'], how='left')
     return test
-"""
-def mean_14_days(test):
-    n = 14
-    test['date'] = pd.to_datetime(test.date)
-    idx = pd.date_range(test.date.min(), test.date.max(), freq='D')
-    df_eee = test.pivot(index='date', values='visits',
-                        columns='placekey').reindex(idx)
-    # print(df_eee.iloc[0])
-    df2 = (df_eee.shift().rolling(
-        window=n, min_periods=1).mean().reset_index().drop_duplicates())
-    # print(df2['index'])
-    df3 = (pd.melt(df2, id_vars='index', value_name='visits').sort_values(
-        ['index', 'placekey']).reset_index(drop=True))
-    df3 = df3.rename(columns={'index': 'date', 'visits': 'mean_last_14_days'})
-    test = test.merge(df3, on=['placekey', 'date'], how='left')
-    return test
-
-def mean_21_days(test):
-    n = 21
-    test['date'] = pd.to_datetime(test.date)
-    idx = pd.date_range(test.date.min(), test.date.max(), freq='D')
-    df_eee = test.pivot(index='date', values='visits',
-                        columns='placekey').reindex(idx)
-    # print(df_eee.iloc[0])
-    df2 = (df_eee.shift().rolling(
-        window=n, min_periods=1).mean().reset_index().drop_duplicates())
-    # print(df2['index'])
-    df3 = (pd.melt(df2, id_vars='index', value_name='visits').sort_values(
-        ['index', 'placekey']).reset_index(drop=True))
-    df3 = df3.rename(columns={'index': 'date', 'visits': 'mean_last_21_days'})
-    test = test.merge(df3, on=['placekey', 'date'], how='left')
-    return test
-
-def mean_60_days(test):
-    n = 60
-    test['date'] = pd.to_datetime(test.date)
-    idx = pd.date_range(test.date.min(), test.date.max(), freq='D')
-    df_eee = test.pivot(index='date', values='visits',
-                        columns='placekey').reindex(idx)
-    # print(df_eee.iloc[0])
-    df2 = (df_eee.shift().rolling(
-        window=n, min_periods=1).mean().reset_index().drop_duplicates())
-    # print(df2['index'])
-    df3 = (pd.melt(df2, id_vars='index', value_name='visits').sort_values(
-        ['index', 'placekey']).reset_index(drop=True))
-    df3 = df3.rename(columns={'index': 'date', 'visits': 'mean_last_60_days'})
-    test = test.merge(df3, on=['placekey', 'date'], how='left')
-    return test
-
-def mean_21_days(test):
-    n = 21
-    test['date'] = pd.to_datetime(test.date)
-    idx = pd.date_range(test.date.min(), test.date.max(), freq='D')
-    df_eee = test.pivot(index='date', values='visits',
-                        columns='placekey').reindex(idx)
-    # print(df_eee.iloc[0])
-    df2 = (df_eee.shift().rolling(
-        window=n, min_periods=1).mean().reset_index().drop_duplicates())
-    # print(df2['index'])
-    df3 = (pd.melt(df2, id_vars='index', value_name='visits').sort_values(
-        ['index', 'placekey']).reset_index(drop=True))
-    df3 = df3.rename(columns={'index': 'date', 'visits': 'mean_last_21_days'})
-    test = test.merge(df3, on=['placekey', 'date'], how='left')
-    return test
-"""
 
 def add_dummies(df, drop_first=False):
     df = df.copy()
@@ -336,6 +252,20 @@ def add_dummies(df, drop_first=False):
     df["day_aux"] = df["date"].dt.day_name()
     df = pd.get_dummies(df, columns=["day_aux"],
                         prefix="day", drop_first=drop_first)
+    return df
+
+def add_location(df): #DONE, BUT NO CONTRIBUTION TO THE MODEL.
+    path = paths.get_processed_file_path(state, city, 'location.csv')
+    aaaa = pd.read_csv(path)
+    aaaa = aaaa.rename(columns={"areas": "location"})
+    df = df.merge(aaaa, on='latitude', how='left')
+    return df
+
+def test_new_dummies(df, drop_first=False):
+    df = df.copy()
+    df = pd.get_dummies(df, columns=["location"],
+                        prefix="loc", drop_first=drop_first)
+
     return df
 
 
@@ -386,22 +316,24 @@ df = add_population(df, city, state)
 df = add_devices(df, city, state)
 df = compute_real_visits(df)
 df = add_last_visits(df)
+df = add_location(df)
 df = mean_n_days(df, 3)
-df = mean_n_days(df, 7)
+df = mean_n_days(df, 7) #No more time 4 mean_week, now it's this :S
 df = mean_n_days(df, 14)
 df = mean_n_days(df, 21)
 df = mean_n_days(df, 30)
 df = mean_n_days(df, 60)
 df = clean_stores(df)
+df = test_new_dummies(df)
 #df = add_dummies(df, drop_first=False)
-# %%
-
+#%%
 
 def filter_model_columns(df: pd.DataFrame):
     exclude_cols = ['placekey', 'safegraph_place_id', 'brands','latitude','longitude','street_address','date',
                     'week_day','is_weekend','number_devices_residing','postal_code','cbg_income','poi_cbg',
                     'is_holiday','population','month','year']
-    get_cols = ['day', 'rain', 'yesterday_visits','last_week_visits','mean_last_7_days', 'mean_last_14_days', 'mean_last_21_days','mean_last_30_days', 'mean_last_3_days','mean_last_60_days', 'visits'] #include area_square_meters???
+    get_cols = ['day', 'rain', 'yesterday_visits','last_week_visits','mean_last_7_days', 'mean_last_14_days',
+                'mean_last_21_days','mean_last_30_days', 'mean_last_3_days','mean_last_60_days', 'visits'] #include area_square_meters???
     cols = [col for col in df.columns if col in get_cols]
     return df[cols]
 
@@ -427,6 +359,8 @@ def get_sorted_coefs(columns, coefficients):
 #             'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
 #             'September', 'October', 'November', 'December']
 df = df.sort_values(by='date')
+#%%
+df.to_csv('test.csv', index=False)
 df = filter_model_columns(df)
 df_model = df.copy()
 # %%
@@ -451,11 +385,7 @@ print(regr.score(X_train, y_train))
 print(regr.score(X_test, y_test))
 # %%
 get_sorted_coefs(df_model.columns, regr.coef_)
-
-
 #%%
-
-# %%
 """
 SVM -> very very very slow
 
@@ -500,4 +430,5 @@ print(f"El error (mse) de test es: {mse}")
 print(model.score(X_train, y_train))
 print(model.score(X_test, y_test))
 print(model.get_params())
+
 # %%
