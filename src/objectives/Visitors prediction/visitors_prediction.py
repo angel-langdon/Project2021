@@ -111,6 +111,16 @@ def add_rain(df, city, state):
         msg = "Rain data is missing it shoud be here: \n"+path
         raise(FileNotFoundError(msg))
 
+def add_area(df, city, state):
+    path = paths.get_processed_file_path(state, city, 'geometry.csv')
+    if os.path.isfile(path):
+        area_df = pd.read_csv(path)
+        area_df['area_square_feet'] = area_df['area_square_feet']*0.092903
+        area_df = area_df.rename(columns={"area_square_feet": "area_square_meters"})
+        return df.merge(area_df, on='safegraph_place_id', how='left')
+    else:
+        msg = "Geometry data is missing it shoud be here: \n"+path
+        raise(FileNotFoundError(msg))
 
 def add_income(df, city="Houston", state='TX'):
     df = df.copy()
@@ -238,8 +248,7 @@ def mean_week(test):
     return test
 
 
-def mean_30_days(test):
-    n = 30
+def mean_n_days(test, n):
     test['date'] = pd.to_datetime(test.date)
     idx = pd.date_range(test.date.min(), test.date.max(), freq='D')
     df_eee = test.pivot(index='date', values='visits',
@@ -250,10 +259,74 @@ def mean_30_days(test):
     # print(df2['index'])
     df3 = (pd.melt(df2, id_vars='index', value_name='visits').sort_values(
         ['index', 'placekey']).reset_index(drop=True))
-    df3 = df3.rename(columns={'index': 'date', 'visits': 'mean_last_30_days'})
+    df3 = df3.rename(columns={'index': 'date', 'visits': f'mean_last_{n}_days'})
+    test = test.merge(df3, on=['placekey', 'date'], how='left')
+    return test
+"""
+def mean_14_days(test):
+    n = 14
+    test['date'] = pd.to_datetime(test.date)
+    idx = pd.date_range(test.date.min(), test.date.max(), freq='D')
+    df_eee = test.pivot(index='date', values='visits',
+                        columns='placekey').reindex(idx)
+    # print(df_eee.iloc[0])
+    df2 = (df_eee.shift().rolling(
+        window=n, min_periods=1).mean().reset_index().drop_duplicates())
+    # print(df2['index'])
+    df3 = (pd.melt(df2, id_vars='index', value_name='visits').sort_values(
+        ['index', 'placekey']).reset_index(drop=True))
+    df3 = df3.rename(columns={'index': 'date', 'visits': 'mean_last_14_days'})
     test = test.merge(df3, on=['placekey', 'date'], how='left')
     return test
 
+def mean_21_days(test):
+    n = 21
+    test['date'] = pd.to_datetime(test.date)
+    idx = pd.date_range(test.date.min(), test.date.max(), freq='D')
+    df_eee = test.pivot(index='date', values='visits',
+                        columns='placekey').reindex(idx)
+    # print(df_eee.iloc[0])
+    df2 = (df_eee.shift().rolling(
+        window=n, min_periods=1).mean().reset_index().drop_duplicates())
+    # print(df2['index'])
+    df3 = (pd.melt(df2, id_vars='index', value_name='visits').sort_values(
+        ['index', 'placekey']).reset_index(drop=True))
+    df3 = df3.rename(columns={'index': 'date', 'visits': 'mean_last_21_days'})
+    test = test.merge(df3, on=['placekey', 'date'], how='left')
+    return test
+
+def mean_60_days(test):
+    n = 60
+    test['date'] = pd.to_datetime(test.date)
+    idx = pd.date_range(test.date.min(), test.date.max(), freq='D')
+    df_eee = test.pivot(index='date', values='visits',
+                        columns='placekey').reindex(idx)
+    # print(df_eee.iloc[0])
+    df2 = (df_eee.shift().rolling(
+        window=n, min_periods=1).mean().reset_index().drop_duplicates())
+    # print(df2['index'])
+    df3 = (pd.melt(df2, id_vars='index', value_name='visits').sort_values(
+        ['index', 'placekey']).reset_index(drop=True))
+    df3 = df3.rename(columns={'index': 'date', 'visits': 'mean_last_60_days'})
+    test = test.merge(df3, on=['placekey', 'date'], how='left')
+    return test
+
+def mean_21_days(test):
+    n = 21
+    test['date'] = pd.to_datetime(test.date)
+    idx = pd.date_range(test.date.min(), test.date.max(), freq='D')
+    df_eee = test.pivot(index='date', values='visits',
+                        columns='placekey').reindex(idx)
+    # print(df_eee.iloc[0])
+    df2 = (df_eee.shift().rolling(
+        window=n, min_periods=1).mean().reset_index().drop_duplicates())
+    # print(df2['index'])
+    df3 = (pd.melt(df2, id_vars='index', value_name='visits').sort_values(
+        ['index', 'placekey']).reset_index(drop=True))
+    df3 = df3.rename(columns={'index': 'date', 'visits': 'mean_last_21_days'})
+    test = test.merge(df3, on=['placekey', 'date'], how='left')
+    return test
+"""
 
 def add_dummies(df, drop_first=False):
     df = df.copy()
@@ -268,7 +341,7 @@ def add_dummies(df, drop_first=False):
 
 def filter_columns(df):
     df = df.copy()
-    target_cols = ['placekey', "brands", 'latitude',
+    target_cols = ['placekey', 'safegraph_place_id',"brands", 'latitude',
                    'longitude', 'street_address', 'postal_code',
                    'poi_cbg', 'date', 'year', 'month',
                    'day', 'visits']
@@ -306,37 +379,30 @@ df = explode_visits_by_day(df_original)
 df = filter_columns(df)
 df = add_week_columns(df)
 df = add_income(df, city, state)
+df = add_area(df, city, state)
 df = add_is_holiday(df, city, state, country)
 df = add_rain(df, city, state)
 df = add_population(df, city, state)
 df = add_devices(df, city, state)
 df = compute_real_visits(df)
 df = add_last_visits(df)
-df = mean_week(df)
-df = mean_30_days(df)
+df = mean_n_days(df, 3)
+df = mean_n_days(df, 7)
+df = mean_n_days(df, 14)
+df = mean_n_days(df, 21)
+df = mean_n_days(df, 30)
+df = mean_n_days(df, 60)
 df = clean_stores(df)
 #df = add_dummies(df, drop_first=False)
 # %%
 
 
 def filter_model_columns(df: pd.DataFrame):
-    exclude_cols = ['placekey',
-                    'brands',
-                    'latitude',
-                    'longitude',
-                    'street_address',
-                    'date',
-                    'week_day',
-                    'is_weekend',
-                    'number_devices_residing',
-                    'postal_code',
-                    'cbg_income',
-                    'poi_cbg',
-                    'is_holiday',
-                    'population',
-                    'month',
-                    'year']
-    cols = [col for col in df.columns if col not in exclude_cols]
+    exclude_cols = ['placekey', 'safegraph_place_id', 'brands','latitude','longitude','street_address','date',
+                    'week_day','is_weekend','number_devices_residing','postal_code','cbg_income','poi_cbg',
+                    'is_holiday','population','month','year']
+    get_cols = ['day', 'rain', 'yesterday_visits','last_week_visits','mean_last_7_days', 'mean_last_14_days', 'mean_last_21_days','mean_last_30_days', 'mean_last_3_days','mean_last_60_days', 'visits'] #include area_square_meters???
+    cols = [col for col in df.columns if col in get_cols]
     return df[cols]
 
 
@@ -361,12 +427,12 @@ def get_sorted_coefs(columns, coefficients):
 #             'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
 #             'September', 'October', 'November', 'December']
 df = df.sort_values(by='date')
-df = filter_model_columns(df)
+df_model = filter_model_columns(df)
 # %%
 # Sort the dataframe by date
 
-y = df.pop('visits')
-X = df
+y = df_model.pop('visits')
+X = df_model
 # %%
 
 X_train, X_test, y_train, y_test = train_test_split(
@@ -383,17 +449,23 @@ print(mse)
 print(regr.score(X_train, y_train))
 print(regr.score(X_test, y_test))
 # %%
-get_sorted_coefs(df.columns, regr.coef_)
+get_sorted_coefs(df_model.columns, regr.coef_)
 
+
+#%%
+
+df
 # %%
 """
-SVM
-"""
+SVM -> very very very slow
 
-params = {'kernel': ['poly', 'rbf', 'sigmoid'],
-          'degree': [1, 3, 5],
-          'C': [0.5, 1, 1.5]}
-model = GridSearchCV(svm.SVR(), params)
+
+#params = {'kernel': ['poly', 'rbf', 'sigmoid'],
+#          'degree': [1, 3, 5],
+#          'C': [0.5, 1, 1.5]}
+#model = GridSearchCV(svm.SVR(), params)
+
+model = svm.SVR(kernel='poly', degree=4, C=1)#(n_estimators=200, criterion='mse', n_jobs=-1)
 
 model.fit(X_train, y_train)
 
@@ -405,18 +477,19 @@ print(f"El error (mse) de test es: {mse}")
 print(model.score(X_train, y_train))
 print(model.score(X_test, y_test))
 print(model.get_params())
-
+"""
 
 # %%
 
-params = {'n_estimators': [20, 50, 100, 150, 200],
-          'criterion': ['mse', 'mae'],
-          'max_features': ['auto', 'sqrt', 'log2']}
-model = RandomizedSearchCV(RandomForestRegressor(),
-                           params,
-                           cv=2,
-                           n_jobs=-1)
+#params = {'n_estimators': [20, 50, 100, 150, 200],
+#          'criterion': ['mse', 'mae'],
+#          'max_features': ['auto', 'sqrt', 'log2']}
+#model = RandomizedSearchCV(RandomForestRegressor(),
+#                           params,
+#                           cv=2,
+#                           n_jobs=-1)
 
+model = RandomForestRegressor(n_estimators=100, criterion='mse', n_jobs=-1)#100 params are OK
 model.fit(X_train, y_train)
 
 y_pred = model.predict(X=X_test)
@@ -427,5 +500,7 @@ print(f"El error (mse) de test es: {mse}")
 print(model.score(X_train, y_train))
 print(model.score(X_test, y_test))
 print(model.get_params())
-print('voy a escribir algo random a ver si me deja hacer push de una vez jejeje borrad esto')
+# %%
+
+df_model.to_csv('df_model.csv', index=False)
 # %%
