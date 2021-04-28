@@ -504,3 +504,5 @@ print(model.get_params())
 
 df_model.to_csv('df_model.csv', index=False)
 # %%
+pd.read_csv('/Users/mazcu/Desktop/df_model.csv')
+# %%
