@@ -427,4 +427,5 @@ print(f"El error (mse) de test es: {mse}")
 print(model.score(X_train, y_train))
 print(model.score(X_test, y_test))
 print(model.get_params())
+print('voy a escribir algo random a ver si me deja hacer push de una vez jejeje borrad esto')
 # %%
