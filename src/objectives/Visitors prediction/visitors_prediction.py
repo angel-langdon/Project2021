@@ -5,10 +5,13 @@ from collections import Counter
 from datetime import datetime, timedelta
 
 import holidays
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import xgboost as xgb
 from sklearn import svm
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.dummy import DummyRegressor
+from sklearn.ensemble import GradientBoostingRegressor, RandomForestRegressor
 from sklearn.linear_model import (BayesianRidge, ElasticNet, HuberRegressor,
                                   Lasso, LinearRegression, Ridge)
 from sklearn.metrics import mean_squared_error, r2_score
@@ -18,6 +21,7 @@ from utils.date_utils.date_formats import DATE_FORMATS
 from utils.download_data import data_dtypes as dtypes
 from utils.download_data import datasets, download_safegraph_data
 from utils.path_utils import paths
+from xgboost import XGBRegressor
 
 
 def get_important_brands(df: pd.DataFrame):
@@ -111,16 +115,19 @@ def add_rain(df, city, state):
         msg = "Rain data is missing it shoud be here: \n"+path
         raise(FileNotFoundError(msg))
 
+
 def add_area(df, city, state):
     path = paths.get_processed_file_path(state, city, 'geometry.csv')
     if os.path.isfile(path):
         area_df = pd.read_csv(path)
         area_df['area_square_feet'] = area_df['area_square_feet']*0.092903
-        area_df = area_df.rename(columns={"area_square_feet": "area_square_meters"})
+        area_df = area_df.rename(
+            columns={"area_square_feet": "area_square_meters"})
         return df.merge(area_df, on='safegraph_place_id', how='left')
     else:
         msg = "Geometry data is missing it shoud be here: \n"+path
         raise(FileNotFoundError(msg))
+
 
 def add_income(df, city="Houston", state='TX'):
     df = df.copy()
@@ -146,6 +153,7 @@ def add_income(df, city="Houston", state='TX'):
     # save the dataframe to cache it for the next time
     income.to_csv(path, index=False, encoding="utf-8")
     return df.merge(income, on='poi_cbg', how='left')
+
 
 def add_population(df, city, state):
     df = df.copy()
@@ -229,7 +237,9 @@ def add_last_visits(df: pd.DataFrame):
         period_df = period_df.drop(columns=[period_visits_col])
     return df
 
+
 def mean_n_days(test, n):
+    test = test.copy()
     test['date'] = pd.to_datetime(test.date)
     idx = pd.date_range(test.date.min(), test.date.max(), freq='D')
     df_eee = test.pivot(index='date', values='visits',
@@ -240,9 +250,11 @@ def mean_n_days(test, n):
     # print(df2['index'])
     df3 = (pd.melt(df2, id_vars='index', value_name='visits').sort_values(
         ['index', 'placekey']).reset_index(drop=True))
-    df3 = df3.rename(columns={'index': 'date', 'visits': f'mean_last_{n}_days'})
+    df3 = df3.rename(
+        columns={'index': 'date', 'visits': f'mean_last_{n}_days'})
     test = test.merge(df3, on=['placekey', 'date'], how='left')
     return test
+
 
 def add_dummies(df, drop_first=False):
     df = df.copy()
@@ -254,12 +266,14 @@ def add_dummies(df, drop_first=False):
                         prefix="day", drop_first=drop_first)
     return df
 
-def add_location(df): #DONE, BUT NO CONTRIBUTION TO THE MODEL.
+
+def add_location(df):  # DONE, BUT NO CONTRIBUTION TO THE MODEL.
     path = paths.get_processed_file_path(state, city, 'location.csv')
     aaaa = pd.read_csv(path)
     aaaa = aaaa.rename(columns={"areas": "location"})
     df = df.merge(aaaa, on='latitude', how='left')
     return df
+
 
 def test_new_dummies(df, drop_first=False):
     df = df.copy()
@@ -271,7 +285,7 @@ def test_new_dummies(df, drop_first=False):
 
 def filter_columns(df):
     df = df.copy()
-    target_cols = ['placekey', 'safegraph_place_id',"brands", 'latitude',
+    target_cols = ['placekey', 'safegraph_place_id', "brands", 'latitude',
                    'longitude', 'street_address', 'postal_code',
                    'poi_cbg', 'date', 'year', 'month',
                    'day', 'visits']
@@ -318,7 +332,7 @@ df = compute_real_visits(df)
 df = add_last_visits(df)
 df = add_location(df)
 df = mean_n_days(df, 3)
-df = mean_n_days(df, 7) #No more time 4 mean_week, now it's this :S
+df = mean_n_days(df, 7)  # No more time 4 mean_week, now it's this :S
 df = mean_n_days(df, 14)
 df = mean_n_days(df, 21)
 df = mean_n_days(df, 30)
@@ -326,14 +340,15 @@ df = mean_n_days(df, 60)
 df = clean_stores(df)
 df = test_new_dummies(df)
 #df = add_dummies(df, drop_first=False)
-#%%
+# %%
+
 
 def filter_model_columns(df: pd.DataFrame):
-    exclude_cols = ['placekey', 'safegraph_place_id', 'brands','latitude','longitude','street_address','date',
-                    'week_day','is_weekend','number_devices_residing','postal_code','cbg_income','poi_cbg',
-                    'is_holiday','population','month','year']
-    get_cols = ['day', 'rain', 'yesterday_visits','last_week_visits','mean_last_7_days', 'mean_last_14_days',
-                'mean_last_21_days','mean_last_30_days', 'mean_last_3_days','mean_last_60_days', 'visits'] #include area_square_meters???
+    exclude_cols = ['placekey', 'safegraph_place_id', 'brands', 'latitude', 'longitude', 'street_address', 'date',
+                    'week_day', 'is_weekend', 'number_devices_residing', 'postal_code', 'cbg_income', 'poi_cbg',
+                    'is_holiday', 'population', 'month', 'year']
+    get_cols = ['day', 'rain', 'yesterday_visits', 'last_week_visits', 'mean_last_7_days', 'mean_last_14_days',
+                'mean_last_21_days', 'mean_last_30_days', 'mean_last_3_days', 'mean_last_60_days', 'visits']  # include area_square_meters???
     cols = [col for col in df.columns if col in get_cols]
     return df[cols]
 
@@ -359,7 +374,7 @@ def get_sorted_coefs(columns, coefficients):
 #             'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
 #             'September', 'October', 'November', 'December']
 df = df.sort_values(by='date')
-#%%
+# %%
 df.to_csv('test.csv', index=False)
 df = filter_model_columns(df)
 df_model = df.copy()
@@ -385,7 +400,7 @@ print(regr.score(X_train, y_train))
 print(regr.score(X_test, y_test))
 # %%
 get_sorted_coefs(df_model.columns, regr.coef_)
-#%%
+# %%
 """
 SVM -> very very very slow
 
@@ -411,15 +426,16 @@ print(model.get_params())
 
 # %%
 
-#params = {'n_estimators': [20, 50, 100, 150, 200],
+# params = {'n_estimators': [20, 50, 100, 150, 200],
 #          'criterion': ['mse', 'mae'],
 #          'max_features': ['auto', 'sqrt', 'log2']}
-#model = RandomizedSearchCV(RandomForestRegressor(),
+# model = RandomizedSearchCV(RandomForestRegressor(),
 #                           params,
 #                           cv=2,
 #                           n_jobs=-1)
 
-model = RandomForestRegressor(n_estimators=100, criterion='mse', n_jobs=-1)#100 params are OK
+model = RandomForestRegressor(
+    n_estimators=100, criterion='mse', n_jobs=-1)  # 100 params are OK
 model.fit(X_train, y_train)
 
 y_pred = model.predict(X=X_test)
@@ -432,3 +448,12 @@ print(model.score(X_test, y_test))
 print(model.get_params())
 
 # %%
+params = {'n_estimators': 500,
+          'max_depth': 5,
+          'min_samples_split': 5,
+          'learning_rate': 0.01,
+          'loss': 'ls'}
+
+
+reg = GradientBoostingRegressor(**params)
+reg.fit(X_train, y_train)
