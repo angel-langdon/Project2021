@@ -457,3 +457,53 @@ params = {'n_estimators': 500,
 
 reg = GradientBoostingRegressor(**params)
 reg.fit(X_train, y_train)
+
+y_pred = reg.predict(X_test)
+train_mse = mean_squared_error(y_train, reg.predict(X_train))
+test_mse = mean_squared_error(y_test, reg.predict(X_test))
+print(train_mse)
+print(test_mse)
+
+print(r2_score(y_train, reg.predict(X_train)))
+print(r2_score(y_test, reg.predict(X_test)))
+# %%
+
+
+# %%
+param = {'max_depth': 5, 'eta': 0.3, 'objective': 'reg:squarederror', 'eval_metric': 'rmse',
+         'subsample': 0.9, 'colsample_bytree': 0.5}
+
+
+dtrain = xgb.DMatrix(X_train, label=y_train)
+bst = xgb.train(params=param, dtrain=dtrain)
+
+dtest = xgb.DMatrix(X_test)
+y_pred = bst.predict(dtest)
+
+train_mse = mean_squared_error(y_train, bst.predict(dtrain))
+test_mse = mean_squared_error(y_test, bst.predict(dtest))
+print(train_mse)
+print(test_mse)
+
+print(r2_score(y_train, bst.predict(dtrain)))
+print(r2_score(y_test, bst.predict(dtest)))
+
+# %%
+test_score = np.zeros((params['n_estimators'],), dtype=np.float64)
+for i, y_pred in enumerate(reg.staged_predict(X_test)):
+    test_score[i] = reg.loss_(y_test, y_pred)
+
+fig = plt.figure(figsize=(6, 6))
+plt.subplot(1, 1, 1)
+plt.title('Deviance')
+plt.plot(np.arange(params['n_estimators']) + 1, reg.train_score_, 'b-',
+         label='Training Set Deviance')
+plt.plot(np.arange(params['n_estimators']) + 1, test_score, 'r-',
+         label='Test Set Deviance')
+plt.legend(loc='upper right')
+plt.xlabel('Boosting Iterations')
+plt.ylabel('Deviance')
+fig.tight_layout()
+plt.show()
+
+# %%
