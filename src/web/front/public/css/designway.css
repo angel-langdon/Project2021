@@ -1,0 +1,71 @@
+@charset "UTF-8";
+
+@font-face {
+  font-family: "designway";
+  src: url("../fonts/designway.eot");
+  src: url("../fonts/designway.eot?#iefix") format("embedded-opentype"),
+    url("../fonts/designway.woff") format("woff"),
+    url("../fonts/designway.ttf") format("truetype"),
+    url("../fonts/designway.svg#designway") format("svg");
+  font-weight: normal;
+  font-style: normal;
+}
+
+[data-icon]:before {
+  font-family: "designway" !important;
+  content: attr(data-icon);
+  font-style: normal !important;
+  font-weight: normal !important;
+  font-variant: normal !important;
+  text-transform: none !important;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+[class^="dw-"]:before,
+[class*=" dw-"]:before {
+  font-family: "designway" !important;
+  font-style: normal !important;
+  font-weight: normal !important;
+  font-variant: normal !important;
+  text-transform: none !important;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.dw {
+  display: inline-block;
+  font-family: "designway" !important;
+  font-style: normal;
+  font-weight: normal;
+  line-height: 1;
+  font-size-adjust: none;
+  font-stretch: normal;
+  font-feature-settings: normal;
+  font-language-override: normal;
+  font-kerning: auto;
+  font-synthesis: weight style;
+  font-variant: normal;
+  font-size: inherit;
+  text-rendering: auto;
+  -moz-osx-font-smoothing: grayscale;
+}
+.dw-icon1:before {
+  content: "\61";
+}
+.dw-icon2:before {
+  content: "\2a";
+}
+.dw-icon3:before {
+  content: "\63";
+}
+.dw-icon4:before {
+  content: "\64";
+}
+.dw-icon5:before {
+  content: "\65";
+}
+.dw-icon6:before {
+  content: "\66";
+}
