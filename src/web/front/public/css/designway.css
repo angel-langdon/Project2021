@@ -52,10 +52,10 @@
   -moz-osx-font-smoothing: grayscale;
 }
 .dw-icon1:before {
-  content: "\61";
+  content: "\51";
 }
 .dw-icon2:before {
-  content: "\2a";
+  content: "\62";
 }
 .dw-icon3:before {
   content: "\63";
