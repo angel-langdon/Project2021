@@ -10,7 +10,7 @@
 *.rar
 *.zip
 datasets/
-*.html
+
 
 
 # R stuff
