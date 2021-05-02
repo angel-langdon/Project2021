@@ -2,11 +2,11 @@
 
 @font-face {
   font-family: "designway";
-  src: url("../fonts/designway.eot");
-  src: url("../fonts/designway.eot?#iefix") format("embedded-opentype"),
-    url("../fonts/designway.woff") format("woff"),
-    url("../fonts/designway.ttf") format("truetype"),
-    url("../fonts/designway.svg#designway") format("svg");
+  src: url("/fonts/designway.eot");
+  src: url("/fonts/designway.eot?#iefix") format("embedded-opentype"),
+    url("/fonts/designway.woff") format("woff"),
+    url("/fonts/designway.ttf") format("truetype"),
+    url("/fonts/designway.svg#designway") format("svg");
   font-weight: normal;
   font-style: normal;
 }
