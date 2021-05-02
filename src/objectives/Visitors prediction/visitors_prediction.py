@@ -8,7 +8,7 @@ import holidays
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import xgboost as xgb
+#import xgboost as xgb
 from sklearn import svm
 from sklearn.dummy import DummyRegressor
 from sklearn.ensemble import GradientBoostingRegressor, RandomForestRegressor
@@ -21,7 +21,8 @@ from utils.date_utils.date_formats import DATE_FORMATS
 from utils.download_data import data_dtypes as dtypes
 from utils.download_data import datasets, download_safegraph_data
 from utils.path_utils import paths
-from xgboost import XGBRegressor
+
+#from xgboost import XGBRegressor
 
 
 def get_important_brands(df: pd.DataFrame):
@@ -311,6 +312,33 @@ def clean_stores(df):
         "placekey", as_index=False).bfill().ffill())
 
     return df
+
+def apply_mean(df):
+    
+    df = df.copy()
+    df = df.sort_values(["safegraph_place_id", "date"])
+    road2means = df[['safegraph_place_id', 'visits']]
+    listvisits = []
+    means = road2means.groupby("safegraph_place_id", as_index=False).mean()
+    for place in df['safegraph_place_id'].unique():
+        place_df = df[df['safegraph_place_id'] == place]
+        mean2apply = means[means['safegraph_place_id'] == place]['visits']
+        vis = place_df['visits']/float(mean2apply)
+        listvisits.append(vis)
+        
+    flat_list = [item for sublist in listvisits for item in sublist]
+    df['visits'] = flat_list
+    return df
+
+def apply_log(df):
+    df = df.copy()
+    df['visits'] =  np.log(df['visits'].map(str).map(float))
+    return df
+
+def clean_log(df):
+    df = df.copy()
+    df = df[df['visits'] > 0]
+    return df
 # %%
 
 
@@ -329,6 +357,14 @@ df = add_rain(df, city, state)
 df = add_population(df, city, state)
 df = add_devices(df, city, state)
 df = compute_real_visits(df)
+
+# IF YOU WANT THE MEAN VERSION
+#df = apply_mean(df)
+
+#IF YOU WANT THE LOG VERSION
+#df = apply_log(df)
+#df = clean_log(df)
+
 df = add_last_visits(df)
 df = add_location(df)
 df = mean_n_days(df, 3)
@@ -337,6 +373,7 @@ df = mean_n_days(df, 14)
 df = mean_n_days(df, 21)
 df = mean_n_days(df, 30)
 df = mean_n_days(df, 60)
+
 df = clean_stores(df)
 df = test_new_dummies(df)
 #df = add_dummies(df, drop_first=False)
@@ -375,7 +412,7 @@ def get_sorted_coefs(columns, coefficients):
 #             'September', 'October', 'November', 'December']
 df = df.sort_values(by='date')
 # %%
-df.to_csv('test.csv', index=False)
+df = df.reset_index()
 df = filter_model_columns(df)
 df_model = df.copy()
 # %%
@@ -400,6 +437,8 @@ print(regr.score(X_train, y_train))
 print(regr.score(X_test, y_test))
 # %%
 get_sorted_coefs(df_model.columns, regr.coef_)
+#%%
+df
 # %%
 """
 SVM -> very very very slow
@@ -433,7 +472,7 @@ print(model.get_params())
 #                           params,
 #                           cv=2,
 #                           n_jobs=-1)
-
+"""
 model = RandomForestRegressor(
     n_estimators=100, criterion='mse', n_jobs=-1)  # 100 params are OK
 model.fit(X_train, y_train)
@@ -446,7 +485,7 @@ print(f"El error (mse) de test es: {mse}")
 print(model.score(X_train, y_train))
 print(model.score(X_test, y_test))
 print(model.get_params())
-
+"""
 # %%
 params = {'n_estimators': 500,
           'max_depth': 5,
@@ -505,6 +544,5 @@ plt.xlabel('Boosting Iterations')
 plt.ylabel('Deviance')
 fig.tight_layout()
 plt.show()
-
 # %%
 

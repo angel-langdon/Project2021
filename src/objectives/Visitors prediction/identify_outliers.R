@@ -6,7 +6,7 @@ stores = unique(df$safegraph_place_id)
 
 for (store in stores){
   df_ = df[df$safegraph_place_id == store, ]
-  boxplot(df_$visits)
+  plot(df_$visits, type='l')
   Sys.sleep(5)
 }
 
