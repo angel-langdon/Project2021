@@ -22,6 +22,7 @@ export default function ContactUs() {
             </div>
           </div>
         </div>
+        {/* 
         <div id="text-container" className="container-fluid">
           <div className="container">
             <div className="row">
@@ -36,7 +37,8 @@ export default function ContactUs() {
               </div>
             </div>
           </div>
-        </div>
+        </div> 
+        */}
         <div id="contact-details" className="container-fluid">
           <div className="row">
             <div className="col-md-6 address-holder">
@@ -59,17 +61,15 @@ export default function ContactUs() {
                   <i className="fa fa-map-marker" aria-hidden="true" />
                 </div>
                 <div className="col-xs-11 col-sm-5">
-                  <div className="address-row">UPV, Valencia</div>
-                  <div className="address-row">Camí de Vera, s/n, 46009</div>
-                  <div className="address-row">Spain</div>
+                  <div className="address-row">UPV, Valencia, Camí de Vera, s/n, 46009, Spain </div>
+                  <div className="address-row"></div>
+                  <div className="address-row"></div>
                 </div>
               </div>
             </div>
             <div className="col-md-6 contact-text">
               <div className="div-bg" />
-              <h3>
-                Predicting customer behavior is not easy, let’s do it for you.
-              </h3>
+              <h3>Predicting customer behavior is not easy, let us help you with that.</h3>
             </div>
           </div>
         </div>

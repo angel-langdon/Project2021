@@ -156,9 +156,10 @@ export default function Home() {
                   <div>
                     <img src="images/office1.jpg" />
                   </div>
+                  {/* 
                   <div>
                     <img src="images/office2.jpg" />
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>
@@ -205,9 +206,10 @@ export default function Home() {
           <div className="container">
             <div className="row">
               <div className="col-xs-12">
-                <h3>Recent Succes stories</h3>
+                <h3>Recent Success stories</h3>
               </div>
             </div>
+            {/*}
             <div className="row">
               <div className="col-xs-12 text-right">
                 <a className="view-all-link" href="casestudies.html">
@@ -219,6 +221,7 @@ export default function Home() {
                 </a>
               </div>
             </div>
+            */}
             <div className="row">
               <div className="projects-list">
                 <div className="col-xs-12 col-sm-6 col-md-3 project-box-holder">
@@ -231,6 +234,7 @@ export default function Home() {
                     </a>
                   </div>
                 </div>
+               
                 <div className="col-xs-12 col-sm-6 col-md-3 project-box-holder">
                   <div className="project-box">
                     <a href="#">
@@ -241,6 +245,7 @@ export default function Home() {
                     </a>
                   </div>
                 </div>
+                 {/*  
                 <div className="col-xs-12 col-sm-6 col-md-3 project-box-holder">
                   <div className="project-box">
                     <a href="#">
@@ -300,11 +305,12 @@ export default function Home() {
                       </div>
                     </a>
                   </div>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>
         </div>
+
         <div id="services" className="container-fluid">
           <div className="container">
             <div className="row">

@@ -21,15 +21,16 @@ export default function CaseStudies() {
                       <div>
                         <img src="images/pro2.jpg" />
                       </div>
+                      {/* 
                       <div>
                         <img src="images/pro3.jpg" />
-                      </div>
+                      </div> */}
                     </div>
                   </div>
                 </div>
                 <div className="col-md-5 p-details">
                   <div className="details-holder">
-                    <h3 className="project-title">Pharmancie</h3>
+                    <h3 className="project-title">Subway</h3>
                     <p className="info-text">
                       Lorem ipsum dolor sit amet, consectetur adipiscing elit.
                       Morbi ut vehicula ante. Donec turpis est, pulvinar sed

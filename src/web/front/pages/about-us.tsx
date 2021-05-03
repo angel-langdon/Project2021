@@ -29,13 +29,11 @@ export default function AboutUs() {
                 <div>
                   <div className="top-line" />
                 </div>
-                <h3>Entre Datos is not just a creative agency.</h3>
+                <h3>Teamwork divides the task and multiplies success</h3>
+                {/* 
                 <p>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi
-                  ut vehicula ante. Donec turpis est, pulvinar sed ipsum sed,
-                  hendrerit blandit mauris. Cras egestas eget augue vel
-                  pulvinar.
-                </p>
+                  It is a project created by six students in a third year of DataScience Degree.
+                </p>*/}
               </div>
             </div>
           </div>
@@ -53,11 +51,9 @@ export default function AboutUs() {
                   <img src="images/team1.jpg" />
                 </div>
                 <div className="info-card-details">
-                  <div className="person-name">Anne Robbins</div>
+                  <div className="person-name">Ignacio Cano Navarro</div>
                   <div className="person-title">Co-Founder</div>
-                  <div className="person-email">anne@designway.co</div>
-                  <div className="person-phone">+973 912949238</div>
-                  <div className="person-social">Instagram: @annerobbin</div>
+                  <div className="person-email">nachonavarrocano@gmail.com</div>
                 </div>
               </div>
             </div>
@@ -67,11 +63,9 @@ export default function AboutUs() {
                   <img src="images/team2.jpg" />
                 </div>
                 <div className="info-card-details">
-                  <div className="person-name">Mary Adam</div>
+                  <div className="person-name">Álvaro Mazcuñán Herreros</div>
                   <div className="person-title">Project manager</div>
-                  <div className="person-email">mary@designway.co</div>
-                  <div className="person-phone">+973 912949238</div>
-                  <div className="person-social">Instagram: @maryadam</div>
+                  <div className="person-email">alvaromazcuherreros@gmail.com</div>
                 </div>
               </div>
             </div>
@@ -81,11 +75,9 @@ export default function AboutUs() {
                   <img src="images/team3.jpg" />
                 </div>
                 <div className="info-card-details">
-                  <div className="person-name">Tonny Brendon</div>
+                  <div className="person-name">Lisa Gilyarovskaya</div>
                   <div className="person-title">Coder &amp; developer</div>
-                  <div className="person-email">tonny@designway.co</div>
-                  <div className="person-phone">+973 912949238</div>
-                  <div className="person-social">Instagram: @tonybrendon</div>
+                  <div className="person-email">lisa.gilyarovskaya@gmail.com</div>
                 </div>
               </div>
             </div>
@@ -95,11 +87,34 @@ export default function AboutUs() {
                   <img src="images/team4.jpg" />
                 </div>
                 <div className="info-card-details">
-                  <div className="person-name">Rhea Fitzpatric</div>
+                  <div className="person-name">Miquel Marin Colomé</div>
                   <div className="person-title">Web designer</div>
                   <div className="person-email">rhea@designway.co</div>
-                  <div className="person-phone">+973 912949238</div>
-                  <div className="person-social">Instagram: @rheafitric</div>
+                </div>
+              </div>
+            </div>
+            <div className="col-xs-12 col-sm-6 col-md-3">
+              <div className="info-card">
+                <div className="info-card-img">
+                  <img src="images/team5.jpg" />
+                </div>
+                <div className="info-card-details">
+                  <div className="person-name">Angel Langdon Villamayor</div>
+                  <div className="person-title">Web designer</div>
+                  <div className="person-email">angel.langdon@stadlerrail.com</div>
+                 {/*<div className="person-phone">+973 912949238</div>*/}
+                </div>
+              </div>
+            </div>
+            <div className="col-xs-12 col-sm-6 col-md-3">
+              <div className="info-card">
+                <div className="info-card-img">
+                  <img src="images/team6.jpg" />
+                </div>
+                <div className="info-card-details">
+                  <div className="person-name">Iker Rodríguez Martínez</div>
+                  <div className="person-title">Web designer</div>
+                  <div className="person-email">ikrodmar@upv.edu.es</div>
                 </div>
               </div>
             </div>

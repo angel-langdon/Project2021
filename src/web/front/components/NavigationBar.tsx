@@ -18,7 +18,7 @@ const NavigationBar = () => {
               <ul className="main-menu">
                 <li>
                   <a href="succes-stories">
-                    Succes stories
+                    Success stories
                     <span className="link-underline" />
                   </a>
                 </li>
@@ -37,12 +37,6 @@ const NavigationBar = () => {
                 <li>
                   <a href="contact">
                     Contact
-                    <span className="link-underline" />
-                  </a>
-                </li>
-                <li>
-                  <a href="dashboard">
-                    Dashboard Example
                     <span className="link-underline" />
                   </a>
                 </li>
