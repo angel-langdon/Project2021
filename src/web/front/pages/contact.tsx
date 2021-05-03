@@ -1,9 +1,10 @@
 import NavigationBar from "@/components/NavigationBar";
+import DefaultHeader from "@/components/DefaultHeader";
 
 export default function ContactUs() {
   return (
-    <>
-      <title>Entre Datos</title>
+    <div>
+      <DefaultHeader />
       <div className="page-holder">
         <div className="header-holder contactus">
           <div className="color-overlay" />
@@ -73,6 +74,6 @@ export default function ContactUs() {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }

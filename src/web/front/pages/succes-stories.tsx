@@ -1,10 +1,11 @@
+import DefaultHeader from "@/components/DefaultHeader";
 import Footer from "@/components/Footer";
 import NavigationBar from "@/components/NavigationBar";
 
 export default function CaseStudies() {
   return (
-    <>
-      <title>Entre Datos</title>
+    <div>
+      <DefaultHeader />
       <div id="case-study-popup">
         <div className="popup-content-holder">
           <div id="closebtn" />
@@ -15,13 +16,13 @@ export default function CaseStudies() {
                   <div className="image-holder">
                     <div className="project-slider">
                       <div>
-                        <img src="images/pro1.jpg" alt />
+                        <img src="images/pro1.jpg" />
                       </div>
                       <div>
-                        <img src="images/pro2.jpg" alt />
+                        <img src="images/pro2.jpg" />
                       </div>
                       <div>
-                        <img src="images/pro3.jpg" alt />
+                        <img src="images/pro3.jpg" />
                       </div>
                     </div>
                   </div>
@@ -82,7 +83,7 @@ export default function CaseStudies() {
                 <div className="col-xs-12 col-sm-6 col-md-3 project-box-holder">
                   <div className="project-box">
                     <a href="#">
-                      <img className="project-img" src="images/pro1.jpg" alt />
+                      <img className="project-img" src="images/pro1.jpg" />
                       <div className="box-overlay">
                         <h4>Text 1</h4>
                       </div>
@@ -92,7 +93,7 @@ export default function CaseStudies() {
                 <div className="col-xs-12 col-sm-6 col-md-3 project-box-holder">
                   <div className="project-box">
                     <a href="#">
-                      <img className="project-img" src="images/pro2.jpg" alt />
+                      <img className="project-img" src="images/pro2.jpg" />
                       <div className="box-overlay">
                         <h4>Text 2</h4>
                       </div>
@@ -206,6 +207,6 @@ export default function CaseStudies() {
         </div>
         <Footer />
       </div>
-    </>
+    </div>
   );
 }
