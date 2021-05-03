@@ -1,5 +1,6 @@
-function Footer(){
-    return (<div id="footer" className="container-fluid">
+const Footer = () => {
+  return (
+    <div id="footer" className="container-fluid">
       <div className="container">
         <div className="row footer-content">
           <div className="col-xs-12 col-sm-6 text-left">
@@ -7,6 +8,7 @@ function Footer(){
           </div>
         </div>
       </div>
-    </div>)
-}
-export default Footer
+    </div>
+  );
+};
+export default Footer;

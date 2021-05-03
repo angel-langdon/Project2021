@@ -1,4 +1,4 @@
-function NavigationBar() {
+const NavigationBar = () => {
   return (
     <div id="header" className="container-fluid">
       <div className="container">
@@ -40,6 +40,12 @@ function NavigationBar() {
                     <span className="link-underline" />
                   </a>
                 </li>
+                <li>
+                  <a href="dashboard">
+                    Dashboard Example
+                    <span className="link-underline" />
+                  </a>
+                </li>
               </ul>
             </div>
           </div>
@@ -47,5 +53,5 @@ function NavigationBar() {
       </div>
     </div>
   );
-}
+};
 export default NavigationBar;
