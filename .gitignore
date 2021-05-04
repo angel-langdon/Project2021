@@ -4,13 +4,12 @@
 *.xlsx
 *.xls
 *.xlsb
-*.json
 *.gz
 *.zip
 *.rar
 *.zip
 datasets/
-*.html
+
 
 
 # R stuff

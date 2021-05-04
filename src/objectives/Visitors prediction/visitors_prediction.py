@@ -17,6 +17,7 @@ from sklearn.linear_model import (BayesianRidge, ElasticNet, HuberRegressor,
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.model_selection import (GridSearchCV, RandomizedSearchCV,
                                      train_test_split)
+from sklearn.svm import SVR
 from utils.date_utils.date_formats import DATE_FORMATS
 from utils.download_data import data_dtypes as dtypes
 from utils.download_data import datasets, download_safegraph_data
@@ -339,6 +340,19 @@ def clean_log(df):
     df = df.copy()
     df = df[df['visits'] > 0]
     return df
+
+def impute_outliers(df):
+    df = df.copy()
+    df2fill = df[df['safegraph_place_id'] == 'this is only to get an empty df']
+
+    for place in df['safegraph_place_id'].unique():
+        df_per_store = df[df['safegraph_place_id'] == place]
+        upper = df_per_store.visits.quantile(.95)
+        lower = df_per_store.visits.quantile(.05)
+        df_per_store['visits'] = df_per_store['visits'].clip(upper=upper, lower=lower)
+        df2fill = pd.concat([df2fill, df_per_store])
+        
+    return df2fill
 # %%
 
 
@@ -375,6 +389,7 @@ df = mean_n_days(df, 30)
 df = mean_n_days(df, 60)
 
 df = clean_stores(df)
+df = impute_outliers(df)
 df = test_new_dummies(df)
 #df = add_dummies(df, drop_first=False)
 # %%
@@ -384,8 +399,7 @@ def filter_model_columns(df: pd.DataFrame):
     exclude_cols = ['placekey', 'safegraph_place_id', 'brands', 'latitude', 'longitude', 'street_address', 'date',
                     'week_day', 'is_weekend', 'number_devices_residing', 'postal_code', 'cbg_income', 'poi_cbg',
                     'is_holiday', 'population', 'month', 'year']
-    get_cols = ['day', 'rain', 'yesterday_visits', 'last_week_visits', 'mean_last_7_days', 'mean_last_14_days',
-                'mean_last_21_days', 'mean_last_30_days', 'mean_last_3_days', 'mean_last_60_days', 'visits']  # include area_square_meters???
+    get_cols = ['day', 'rain', 'yesterday_visits', 'last_week_visits', 'mean_last_7_days', 'mean_last_30_days', 'visits']  # include area_square_meters???
     cols = [col for col in df.columns if col in get_cols]
     return df[cols]
 
@@ -438,7 +452,7 @@ print(regr.score(X_test, y_test))
 # %%
 get_sorted_coefs(df_model.columns, regr.coef_)
 #%%
-df
+df_original['location_name'].unique()
 # %%
 """
 SVM -> very very very slow
@@ -448,8 +462,8 @@ SVM -> very very very slow
 #          'degree': [1, 3, 5],
 #          'C': [0.5, 1, 1.5]}
 #model = GridSearchCV(svm.SVR(), params)
-
-model = svm.SVR(kernel='poly', degree=4, C=1)#(n_estimators=200, criterion='mse', n_jobs=-1)
+"""
+model = SVR(kernel='poly', degree=2, C=1)#(n_estimators=200, criterion='mse', n_jobs=-1)
 
 model.fit(X_train, y_train)
 
@@ -461,7 +475,8 @@ print(f"El error (mse) de test es: {mse}")
 print(model.score(X_train, y_train))
 print(model.score(X_test, y_test))
 print(model.get_params())
-"""
+
+#%%
 
 # %%
 
@@ -472,7 +487,7 @@ print(model.get_params())
 #                           params,
 #                           cv=2,
 #                           n_jobs=-1)
-"""
+
 model = RandomForestRegressor(
     n_estimators=100, criterion='mse', n_jobs=-1)  # 100 params are OK
 model.fit(X_train, y_train)
@@ -485,14 +500,13 @@ print(f"El error (mse) de test es: {mse}")
 print(model.score(X_train, y_train))
 print(model.score(X_test, y_test))
 print(model.get_params())
-"""
+
 # %%
 params = {'n_estimators': 500,
           'max_depth': 5,
           'min_samples_split': 5,
           'learning_rate': 0.01,
           'loss': 'ls'}
-
 
 reg = GradientBoostingRegressor(**params)
 reg.fit(X_train, y_train)
@@ -544,5 +558,4 @@ plt.xlabel('Boosting Iterations')
 plt.ylabel('Deviance')
 fig.tight_layout()
 plt.show()
-# %%
 
