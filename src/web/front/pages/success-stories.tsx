@@ -1,16 +1,9 @@
 import DefaultHeader from "@/components/DefaultHeader";
 import Footer from "@/components/Footer";
 import NavigationBar from "@/components/NavigationBar";
+import SuccessStory from "@/components/SuccessStory";
 
 export default function CaseStudies() {
-  function openProject() {
-    alert("Hola, la función Open Project devuelve un card con info");
-    return (
-      <div className="position-absolute top-50 start-50 translate-middle">
-        Hola soy un card
-      </div>
-    );
-  }
   return (
     <div>
       <DefaultHeader />
@@ -89,30 +82,17 @@ export default function CaseStudies() {
           <div className="container">
             <div className="row">
               <div className="projects-list full-list">
-                <div className="col-xs-12 col-sm-6 col-md-3 project-box-holder">
-                  <div className="project-box">
-                    <a href="#">
-                      <img className="project-img" src="images/pro1.jpg" />
-
-                      <div
-                        className="box-overlay"
-                        onClick={() => openProject()}
-                      >
-                        <h4>Text 1</h4>
-                      </div>
-                    </a>
-                  </div>
-                </div>
-                <div className="col-xs-12 col-sm-6 col-md-3 project-box-holder">
-                  <div className="project-box">
-                    <a href="#">
-                      <img className="project-img" src="images/pro2.jpg" />
-                      <div className="box-overlay">
-                        <h4>Text 2</h4>
-                      </div>
-                    </a>
-                  </div>
-                </div>
+                <SuccessStory
+                  store="Subway"
+                  img="/images/subway-card.jpg"
+                  msg="Subway is very good company that does sandwiches for hungry and hurried people.
+                       We built a predictive model that was able to predict the number of visitors"
+                />
+                <SuccessStory
+                  store="Starbucks"
+                  img="/images/starbucks-card.jpeg"
+                  msg="Starbucks is a hipster place, we all know...  With our model we were able to predict the number of visitors pretty good"
+                />
                 {/* 
               <div class="col-xs-12 col-sm-6 col-md-3 project-box-holder">
                   <div class="project-box">

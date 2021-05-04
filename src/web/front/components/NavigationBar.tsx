@@ -17,7 +17,7 @@ const NavigationBar = () => {
             <div id="menu-holder">
               <ul className="main-menu">
                 <li>
-                  <a href="succes-stories">
+                  <a href="success-stories">
                     Success stories
                     <span className="link-underline" />
                   </a>

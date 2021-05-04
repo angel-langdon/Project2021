@@ -648,7 +648,7 @@ p {
   pointer-events: none;
 }
 #case-study-popup .popup-content-holder {
-  position: relative; 
+  position: relative;
   width: 100%;
   height: 100%;
   background-color: #ffffff;
@@ -682,7 +682,7 @@ p {
 #case-study-popup .popup-content-holder #closebtn {
   position: absolute;
   top: 30px;
-  right: 30px; 
+  right: 30px;
   width: 50px;
   height: 50px;
   cursor: pointer;
