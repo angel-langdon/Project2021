@@ -4,8 +4,12 @@ import NavigationBar from "@/components/NavigationBar";
 
 export default function CaseStudies() {
   function openProject() {
-    alert("Hola");
-    console.log("hola");
+    alert("Hola, la función Open Project devuelve un card con info");
+    return (
+      <div className="position-absolute top-50 start-50 translate-middle">
+        Hola soy un card
+      </div>
+    );
   }
   return (
     <div>
