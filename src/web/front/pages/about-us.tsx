@@ -104,8 +104,16 @@ export default function AboutUs() {
                 </div>
                 <div className="info-card-details">
                   <div className="person-name">Angel Langdon Villamayor</div>
-                  <div className="person-title">CTO</div>
-                  <div className="person-email">supername1337@gmail.com</div>
+                  <div className="person-title">
+                    Data scientist and Software Engineer
+                  </div>
+                  <div className="person-email">supername1337@gmail.coom</div>
+                  <a
+                    className="person-web"
+                    href="https://www.linkedin.com/in/%C3%A1ngel-langdon-villamayor-a44b49187/"
+                  >
+                    https://www.linkedin.com/in/%C3%A1ngel-langdon-villamayor-a44b49187/
+                  </a>
                 </div>
               </div>
             </div>
