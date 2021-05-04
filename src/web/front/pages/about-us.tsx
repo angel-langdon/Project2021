@@ -65,7 +65,9 @@ export default function AboutUs() {
                 <div className="info-card-details">
                   <div className="person-name">Álvaro Mazcuñán Herreros</div>
                   <div className="person-title">Project manager</div>
-                  <div className="person-email">alvaromazcuherreros@gmail.com</div>
+                  <div className="person-email">
+                    alvaromazcuherreros@gmail.com
+                  </div>
                 </div>
               </div>
             </div>
@@ -77,7 +79,9 @@ export default function AboutUs() {
                 <div className="info-card-details">
                   <div className="person-name">Lisa Gilyarovskaya</div>
                   <div className="person-title">Coder &amp; developer</div>
-                  <div className="person-email">lisa.gilyarovskaya@gmail.com</div>
+                  <div className="person-email">
+                    lisa.gilyarovskaya@gmail.com
+                  </div>
                 </div>
               </div>
             </div>
@@ -100,9 +104,8 @@ export default function AboutUs() {
                 </div>
                 <div className="info-card-details">
                   <div className="person-name">Angel Langdon Villamayor</div>
-                  <div className="person-title">Web designer</div>
-                  <div className="person-email">angel.langdon@stadlerrail.com</div>
-                 {/*<div className="person-phone">+973 912949238</div>*/}
+                  <div className="person-title">CTO</div>
+                  <div className="person-email">supername1337@gmail.com</div>
                 </div>
               </div>
             </div>
