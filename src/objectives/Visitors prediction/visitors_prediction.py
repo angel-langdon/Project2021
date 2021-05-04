@@ -56,7 +56,7 @@ def read_patterns_data(city, state, brand):
         df = pd.read_csv(path, encoding="utf-8",
                          dtype=dtypes.mobility_dtypes)
         df = df.dropna(subset=["poi_cbg"])
-        df["poi_cbg"] = df["poi_cbg"].astype("int64").astype("category")
+        df["poi_cbg"] = df["poi_cbg"].astype("float64").astype("int64").astype("category")
         df = drop_duplicate_stores(df)
     else:
         msg = "Patterns data not found, should be here:\n"+path
@@ -140,6 +140,8 @@ def add_income(df, city="Houston", state='TX'):
     if os.path.isfile(path):
         income = pd.read_csv(path, dtype=dtypes.census_dtypes,
                              encoding="utf-8")
+        income = income.rename(columns={"census_block_group": "poi_cbg",
+                                    'B19013e1': 'income'})
         income["poi_cbg"] = income["poi_cbg"].astype(int).astype(str)
         return df.merge(income, on='poi_cbg', how="left")
 
@@ -163,6 +165,8 @@ def add_population(df, city, state):
     path = paths.get_processed_file_path(state, city, file_name)
     if os.path.isfile(path):
         pop = pd.read_csv(path)
+        pop = pop.rename(columns={"census_block_group": "poi_cbg",
+                                    'B01001e1': 'population'})
         pop['poi_cbg'] = pop['poi_cbg'].astype(int).astype(str)
         return df.merge(pop, on='poi_cbg', how='left')
     else:
@@ -187,6 +191,7 @@ def add_devices(df, city, state):
     if os.path.isfile(path):
         # home_panel_summary
         devices = pd.read_csv(path)
+        devices = devices.rename(columns={"census_block_group": "poi_cbg"})
         devices['poi_cbg'] = devices['poi_cbg'].astype(int).astype(str)
         return df.merge(devices, on='poi_cbg', how='left')
     else:
@@ -359,7 +364,7 @@ def impute_outliers(df):
 country = "US"
 city = "Houston"
 state = "TX"
-brand = "subway"
+brand = "Starbucks"
 df_original = read_patterns_data(city, state, brand)
 df = explode_visits_by_day(df_original)
 df = filter_columns(df)
@@ -397,8 +402,8 @@ df = test_new_dummies(df)
 
 def filter_model_columns(df: pd.DataFrame):
     exclude_cols = ['placekey', 'safegraph_place_id', 'brands', 'latitude', 'longitude', 'street_address', 'date',
-                    'week_day', 'is_weekend', 'number_devices_residing', 'postal_code', 'cbg_income', 'poi_cbg',
-                    'is_holiday', 'population', 'month', 'year']
+                    'week_day', 'is_weekend', 'number_devices_residing', 'postal_code', 'poi_cbg',
+                    'month', 'year']
     get_cols = ['day', 'rain', 'yesterday_visits', 'last_week_visits', 'mean_last_7_days', 'mean_last_30_days', 'visits']  # include area_square_meters???
     cols = [col for col in df.columns if col in get_cols]
     return df[cols]
@@ -437,7 +442,7 @@ X = df_model
 # %%
 
 X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, shuffle=False)
+    X, y, test_size=0.2, shuffle=True)
 
 regr = Lasso(alpha=1)
 regr.fit(X_train, y_train)
@@ -452,7 +457,6 @@ print(regr.score(X_test, y_test))
 # %%
 get_sorted_coefs(df_model.columns, regr.coef_)
 #%%
-df_original['location_name'].unique()
 # %%
 """
 SVM -> very very very slow
@@ -477,7 +481,7 @@ print(model.score(X_test, y_test))
 print(model.get_params())
 
 #%%
-
+df.to_csv('starbucks.csv', index=False)
 # %%
 
 # params = {'n_estimators': [20, 50, 100, 150, 200],
