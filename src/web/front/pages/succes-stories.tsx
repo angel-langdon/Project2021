@@ -3,6 +3,10 @@ import Footer from "@/components/Footer";
 import NavigationBar from "@/components/NavigationBar";
 
 export default function CaseStudies() {
+  function openProject() {
+    alert("Hola");
+    console.log("hola");
+  }
   return (
     <div>
       <DefaultHeader />
@@ -85,7 +89,11 @@ export default function CaseStudies() {
                   <div className="project-box">
                     <a href="#">
                       <img className="project-img" src="images/pro1.jpg" />
-                      <div className="box-overlay">
+
+                      <div
+                        className="box-overlay"
+                        onClick={() => openProject()}
+                      >
                         <h4>Text 1</h4>
                       </div>
                     </a>
