@@ -138,17 +138,14 @@ export default function Home() {
                 <div>
                   <div className="top-line" />
                 </div>
-                <h3>We are based on Spain, Valencia</h3>
-                <p>
-                  We are students who see the need to facilitate this portal in
-                  order to offer a real and concise representation and
-                  conclusion to our clients about their data. .
-                </p>
+                <h3>We are based in Spain, Valencia</h3>
                 <p>
                   {" "}
-                  Our main business objectives are as we mentioned before design
-                  and develop this web portal to maintain and consult all our
-                  proyects carried out.
+                </p>
+                <p>
+                  We are a young team formed by six students who founded EntreDatos in response to growing market demand. 
+                  Our main goal is to transform complex data sets into tangible solutions, 
+                  which requires science, commitment, desire and a little bit of creativity😉.
                 </p>
               </div>
               <div className="col-xs-12 col-md-7">
@@ -172,9 +169,8 @@ export default function Home() {
                 <div className="info-box">
                   <h4>Who</h4>
                   <p>
-                    Six students that make up a group formed at the Polytechnic
-                    University of Valencia in order to extend their knowledge
-                    and wisdom about the world that surrounds data.
+                    A group of six students about to finish DataScience Degree at the Polytechnic
+                    University of Valencia looking forward to expanding their knowledge with new challenge.
                   </p>
                 </div>
               </div>
@@ -182,9 +178,7 @@ export default function Home() {
                 <div className="info-box">
                   <h4>Why</h4>
                   <p>
-                    Facilitate the accessibility of our clients when they want
-                    to access their data and results obtained, thanks to our
-                    models.
+                    To provide tangible solutions to our clients by extracting knowledge from their data.
                   </p>
                 </div>
               </div>
@@ -192,10 +186,10 @@ export default function Home() {
                 <div className="info-box">
                   <h4>What</h4>
                   <p>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                    Morbi ut vehicula ante. Donec turpis est, pulvinar sed ipsum
-                    sed, hendrerit blandit mauris. Cras egestas eget augue vel
-                    pulvinar.
+                    Machine Learning, Prediction Modeling, Analytics and Consulting services.
+                  </p>
+                  <p>
+                    As Charles Babbage said: “Errors using inadequate data are much less than those using no data at all.”
                   </p>
                 </div>
               </div>
