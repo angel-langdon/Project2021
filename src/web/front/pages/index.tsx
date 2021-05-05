@@ -221,7 +221,7 @@ export default function Home() {
                 <div className="col-xs-12 col-sm-6 col-md-3 project-box-holder">
                   <div className="project-box">
                     <a href="#">
-                      <img className="project-img" src="images/pro1.jpg" />
+                      <img className="project-img" src="images/subway-card.jpg" />
                       <div className="box-overlay">
                         <h4>Text 1</h4>
                       </div>
@@ -229,16 +229,7 @@ export default function Home() {
                   </div>
                 </div>
                
-                <div className="col-xs-12 col-sm-6 col-md-3 project-box-holder">
-                  <div className="project-box">
-                    <a href="#">
-                      <img className="project-img" src="images/pro2.jpg" />
-                      <div className="box-overlay">
-                        <h4>Text 2</h4>
-                      </div>
-                    </a>
-                  </div>
-                </div>
+                
                  {/*  
                 <div className="col-xs-12 col-sm-6 col-md-3 project-box-holder">
                   <div className="project-box">
@@ -269,7 +260,20 @@ export default function Home() {
                       </div>
                     </a>
                   </div>
+                </div> */} 
+                
+                <div className="col-xs-12 col-sm-6 col-md-3 project-box-holder">
+                  <div className="project-box">
+                    <a href="#">
+                      <img className="project-img" src="images/starbucks-card.jpeg" />
+                      <div className="box-overlay">
+                        <h4>Text 2</h4>
+                      </div>
+                    </a>
+                  </div>
                 </div>
+
+                 {/* 
                 <div className="col-xs-12 col-sm-6 col-md-3 project-box-holder">
                   <div className="project-box">
                     <a href="#">
