@@ -6,8 +6,7 @@ const defaultStyles = {
   title: "Visits per day",
   xaxis: { title: "Date" },
   yaxis: { title: "Nº of Visits" },
-
-  plot_bgcolor: "black",
+  plot_bgcolor: "#8595a8",
   font: { color: "#FFF" },
   paper_bgcolor: "#FFF3",
 };
@@ -17,12 +16,9 @@ function getColumn(arr, column) {
 }
 
 const LinePlotVisits = (props) => {
-  const filteredData = props.data.filter(
-    (object) => object.placekey == props.placekey
-  );
-  const visits = getColumn(filteredData, "visits");
-  const dates = getColumn(filteredData, "date");
-  console.log(dates);
+  const visits = getColumn(props.filteredData, "visits");
+  const dates = getColumn(props.filteredData, "date");
+  const predictedVisits = getColumn(props.filteredData, "prediction");
   return (
     <Plot
       data={[
@@ -30,6 +26,15 @@ const LinePlotVisits = (props) => {
           x: dates,
           y: visits,
           type: "scatter",
+          name: "Real visits",
+          mode: "lines",
+          marker: { color: "black" },
+        },
+        {
+          x: dates,
+          y: predictedVisits,
+          type: "scatter",
+          name: "Predicted visits",
           mode: "lines",
           marker: { color: "red" },
         },
