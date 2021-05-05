@@ -3,15 +3,19 @@ import KPIs from "@/components/KPIs";
 const LinePlotVisits = dynamic(() => import("@/components/LinePlotVisits"), {
   ssr: false,
 });
-const data = 1;
 
-function Dashboard() {
+interface IProps {
+  store: string;
+  data: object;
+}
+
+const Dashboard = (props: IProps) => {
   return (
     <div className="dashboard-container">
-      <KPIs data={data} />
-      <LinePlotVisits data={data} />
+      <KPIs {...props} />
+      <LinePlotVisits {...props} />
     </div>
   );
-}
+};
 
 export default Dashboard;
