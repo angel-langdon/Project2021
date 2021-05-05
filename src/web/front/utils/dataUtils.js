@@ -1,5 +1,6 @@
 export function preprocessPatternsData(data) {
-  return data.map((object) => {
-    return { ...object, date: Date(object["date"]) };
+  const res = data.map((object) => {
+    return { ...object, date: new Date(object["date"]) };
   });
+  return res;
 }

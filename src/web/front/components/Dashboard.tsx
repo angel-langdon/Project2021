@@ -16,7 +16,9 @@ const Dashboard = (props: IProps) => {
   return (
     <div className="dashboard-container">
       <KPIs {...props} placekey={placekey} />
-      <LinePlotVisits {...props} placekey={placekey} />
+      <div>
+        <LinePlotVisits {...props} placekey={placekey} />
+      </div>
     </div>
   );
 };

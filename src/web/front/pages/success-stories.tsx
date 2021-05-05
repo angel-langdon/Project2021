@@ -93,6 +93,7 @@ export default function CaseStudies() {
                   store="Starbucks"
                   img="/images/starbucks-card.jpeg"
                   msg="Starbucks is a hipster place, we all know...  With our model we were able to predict the number of visitors pretty good"
+                  dashboardUrl="#"
                 />
                 {/* 
               <div class="col-xs-12 col-sm-6 col-md-3 project-box-holder">

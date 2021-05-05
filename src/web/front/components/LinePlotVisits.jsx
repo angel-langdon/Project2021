@@ -2,7 +2,11 @@ import Plot from "react-plotly.js";
 
 const defaultStyles = {
   display: "flex",
+  autosize: true,
   title: "Visits per day",
+  xaxis: { title: "Date" },
+  yaxis: { title: "Nº of Visits" },
+
   plot_bgcolor: "black",
   font: { color: "#FFF" },
   paper_bgcolor: "#FFF3",
