@@ -432,6 +432,7 @@ def get_sorted_coefs(columns, coefficients):
 df = df.sort_values(by='date')
 # %%
 df = df.reset_index()
+a = df.copy()
 df = filter_model_columns(df)
 df_model = df.copy()
 # %%
@@ -563,3 +564,27 @@ plt.ylabel('Deviance')
 fig.tight_layout()
 plt.show()
 
+#%%
+b = a[a['safegraph_place_id'] == 'sg:b1ba9c1947974b5597eab48611826512']
+
+# %%
+b
+# %%
+d = b.copy()
+g = []
+for nrow in range(b.shape[0]):
+    if nrow == 0:
+        g.append((b.iloc[nrow]['visits'] + b.iloc[nrow+1]['visits'])/2)
+    elif nrow == b.shape[0]-1:
+        g.append((b.iloc[nrow]['visits'] + b.iloc[nrow-1]['visits'])/2)
+    else:
+        g.append((b.iloc[nrow-1]['visits'] + b.iloc[nrow]['visits'] + b.iloc[nrow+1]['visits'])/3)
+
+# %%
+b['new'] = g
+b.to_csv('testing.csv', index=False)
+# %%
+b['new']
+# %%
+g
+# %%
