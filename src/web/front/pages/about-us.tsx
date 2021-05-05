@@ -52,7 +52,7 @@ export default function AboutUs() {
                 </div>
                 <div className="info-card-details">
                   <div className="person-name">Ignacio Cano Navarro</div>
-                  <div className="person-title">Co-Founder</div>
+                  <div className="person-title"> CEO and founder</div>
                   <div className="person-email">nachonavarrocano@gmail.com</div>
                 </div>
               </div>
@@ -92,8 +92,8 @@ export default function AboutUs() {
                 </div>
                 <div className="info-card-details">
                   <div className="person-name">Miquel Marin Colomé</div>
-                  <div className="person-title">Web designer</div>
-                  <div className="person-email">rhea@designway.co</div>
+                  <div className="person-title">Machine Learning specialist</div>
+                  <div className="person-email">miquelmarin43@gmail.com</div>
                 </div>
               </div>
             </div>
@@ -105,15 +105,8 @@ export default function AboutUs() {
                 <div className="info-card-details">
                   <div className="person-name">Angel Langdon Villamayor</div>
                   <div className="person-title">
-                    Data scientist and Software Engineer
-                  </div>
-                  <div className="person-email">supername1337@gmail.coom</div>
-                  <a
-                    className="person-web"
-                    href="https://www.linkedin.com/in/%C3%A1ngel-langdon-villamayor-a44b49187/"
-                  >
-                    https://www.linkedin.com/in/%C3%A1ngel-langdon-villamayor-a44b49187/
-                  </a>
+                    Software Engineer </div>
+                  <div className="person-email">angel.langdon@stadlerrail.com</div>
                 </div>
               </div>
             </div>
@@ -124,7 +117,7 @@ export default function AboutUs() {
                 </div>
                 <div className="info-card-details">
                   <div className="person-name">Iker Rodríguez Martínez</div>
-                  <div className="person-title">Web designer</div>
+                  <div className="person-title">Commercial Agent</div>
                   <div className="person-email">ikrodmar@upv.edu.es</div>
                 </div>
               </div>

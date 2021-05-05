@@ -15,7 +15,7 @@ export default function ContactUs() {
                 <div className="col-xs-12">
                   <h1>Contact us</h1>
                   <h1 className="headline">
-                    Let’s make something magic together!
+                    
                   </h1>
                 </div>
               </div>
@@ -42,11 +42,9 @@ export default function ContactUs() {
         <div id="contact-details" className="container-fluid">
           <div className="row">
             <div className="col-md-6 address-holder">
-              <h3>Contact us</h3>
+             {/* <h3>Contact us</h3>  */}
               <p>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris
-                egestas non ante non consequat. Aenean accumsan eros vel elit
-                tristique, non sodales nunc luctus.
+               If you'd like to chat to our team about how we can help you achieve great results, send us your details by email and we'll be in touch. Drop a line about your project or describe a challenge your company needs help solving. We’d love to discuss all the details with you scheduling a meeting as soon as possible.
               </p>
               <div className="address">
                 <div className="col-xs-1 col-sm-1">
@@ -69,7 +67,8 @@ export default function ContactUs() {
             </div>
             <div className="col-md-6 contact-text">
               <div className="div-bg" />
-              <h3>Predicting customer behavior is not easy, let us help you with that.</h3>
+              <h3>Your Data holds the answers,</h3>
+              <h3>Let's discover them together!</h3>
             </div>
           </div>
         </div>

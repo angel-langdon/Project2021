@@ -1,5 +1,6 @@
+{/*
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles } from "@material-ui/core/styles"; 
 import Card from "@material-ui/core/Card";
 import CardActionArea from "@material-ui/core/CardActionArea";
 import CardActions from "@material-ui/core/CardActions";
@@ -64,3 +65,4 @@ const CardInfo = (props) => {
 };
 
 export default CardInfo;
+*/}
