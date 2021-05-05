@@ -85,6 +85,7 @@ export default function CaseStudies() {
                 <SuccessStory
                   store="Subway"
                   img="/images/subway-card.jpg"
+                  dashboardUrl="/dashboard-example-subway"
                   msg="Subway is very good company that does sandwiches for hungry and hurried people.
                        We built a predictive model that was able to predict the number of visitors"
                 />

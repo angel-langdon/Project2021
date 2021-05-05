@@ -5,6 +5,7 @@ interface IProps {
   store: string;
   img: string;
   msg: string;
+  dashboardUrl: string;
 }
 
 const SuccessStory = (props: IProps) => {

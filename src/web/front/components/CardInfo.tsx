@@ -6,6 +6,7 @@ import CardActions from "@material-ui/core/CardActions";
 import CardContent from "@material-ui/core/CardContent";
 import CardMedia from "@material-ui/core/CardMedia";
 import Button from "@material-ui/core/Button";
+import Link from "@material-ui/core/Link";
 import Typography from "@material-ui/core/Typography";
 
 const useStyles = makeStyles({
@@ -46,7 +47,9 @@ const CardInfo = (props) => {
       </CardActionArea>
       <CardActions className={classes.buttons}>
         <Button size="large" color="primary">
-          <Typography variant="h6">View example dashboard</Typography>
+          <Link href={props.dashboardUrl}>
+            <Typography variant="h6">View example dashboard</Typography>
+          </Link>
         </Button>
         <Button
           size="large"
