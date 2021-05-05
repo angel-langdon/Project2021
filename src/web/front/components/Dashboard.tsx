@@ -4,12 +4,12 @@ import { useState } from "react";
 const LinePlotVisits = dynamic(() => import("@/components/LinePlotVisits"), {
   ssr: false,
 });
-
+// ? for optional parameters
 interface IProps {
   store: string;
-  data: object;
-  filteredData: object;
-  placekey: string;
+  data: Array<any>;
+  filteredData?: object;
+  placekey?: string;
 }
 
 const Dashboard = (props: IProps) => {
