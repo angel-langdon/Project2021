@@ -210,6 +210,27 @@ def compute_real_visits(df):
                     .round().astype(int))
     return df
 
+def modelate_visits(df):
+    df = df.copy()
+    df = df[df['visits'] != 0]
+    df = df[df.groupby('placekey')['placekey'].transform('size') > 200]
+    df2fill = df[df['safegraph_place_id'] == 'this is only to get an empty df']
+    for place in df['safegraph_place_id'].unique():
+        df_per_store = df[df['safegraph_place_id'] == place]
+        g = []
+        for nrow in range(df_per_store.shape[0]):
+            if nrow == 0:
+                g.append((df_per_store.iloc[nrow]['visits'] + df_per_store.iloc[nrow+1]['visits'])/2)
+            elif nrow == df_per_store.shape[0]-1:
+                g.append((df_per_store.iloc[nrow]['visits'] + df_per_store.iloc[nrow-1]['visits'])/2)
+            else:
+                g.append((df_per_store.iloc[nrow-1]['visits'] + df_per_store.iloc[nrow]['visits'] + df_per_store.iloc[nrow+1]['visits'])/3)
+        c = df_per_store['visits']
+        df_per_store['visits'] = g
+        df_per_store['old_visits'] = c
+        df2fill = pd.concat([df2fill, df_per_store])
+    
+    return df2fill
 
 def add_last_visits(df: pd.DataFrame):
     """ Adds new visits columns to patterns data
@@ -364,7 +385,7 @@ def impute_outliers(df):
 country = "US"
 city = "Houston"
 state = "TX"
-brand = "Starbucks"
+brand = "subway"
 df_original = read_patterns_data(city, state, brand)
 df = explode_visits_by_day(df_original)
 df = filter_columns(df)
@@ -376,6 +397,7 @@ df = add_rain(df, city, state)
 df = add_population(df, city, state)
 df = add_devices(df, city, state)
 df = compute_real_visits(df)
+df = modelate_visits(df)
 
 # IF YOU WANT THE MEAN VERSION
 #df = apply_mean(df)
@@ -404,7 +426,7 @@ def filter_model_columns(df: pd.DataFrame):
     exclude_cols = ['placekey', 'safegraph_place_id', 'brands', 'latitude', 'longitude', 'street_address', 'date',
                     'week_day', 'is_weekend', 'number_devices_residing', 'postal_code', 'poi_cbg',
                     'month', 'year']
-    get_cols = ['day', 'rain', 'yesterday_visits', 'last_week_visits', 'mean_last_7_days', 'mean_last_30_days', 'visits']  # include area_square_meters???
+    get_cols = ['day', 'rain', 'yesterday_visits', 'last_week_visits', 'mean_last_7_days', 'mean_last_30_days', 'visits', 'old_visits']  # include area_square_meters???
     cols = [col for col in df.columns if col in get_cols]
     return df[cols]
 
@@ -432,18 +454,22 @@ def get_sorted_coefs(columns, coefficients):
 df = df.sort_values(by='date')
 # %%
 df = df.reset_index()
-a = df.copy()
 df = filter_model_columns(df)
 df_model = df.copy()
 # %%
 # Sort the dataframe by date
 
-y = df_model.pop('visits')
+y, y_ = df_model.pop('visits'), df_model.pop('old_visits')
 X = df_model
 # %%
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, shuffle=True)
+
+X_train, _, y_train, _ = train_test_split(
+    X, y, test_size=0.2, shuffle=True, random_state=11)
+
+_, X_test, _, y_test = train_test_split(
+    X, y_, test_size=0.2, shuffle=True, random_state=11)
+
 
 regr = Lasso(alpha=1)
 regr.fit(X_train, y_train)
@@ -458,6 +484,9 @@ print(regr.score(X_test, y_test))
 # %%
 get_sorted_coefs(df_model.columns, regr.coef_)
 #%%
+y_pred.mean()
+#%%
+mse/y_pred.shape
 # %%
 """
 SVM -> very very very slow
@@ -468,6 +497,7 @@ SVM -> very very very slow
 #          'C': [0.5, 1, 1.5]}
 #model = GridSearchCV(svm.SVR(), params)
 """
+
 model = SVR(kernel='poly', degree=2, C=1)#(n_estimators=200, criterion='mse', n_jobs=-1)
 
 model.fit(X_train, y_train)
@@ -482,7 +512,7 @@ print(model.score(X_test, y_test))
 print(model.get_params())
 
 #%%
-df.to_csv('starbucks.csv', index=False)
+
 # %%
 
 # params = {'n_estimators': [20, 50, 100, 150, 200],
@@ -563,28 +593,3 @@ plt.xlabel('Boosting Iterations')
 plt.ylabel('Deviance')
 fig.tight_layout()
 plt.show()
-
-#%%
-b = a[a['safegraph_place_id'] == 'sg:b1ba9c1947974b5597eab48611826512']
-
-# %%
-b
-# %%
-d = b.copy()
-g = []
-for nrow in range(b.shape[0]):
-    if nrow == 0:
-        g.append((b.iloc[nrow]['visits'] + b.iloc[nrow+1]['visits'])/2)
-    elif nrow == b.shape[0]-1:
-        g.append((b.iloc[nrow]['visits'] + b.iloc[nrow-1]['visits'])/2)
-    else:
-        g.append((b.iloc[nrow-1]['visits'] + b.iloc[nrow]['visits'] + b.iloc[nrow+1]['visits'])/3)
-
-# %%
-b['new'] = g
-b.to_csv('testing.csv', index=False)
-# %%
-b['new']
-# %%
-g
-# %%
