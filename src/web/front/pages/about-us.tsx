@@ -92,7 +92,9 @@ export default function AboutUs() {
                 </div>
                 <div className="info-card-details">
                   <div className="person-name">Miquel Marin Colomé</div>
-                  <div className="person-title">Machine Learning specialist</div>
+                  <div className="person-title">
+                    Machine Learning specialist
+                  </div>
                   <div className="person-email">miquelmarin43@gmail.com</div>
                 </div>
               </div>
@@ -105,8 +107,15 @@ export default function AboutUs() {
                 <div className="info-card-details">
                   <div className="person-name">Angel Langdon Villamayor</div>
                   <div className="person-title">
-                    Software Engineer </div>
-                  <div className="person-email">angel.langdon@stadlerrail.com</div>
+                    Data Scientist & Software Engineer
+                  </div>
+                  <div className="person-email">supername1337@gmail.com</div>
+                  <a
+                    className="person-linkedin"
+                    href="https://www.linkedin.com/in/ángel-langdon-villamayor-a44b49187/"
+                  >
+                    linkedin.com/in/ángel-langdon-villamayor-a44b49187/
+                  </a>
                 </div>
               </div>
             </div>
