@@ -1,12 +1,15 @@
 import dynamic from "next/dynamic";
-const LinePlot = dynamic(() => import("@/components/LinePlot"), {
+import KPIs from "@/components/KPIs";
+const LinePlotVisits = dynamic(() => import("@/components/LinePlotVisits"), {
   ssr: false,
 });
+const data = 1;
 
 function Dashboard() {
   return (
     <div className="dashboard-container">
-      <LinePlot />
+      <KPIs data={data} />
+      <LinePlotVisits data={data} />
     </div>
   );
 }
