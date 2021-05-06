@@ -2,6 +2,7 @@ import dynamic from "next/dynamic";
 import KPIsTop from "@/components/dashboard/KPIsTop";
 import DefaultHeader from "@/components/DefaultHeader";
 import { useState } from "react";
+import KPIsPlotVisits from "./KPIsPlotVisits";
 const LinePlotVisits = dynamic(
   () => import("@/components/dashboard/LinePlotVisits"),
   {
@@ -30,11 +31,12 @@ const Dashboard = (props: IProps) => {
         <KPIsTop {...props} />
       </div>
       <div className="row">
-        <div className="col">
+        <div className="col-10">
           <LinePlotVisits {...props} />
         </div>
-        <div className="col"></div>
-        <LinePlotVisits {...props} />
+        <div className="col">
+          <KPIsPlotVisits {...props} />
+        </div>
       </div>
     </div>
   );

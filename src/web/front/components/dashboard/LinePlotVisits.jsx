@@ -38,7 +38,7 @@ const LinePlotVisits = (props) => {
       ]}
       layout={defaultStyles}
       useResizeHandler={true}
-      style={{ width: "80vw" }}
+      style={{ width: "100%", height: "100%" }}
     />
   );
 };
