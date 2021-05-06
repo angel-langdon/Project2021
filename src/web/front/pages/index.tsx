@@ -1,7 +1,7 @@
 import Footer from "@/components/Footer";
 import NavigationBar from "@/components/NavigationBar";
 import DefaultHeader from "@/components/DefaultHeader";
-import SuccessStory from "@/components/SuccessStory";
+import SuccessStoriesList from "@/components/SuccessStoriesList";
 
 export default function Home() {
   return (
@@ -223,20 +223,7 @@ export default function Home() {
             */}
             <div className="row">
               <div className="projects-list">
-                <SuccessStory
-                  store="Subway"
-                  img="/images/subway-card.jpg"
-                  dashboardUrl="/dashboard-example-subway"
-                  msg="Subway is very good company that does sandwiches for hungry and hurried people.
-                       We built a predictive model that was able to predict the number of visitors"
-                />
-                <SuccessStory
-                  store="Starbucks"
-                  img="/images/starbucks-card.jpeg"
-                  msg="Starbucks is a hipster place, we all know...  With our model we were able to predict the number of visitors pretty good"
-                  dashboardUrl="#"
-                />
-
+                <SuccessStoriesList />
                 {/*  
                 <div className="col-xs-12 col-sm-6 col-md-3 project-box-holder">
                   <div className="project-box">
