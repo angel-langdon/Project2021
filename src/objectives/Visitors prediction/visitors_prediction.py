@@ -379,6 +379,111 @@ def impute_outliers(df):
         df2fill = pd.concat([df2fill, df_per_store])
         
     return df2fill
+
+
+def get_data_with_0_dashboard(df):
+    df = df.copy()
+    def add_last_visits_modified(df: pd.DataFrame):
+        
+        df = df.copy()
+        df['date'] = pd.to_datetime(df['date'])
+        df["safegraph_place_id"] = df["safegraph_place_id"].astype(str)
+        # Define the data periods we want to add
+        dict_last_visits = {"yesterday": -timedelta(days=1),
+                            "last_week": -timedelta(days=7)}
+        # Default suffix for new visits columns
+        suffix = "_visits"
+        # For each period
+        for period, diff in dict_last_visits.items():
+            # Auxiliar dataframe for left joining on place key and date
+            period_df = pd.DataFrame()
+            period_df["safegraph_place_id"] = df["safegraph_place_id"]
+            # new visits column
+            period_visits_col = period+suffix
+            # create the new date column to merge
+            period_df["date"] = df["date"] - diff
+            # assign to the peroid visits col the visits
+            period_df[period_visits_col] = df["visits"]
+            df = pd.merge(df, period_df, how="left",
+                        on=["safegraph_place_id", "date"])
+            # drop the column from the auxiliar dataframe in case
+            # there are more date periods to add
+            period_df = period_df.drop(columns=[period_visits_col])
+        return df
+
+    def mean_n_days_modified(test, n):
+        test = test.copy()
+        test['date'] = pd.to_datetime(test.date)
+        idx = pd.date_range(test.date.min(), test.date.max(), freq='D')
+        df_eee = test.pivot(index='date', values='visits',
+                            columns='safegraph_place_id').reindex(idx)
+        # print(df_eee.iloc[0])
+        df2 = (df_eee.shift().rolling(
+            window=n, min_periods=1).mean().reset_index().drop_duplicates())
+        # print(df2['index'])
+        df3 = (pd.melt(df2, id_vars='index', value_name='visits').sort_values(
+            ['index', 'safegraph_place_id']).reset_index(drop=True))
+        df3 = df3.rename(
+            columns={'index': 'date', 'visits': f'mean_last_{n}_days'})
+        test = test.merge(df3, on=['safegraph_place_id', 'date'], how='left')
+        return test
+
+    df2fill = df[df['safegraph_place_id'] == 'this is only to get an empty df']
+    df2fill = df2fill[['date', 'visits', 'old_visits']]
+    
+    for place in df['safegraph_place_id'].unique():
+        
+        a = df[df['safegraph_place_id'] == place]
+        start = df['date'].min()
+        end = df['date'].max()
+        delta = end - start
+        list_dates  = [start + timedelta(days=i) for i in range(delta.days + 1)]
+        l_dates = pd.DataFrame({'date':list_dates})
+
+        place = list(a['safegraph_place_id'])[0]
+        brand = list(a['brands'])[0]
+        lat = list(a['latitude'])[0]
+        lon = list(a['longitude_x'])[0]
+        street = list(a['street_address'])[0]
+        postal = list(a['postal_code'])[0]
+        cbg = list(a['poi_cbg'])[0]
+
+        get_cols = ['date', 'visits', 'old_visits']
+        c = a[get_cols]
+        df_to_add = l_dates.merge(c, on='date', how='left')
+
+        df_to_add['safegraph_place_id'] = place
+        df_to_add['brands'] = brand
+        df_to_add['latitude'] = lat
+        df_to_add['longitude'] = lon
+        df_to_add['street_address'] = street
+        df_to_add['postal_code'] = postal
+        df_to_add['poi_cbg'] = cbg
+
+        df2fill = pd.concat([df2fill, df_to_add])
+
+    df2fill["month"] = df2fill["date"].dt.month
+    df2fill["year"] = df2fill["date"].dt.year
+    df2fill["day"] = df2fill["date"].dt.day
+    df2fill = add_week_columns(df2fill)
+    df2fill = add_income(df2fill, city, state)
+    df2fill = add_area(df2fill, city, state)
+    df2fill = add_is_holiday(df2fill, city, state, country)
+    df2fill = add_rain(df2fill, city, state)
+    df2fill = add_population(df2fill, city, state)
+    df2fill = add_last_visits_modified(df2fill)
+    df2fill = add_location(df2fill)
+    df2fill = mean_n_days_modified(df2fill, 7)
+    df2fill = mean_n_days_modified(df2fill, 30)
+    df2fill['visits'] = df2fill['visits'].replace(np.NaN, 0.0)
+    df2fill['old_visits'] = df2fill['old_visits'].replace(np.NaN, 0.0)
+    df2fill['last_week_visits'] = df2fill['last_week_visits'].replace(np.NaN, 0.0)
+    df2fill['mean_last_30_days'] = df2fill['mean_last_30_days'].replace(np.NaN, 0.0)
+    df2fill['mean_last_7_days'] = df2fill['mean_last_7_days'].replace(np.NaN, 0.0)
+    df2fill = df2fill.reset_index()
+    df2fill.drop('index', axis=1)
+    return df2fill
+
 # %%
 
 
@@ -444,14 +549,15 @@ def get_sorted_coefs(columns, coefficients):
 
 # get_correlation_plot(df)
 
+# %%
+# DO YOU WANT THE DATA FOR THE DASHBOARD?
+# IF YES, EXECUTE THE FOLLOWING LINES
+# 
+# df2dash = get_data_with_0_dashboard(df)
+# df2dash.to_csv('data_dashboard.csv', index=False)
+# 
 
 # %%
-# selection=['year_2020', 'year_2021', 'day', 'yesterday_visits', 'last_week_visits',
-#             'is_weekend', 'cbg_income', 'is_holiday', 'rain', 'population', 'Monday', 'Tuesday',
-#             'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday',
-#             'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
-#             'September', 'October', 'November', 'December']
-a = df.copy()
 df = df.sort_values(by='date')
 # %%
 df = df.reset_index()
@@ -484,10 +590,6 @@ print(regr.score(X_train, y_train))
 print(regr.score(X_test, y_test))
 # %%
 get_sorted_coefs(df_model.columns, regr.coef_)
-#%%
-y_pred.mean()
-#%%
-mse/y_pred.shape
 # %%
 """
 SVM -> very very very slow
@@ -595,49 +697,114 @@ plt.ylabel('Deviance')
 fig.tight_layout()
 plt.show()
 
-"""TESTING BELOW"""
-#%%
-b = pd.to_datetime(a['date'].min(), format=DATE_FORMATS.DAY)
 # %%
-a['date'].iloc[0]
+
+def get_data_with_0_dashboard(df):
+    df = df.copy()
+    def add_last_visits_modified(df: pd.DataFrame):
+        
+        df = df.copy()
+        df['date'] = pd.to_datetime(df['date'])
+        df["safegraph_place_id"] = df["safegraph_place_id"].astype(str)
+        # Define the data periods we want to add
+        dict_last_visits = {"yesterday": -timedelta(days=1),
+                            "last_week": -timedelta(days=7)}
+        # Default suffix for new visits columns
+        suffix = "_visits"
+        # For each period
+        for period, diff in dict_last_visits.items():
+            # Auxiliar dataframe for left joining on place key and date
+            period_df = pd.DataFrame()
+            period_df["safegraph_place_id"] = df["safegraph_place_id"]
+            # new visits column
+            period_visits_col = period+suffix
+            # create the new date column to merge
+            period_df["date"] = df["date"] - diff
+            # assign to the peroid visits col the visits
+            period_df[period_visits_col] = df["visits"]
+            df = pd.merge(df, period_df, how="left",
+                        on=["safegraph_place_id", "date"])
+            # drop the column from the auxiliar dataframe in case
+            # there are more date periods to add
+            period_df = period_df.drop(columns=[period_visits_col])
+        return df
+
+    def mean_n_days_modified(test, n):
+        test = test.copy()
+        test['date'] = pd.to_datetime(test.date)
+        idx = pd.date_range(test.date.min(), test.date.max(), freq='D')
+        df_eee = test.pivot(index='date', values='visits',
+                            columns='safegraph_place_id').reindex(idx)
+        # print(df_eee.iloc[0])
+        df2 = (df_eee.shift().rolling(
+            window=n, min_periods=1).mean().reset_index().drop_duplicates())
+        # print(df2['index'])
+        df3 = (pd.melt(df2, id_vars='index', value_name='visits').sort_values(
+            ['index', 'safegraph_place_id']).reset_index(drop=True))
+        df3 = df3.rename(
+            columns={'index': 'date', 'visits': f'mean_last_{n}_days'})
+        test = test.merge(df3, on=['safegraph_place_id', 'date'], how='left')
+        return test
+
+    df2fill = df[df['safegraph_place_id'] == 'this is only to get an empty df']
+    df2fill = df2fill[['date', 'visits', 'old_visits']]
+    
+    for place in df['safegraph_place_id'].unique():
+        
+        a = df[df['safegraph_place_id'] == place]
+        start = df['date'].min()
+        end = df['date'].max()
+        delta = end - start
+        list_dates  = [start + timedelta(days=i) for i in range(delta.days + 1)]
+        l_dates = pd.DataFrame({'date':list_dates})
+
+        place = list(a['safegraph_place_id'])[0]
+        brand = list(a['brands'])[0]
+        lat = list(a['latitude'])[0]
+        lon = list(a['longitude_x'])[0]
+        street = list(a['street_address'])[0]
+        postal = list(a['postal_code'])[0]
+        cbg = list(a['poi_cbg'])[0]
+
+        get_cols = ['date', 'visits', 'old_visits']
+        c = a[get_cols]
+        df_to_add = l_dates.merge(c, on='date', how='left')
+
+        df_to_add['safegraph_place_id'] = place
+        df_to_add['brands'] = brand
+        df_to_add['latitude'] = lat
+        df_to_add['longitude'] = lon
+        df_to_add['street_address'] = street
+        df_to_add['postal_code'] = postal
+        df_to_add['poi_cbg'] = cbg
+
+        df2fill = pd.concat([df2fill, df_to_add])
+
+    df2fill["month"] = df2fill["date"].dt.month
+    df2fill["year"] = df2fill["date"].dt.year
+    df2fill["day"] = df2fill["date"].dt.day
+    df2fill = add_week_columns(df2fill)
+    df2fill = add_income(df2fill, city, state)
+    df2fill = add_area(df2fill, city, state)
+    df2fill = add_is_holiday(df2fill, city, state, country)
+    df2fill = add_rain(df2fill, city, state)
+    df2fill = add_population(df2fill, city, state)
+    df2fill = add_last_visits_modified(df2fill)
+    df2fill = add_location(df2fill)
+    df2fill = mean_n_days_modified(df2fill, 7)
+    df2fill = mean_n_days_modified(df2fill, 30)
+    df2fill['visits'] = df2fill['visits'].replace(np.NaN, 0.0)
+    df2fill['old_visits'] = df2fill['old_visits'].replace(np.NaN, 0.0)
+    df2fill['last_week_visits'] = df2fill['last_week_visits'].replace(np.NaN, 0.0)
+    df2fill['mean_last_30_days'] = df2fill['mean_last_30_days'].replace(np.NaN, 0.0)
+    df2fill['mean_last_7_days'] = df2fill['mean_last_7_days'].replace(np.NaN, 0.0)
+    df2fill = df2fill.reset_index()
+    df2fill.drop('index', axis=1)
+    return df2fill
+
+
+#%%
+b = get_data_with_0_dashboard(a)
 # %%
 b
-# %%
-c = a[a['safegraph_place_id'] == 'sg:e7675d2c52f545b8ad489c68f3bbe9e5']
-# %%
-dates = pd.Index(list(c['date']))
-s = pd.Series(list(c['visits']), dates)
-print(s.asfreq('D'))
-# %%
-c.iloc[c.shape[0]-1]
-# %%
-set_list = {a['date'].min(), a['date'].max()}
-set_list.update(list(c['date']))
-list(set_list)
-# %%
-# %%
-get_cols = ['safegraph_place_id', 'brands', 'latitude', 'longitude_x', 'street_address', 'postal_code', 'poi_cbg', 'date', 'visits', 'old_visits']
-
-cols = [col for col in df.columns if col in get_cols]
-d = c[cols]
-# %%
-c['visits'].asfreq('D')
-# %%
-start = a['date'].min()
-end = a['date'].max()
-
-delta = end - start
-list_dates  = [start + timedelta(days=i) for i in range(delta.days + 1)]
-# %%
-l_dates = pd.DataFrame({'date':list_dates})
-
-# %%
-c = a[a['safegraph_place_id'] == 'sg:e7675d2c52f545b8ad489c68f3bbe9e5']
-get_cols = ['safegraph_place_id', 'brands', 'latitude', 'longitude_x', 'street_address', 'postal_code', 'poi_cbg', 'date', 'visits', 'old_visits']
-c = c[get_cols]
-uu = l_dates.merge(c, on='date', how='left')
-# %%
-uu['visits'] = uu[type(uu['visits'].astype('float')) != 'float'] = 0
-# %%
-uu
 # %%
