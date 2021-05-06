@@ -1,4 +1,4 @@
-import Dashboard from "@/components/Dashboard";
+import Dashboard from "@/components/dashboard/Dashboard";
 import data from "../public/data/subway.json";
 import { preprocessPatternsData } from "@/utils/dataUtils.js";
 

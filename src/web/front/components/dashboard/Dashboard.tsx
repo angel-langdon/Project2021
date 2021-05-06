@@ -1,10 +1,13 @@
 import dynamic from "next/dynamic";
-import KPIs from "@/components/KPIs";
+import KPIsTop from "@/components/dashboard/KPIsTop";
 import DefaultHeader from "@/components/DefaultHeader";
 import { useState } from "react";
-const LinePlotVisits = dynamic(() => import("@/components/LinePlotVisits"), {
-  ssr: false,
-});
+const LinePlotVisits = dynamic(
+  () => import("@/components/dashboard/LinePlotVisits"),
+  {
+    ssr: false,
+  }
+);
 // ? for optional parameters
 interface IProps {
   store: string;
@@ -24,13 +27,14 @@ const Dashboard = (props: IProps) => {
     <div className="dashboard-container">
       <DefaultHeader />
       <div className="row horizontal-kpis-container">
-        <KPIs {...props} />
+        <KPIsTop {...props} />
       </div>
       <div className="row">
         <div className="col">
           <LinePlotVisits {...props} />
         </div>
         <div className="col"></div>
+        <LinePlotVisits {...props} />
       </div>
     </div>
   );
