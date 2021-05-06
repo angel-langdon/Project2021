@@ -27,7 +27,10 @@ const Dashboard = (props: IProps) => {
         <KPIs {...props} />
       </div>
       <div className="row">
-        <LinePlotVisits {...props} />
+        <div className="col">
+          <LinePlotVisits {...props} />
+        </div>
+        <div className="col"></div>
       </div>
     </div>
   );
