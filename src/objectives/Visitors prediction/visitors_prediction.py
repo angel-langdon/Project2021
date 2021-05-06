@@ -451,6 +451,7 @@ def get_sorted_coefs(columns, coefficients):
 #             'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday',
 #             'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
 #             'September', 'October', 'November', 'December']
+a = df.copy()
 df = df.sort_values(by='date')
 # %%
 df = df.reset_index()
@@ -593,3 +594,50 @@ plt.xlabel('Boosting Iterations')
 plt.ylabel('Deviance')
 fig.tight_layout()
 plt.show()
+
+"""TESTING BELOW"""
+#%%
+b = pd.to_datetime(a['date'].min(), format=DATE_FORMATS.DAY)
+# %%
+a['date'].iloc[0]
+# %%
+b
+# %%
+c = a[a['safegraph_place_id'] == 'sg:e7675d2c52f545b8ad489c68f3bbe9e5']
+# %%
+dates = pd.Index(list(c['date']))
+s = pd.Series(list(c['visits']), dates)
+print(s.asfreq('D'))
+# %%
+c.iloc[c.shape[0]-1]
+# %%
+set_list = {a['date'].min(), a['date'].max()}
+set_list.update(list(c['date']))
+list(set_list)
+# %%
+# %%
+get_cols = ['safegraph_place_id', 'brands', 'latitude', 'longitude_x', 'street_address', 'postal_code', 'poi_cbg', 'date', 'visits', 'old_visits']
+
+cols = [col for col in df.columns if col in get_cols]
+d = c[cols]
+# %%
+c['visits'].asfreq('D')
+# %%
+start = a['date'].min()
+end = a['date'].max()
+
+delta = end - start
+list_dates  = [start + timedelta(days=i) for i in range(delta.days + 1)]
+# %%
+l_dates = pd.DataFrame({'date':list_dates})
+
+# %%
+c = a[a['safegraph_place_id'] == 'sg:e7675d2c52f545b8ad489c68f3bbe9e5']
+get_cols = ['safegraph_place_id', 'brands', 'latitude', 'longitude_x', 'street_address', 'postal_code', 'poi_cbg', 'date', 'visits', 'old_visits']
+c = c[get_cols]
+uu = l_dates.merge(c, on='date', how='left')
+# %%
+uu['visits'] = uu[type(uu['visits'].astype('float')) != 'float'] = 0
+# %%
+uu
+# %%
