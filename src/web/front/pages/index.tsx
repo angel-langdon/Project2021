@@ -1,6 +1,7 @@
 import Footer from "@/components/Footer";
 import NavigationBar from "@/components/NavigationBar";
 import DefaultHeader from "@/components/DefaultHeader";
+import SuccessStory from "@/components/SuccessStory";
 
 export default function Home() {
   return (
@@ -139,13 +140,13 @@ export default function Home() {
                   <div className="top-line" />
                 </div>
                 <h3>We are based in Spain, Valencia</h3>
+                <p> </p>
                 <p>
-                  {" "}
-                </p>
-                <p>
-                  We are a young team formed by six students who founded EntreDatos in response to growing market demand. 
-                  Our main goal is to transform complex data sets into tangible solutions, 
-                  which requires science, commitment, desire and a little bit of creativity😉.
+                  We are a young team formed by six students who founded
+                  EntreDatos in response to growing market demand. Our main goal
+                  is to transform complex data sets into tangible solutions,
+                  which requires science, commitment, desire and a little bit of
+                  creativity😉.
                 </p>
               </div>
               <div className="col-xs-12 col-md-7">
@@ -169,8 +170,9 @@ export default function Home() {
                 <div className="info-box">
                   <h4>Who</h4>
                   <p>
-                    A group of six students about to finish DataScience Degree at the Polytechnic
-                    University of Valencia looking forward to expanding their knowledge with new challenge.
+                    A group of six students about to finish DataScience Degree
+                    at the Polytechnic University of Valencia looking forward to
+                    expanding their knowledge with new challenge.
                   </p>
                 </div>
               </div>
@@ -178,7 +180,8 @@ export default function Home() {
                 <div className="info-box">
                   <h4>Why</h4>
                   <p>
-                    To provide tangible solutions to our clients by extracting knowledge from their data.
+                    To provide tangible solutions to our clients by extracting
+                    knowledge from their data.
                   </p>
                 </div>
               </div>
@@ -186,10 +189,12 @@ export default function Home() {
                 <div className="info-box">
                   <h4>What</h4>
                   <p>
-                    Machine Learning, Prediction Modeling, Analytics and Consulting services.
+                    Machine Learning, Prediction Modeling, Analytics and
+                    Consulting services.
                   </p>
                   <p>
-                    As Charles Babbage said: “Errors using inadequate data are much less than those using no data at all.”
+                    As Charles Babbage said: “Errors using inadequate data are
+                    much less than those using no data at all.”
                   </p>
                 </div>
               </div>
@@ -218,19 +223,21 @@ export default function Home() {
             */}
             <div className="row">
               <div className="projects-list">
-                <div className="col-xs-12 col-sm-6 col-md-3 project-box-holder">
-                  <div className="project-box">
-                    <a href="#">
-                      <img className="project-img" src="images/subway-card.jpg" />
-                      <div className="box-overlay">
-                        <h4>Text 1</h4>
-                      </div>
-                    </a>
-                  </div>
-                </div>
-               
-                
-                 {/*  
+                <SuccessStory
+                  store="Subway"
+                  img="/images/subway-card.jpg"
+                  dashboardUrl="/dashboard-example-subway"
+                  msg="Subway is very good company that does sandwiches for hungry and hurried people.
+                       We built a predictive model that was able to predict the number of visitors"
+                />
+                <SuccessStory
+                  store="Starbucks"
+                  img="/images/starbucks-card.jpeg"
+                  msg="Starbucks is a hipster place, we all know...  With our model we were able to predict the number of visitors pretty good"
+                  dashboardUrl="#"
+                />
+
+                {/*  
                 <div className="col-xs-12 col-sm-6 col-md-3 project-box-holder">
                   <div className="project-box">
                     <a href="#">
@@ -260,20 +267,9 @@ export default function Home() {
                       </div>
                     </a>
                   </div>
-                </div> */} 
-                
-                <div className="col-xs-12 col-sm-6 col-md-3 project-box-holder">
-                  <div className="project-box">
-                    <a href="#">
-                      <img className="project-img" src="images/starbucks-card.jpeg" />
-                      <div className="box-overlay">
-                        <h4>Text 2</h4>
-                      </div>
-                    </a>
-                  </div>
-                </div>
+                </div> */}
 
-                 {/* 
+                {/* 
                 <div className="col-xs-12 col-sm-6 col-md-3 project-box-holder">
                   <div className="project-box">
                     <a href="#">
