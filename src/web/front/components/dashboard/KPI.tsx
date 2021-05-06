@@ -1,4 +1,4 @@
-import RoundedRectangleContainer from "./RoundedRectangleContanier";
+import RoundedRectangleContainer from "@/components/dashboard/RoundedRectangleContanier";
 interface IProps {
   number: number;
   unit: string;
