@@ -1,4 +1,5 @@
 import Plot from "react-plotly.js";
+import { getColumn } from "@/utils/dataUtils";
 
 const defaultStyles = {
   display: "flex",
@@ -10,10 +11,6 @@ const defaultStyles = {
   font: { color: "#FFF" },
   paper_bgcolor: "#FFF3",
 };
-
-function getColumn(arr, column) {
-  return arr.map((object) => object[column]);
-}
 
 const LinePlotVisits = (props) => {
   const visits = getColumn(props.filteredData, "visits");

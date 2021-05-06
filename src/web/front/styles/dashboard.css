@@ -1,9 +1,17 @@
 .dashboard-container {
-  display: flex;
   height: 100vh;
   width: 100vw;
   margin: 0;
   padding: 0;
   background-color: black;
-  flex-direction: row;
+}
+.rounded-rectangle-container {
+  background-color: beige;
+  border-radius: 10px;
+  padding: 5px;
+  margin: 10px;
+}
+
+.horizontal-kpis-container {
+  padding: 20px;
 }

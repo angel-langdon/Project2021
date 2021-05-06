@@ -22,6 +22,5 @@ df = df[df["date"] > (df["date"].max() - timedelta(days=31))]
 df.to_json("subway.json", "records", indent=4)
 
 # %%
-df
 
 # %%
