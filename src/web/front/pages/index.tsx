@@ -91,7 +91,7 @@ export default function Home() {
                 <div className="col-xs-12 ">
                   <div className="dw-button">
                     <div className="dw-button-bg" />
-                    <a className="dw-button-link" href="#">
+                    <a className="dw-button-link" href="success-stories">
                       Success stories
                     </a>
                   </div>

@@ -54,6 +54,11 @@ export default function AboutUs() {
                   <div className="person-name">Ignacio Cano Navarro</div>
                   <div className="person-title"> CEO and founder</div>
                   <div className="person-email">nachonavarrocano@gmail.com</div>
+                  <ul
+                    className="person-linkedin"
+                  >
+                   <a href="https://www.linkedin.com/in/ignacio-cano/"><i className="fa fa-linkedin" aria-hidden="true"></i></a>
+                  </ul>
                 </div>
               </div>
             </div>
@@ -68,6 +73,11 @@ export default function AboutUs() {
                   <div className="person-email">
                     alvaromazcuherreros@gmail.com
                   </div>
+                  <ul
+                    className="person-linkedin"
+                  >
+                   <a href="https://www.linkedin.com/in/alvaro-mazcu-herreros/"><i className="fa fa-linkedin" aria-hidden="true"></i></a>
+                  </ul>
                 </div>
               </div>
             </div>
@@ -82,6 +92,11 @@ export default function AboutUs() {
                   <div className="person-email">
                     lisa.gilyarovskaya@gmail.com
                   </div>
+                  <ul
+                    className="person-linkedin"
+                  >
+                   <a href="https://www.linkedin.com/in/lisagilyarovskaya"><i className="fa fa-linkedin" aria-hidden="true"></i></a>
+                  </ul>
                 </div>
               </div>
             </div>
@@ -96,6 +111,11 @@ export default function AboutUs() {
                     Machine Learning specialist
                   </div>
                   <div className="person-email">miquelmarin43@gmail.com</div>
+                  <ul
+                    className="person-linkedin"
+                  >
+                   <a href="https://www.linkedin.com/in/miquel-marin-colome/"><i className="fa fa-linkedin" aria-hidden="true"></i></a>
+                  </ul>
                 </div>
               </div>
             </div>
@@ -110,12 +130,11 @@ export default function AboutUs() {
                     Data Scientist & Software Engineer
                   </div>
                   <div className="person-email">supername1337@gmail.com</div>
-                  <a
+                  <ul
                     className="person-linkedin"
-                    href="https://www.linkedin.com/in/ángel-langdon-villamayor-a44b49187/"
                   >
-                    linkedin.com/in/ángel-langdon-villamayor-a44b49187/
-                  </a>
+                   <a href="https://www.linkedin.com/in/ángel-langdon-villamayor-a44b49187/"><i className="fa fa-linkedin" aria-hidden="true"></i></a>
+                  </ul>
                 </div>
               </div>
             </div>
@@ -128,6 +147,11 @@ export default function AboutUs() {
                   <div className="person-name">Iker Rodríguez Martínez</div>
                   <div className="person-title">Commercial Agent</div>
                   <div className="person-email">ikrodmar@upv.edu.es</div>
+                  <ul
+                    className="person-linkedin"
+                  >
+                   <a href="#"><i className="fa fa-linkedin" aria-hidden="true"></i></a>
+                  </ul>
                 </div>
               </div>
             </div>
@@ -138,3 +162,16 @@ export default function AboutUs() {
     </div>
   );
 }
+{/*
+<div class="col-xs-12 col-sm-6 col-md-3 list-holder">
+<h4>Media</h4>
+<ul class="list-menu">
+    <li><a href="#"><i class="fa fa-behance"></i>Behance Network</a></li>
+    <li><a href="#"><i class="fa fa-youtube"></i>Youtube</a></li>
+    <li><a href="#"><i class="fa fa-twitter"></i>Twitter</a></li>
+    <li><a href="#"><i class="fa fa-facebook"></i>Facebook</a></li>
+    <li><a href="#"><i class="fa fa-instagram"></i>Instagram</a></li>
+    <li><a href="#"><i class="fab fa-linkedin-in"></i>Linkedin</a></li>
+</ul>
+</div>
+ */}

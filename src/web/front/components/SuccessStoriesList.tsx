@@ -6,13 +6,27 @@ const SuccessStoriesList = () => {
         store="Subway"
         img="/images/subway-card.jpg"
         dashboardUrl="/dashboard-example-subway"
-        msg="Subway is very good company that does sandwiches for hungry and hurried people.
-                       We built a predictive model that was able to predict the number of visitors"
+        msg="Subway is a restaurant chain specializing in submarine sandwiches
+                       We built a predictive model that was able to predict the daily number of visitors in a determined local."
       />
       <SuccessStory
         store="Starbucks"
         img="/images/starbucks-card.jpeg"
-        msg="Starbucks is a hipster place, we all know...  With our model we were able to predict the number of visitors pretty good"
+        msg="Starbucks Corp is a coffee roaster and retailer of specialty coffee with operations in approximately 82 markets around the world.  With our model we were able to predict the number of visitors pretty good."
+        dashboardUrl="#"
+      />
+
+       <SuccessStory
+        store="Walmart"
+        img="/images/walmart-card.jpg"
+        msg="Walmart Inc. is an American multinational retail corporation that operates a chain of hypermarkets, discount department stores, and grocery stores from the United States."
+        dashboardUrl="#"
+      />
+
+        <SuccessStory
+        store="Old Navy"
+        img="/images/oldnavy-card.jpeg"
+        msg="Old Navy is an American clothing and accessories retailing company owned by American multinational corporation Gap Inc.."
         dashboardUrl="#"
       />
     </div>
