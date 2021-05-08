@@ -14,9 +14,7 @@ export default function ContactUs() {
               <div className="row">
                 <div className="col-xs-12">
                   <h1>Contact us</h1>
-                  <h1 className="headline">
-                    
-                  </h1>
+                  <h1 className="headline"></h1>
                 </div>
               </div>
             </div>
@@ -42,9 +40,14 @@ export default function ContactUs() {
         <div id="contact-details" className="container-fluid">
           <div className="row">
             <div className="col-md-6 address-holder">
-             {/* <h3>Contact us</h3>  */}
+              {/* <h3>Contact us</h3>  */}
               <p>
-               If you'd like to chat to our team about how we can help you achieve great results, send us your details by email and we'll be in touch. Drop a line about your project or describe a challenge your company needs help solving. We’d love to discuss all the details with you scheduling a meeting as soon as possible.
+                If you'd like to chat to our team about how we can help you
+                achieve great results, send us your details by email and we'll
+                be in touch. Drop a line about your project or describe a
+                challenge your company needs help solving. We’d love to discuss
+                all the details with you scheduling a meeting as soon as
+                possible.
               </p>
               <div className="address">
                 <div className="col-xs-1 col-sm-1">
@@ -59,7 +62,9 @@ export default function ContactUs() {
                   <i className="fa fa-map-marker" aria-hidden="true" />
                 </div>
                 <div className="col-xs-11 col-sm-5">
-                  <div className="address-row">UPV, Valencia, Camí de Vera, s/n, 46009, Spain </div>
+                  <div className="address-row">
+                    UPV, Valencia, Camí de Vera, s/n, 46009, Spain{" "}
+                  </div>
                   <div className="address-row"></div>
                   <div className="address-row"></div>
                 </div>

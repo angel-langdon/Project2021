@@ -1,13 +1,14 @@
 .dashboard-container {
-  height: 100%;
-  width: 100%;
   margin: 0;
   padding: 50pt;
+  height: 100%;
+  width: 100%;
   background-color: black;
 }
 .rounded-rectangle-container {
   background-color: beige;
   border-radius: 10px;
+  max-width: 150px;
   padding: 8px;
   margin: 10px;
 }
