@@ -40,18 +40,22 @@
   margin-right: 10px;
 }
 
-.dashboard-stats {
-  padding: 20px !important;
+.dashboard-stats-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr 3fr 2fr 2fr;
+  grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
+  padding: 10px !important;
+  grid-gap: 5px;
   width: 100vw;
   margin: 0;
-  padding: 0;
-  background-color: aquamarine;
+  background-color: rgba(14, 30, 58, 0.776);
 }
 
 .mean-kpi {
   background-color: white;
   border-radius: 15px;
   min-width: 100%;
+  min-height: 100%;
   margin-bottom: 10px;
   padding: 5px;
 }
@@ -65,23 +69,48 @@
   margin: 0 !important;
   color: black;
 }
-.visits-mean-row {
-  width: 160px;
-}
-.visits-mean-column {
-  flex-basis: 100%;
-  flex-wrap: wrap;
+
+.mean-income-container {
+  background-color: white;
+  width: 100%;
+  height: 100%;
+  border-radius: 15px;
 }
 
-.visits-mean-label {
-  flex-wrap: wrap;
-  flex-basis: 100%;
+.kpi-income-container {
+  background-color: rgb(0, 0, 2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-left: 10px;
+  padding-right: 40px;
+  align-self: center;
+  padding-top: 0;
+  height: 30px;
+  color: white;
+  margin: 10px;
+  border-radius: 15px;
 }
 
-.dashboard-stats-1-row {
-  height: 400px;
+.no-margin {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+.kpi-income-value {
+  color: orange;
+}
+.dashboard-stats-label {
+  align-self: center;
+  color: white;
+  font-weight: 700;
+}
+.kpi-visits-label {
+}
+.kpi-vists-value {
 }
 
-.mean-visits-container {
-  flex: 1 0 auto;
+.kpi-visits-container {
+  background-color: white;
+  border-radius: 15px;
+  padding: 10px;
 }
