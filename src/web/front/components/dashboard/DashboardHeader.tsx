@@ -5,11 +5,8 @@ const DashboardHeader = (props) => {
     <div className="dashboard-header">
       <div className="d-flex justify-content-between">
         <div className="row photo-and-text">
-          <div className="brand-image-container">
-            <img
-              src="/images/subway_logo.png"
-              className="brand-image mx-auto d-block"
-            ></img>
+          <div className="brand-image-container d-flex flex-column justify-content-center ">
+            <img src={props.brandImage} className="brand-image"></img>
           </div>
           <div className="col dashboard-header-info">
             <h4 className="title">{props.filteredData[0].brands}</h4>
@@ -19,7 +16,9 @@ const DashboardHeader = (props) => {
             </h6>
           </div>
         </div>
-        <DashboardSearcher {...props} />
+        <div className="d-flex flex-column justify-content-center">
+          <DashboardSearcher {...props} />
+        </div>
       </div>
     </div>
   );

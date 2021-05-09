@@ -17,3 +17,15 @@ export function sum(arr) {
 export function mean(arr) {
   return sum(arr) / arr.length;
 }
+
+export function uniqueValues(arr, property) {
+  let uniqueValues = new Array();
+  let currentAddedValues = new Set();
+  arr.forEach((item) => {
+    if (!currentAddedValues.has(item[property])) {
+      uniqueValues.push(item);
+      currentAddedValues.add(item[property]);
+    }
+  });
+  return uniqueValues;
+}

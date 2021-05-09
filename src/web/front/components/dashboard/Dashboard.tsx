@@ -5,6 +5,8 @@ import { useState } from "react";
 import React from "react";
 import KPIsPlotVisits from "./KPIsPlotVisits";
 import DashboardHeader from "./DashboardHeader";
+import DashboardStats from "@/components/dashboard/DashboardStats";
+import { uniqueValues } from "@/utils/dataUtils";
 const LinePlotVisits = dynamic(
   () => import("@/components/dashboard/LinePlotVisits"),
   { ssr: false }
@@ -15,7 +17,10 @@ interface IProps {
   store: string;
   data: Array<any>;
   filteredData?: object;
+  brandImage: string;
   placekey?: string;
+  uniqueStores?: Array<any>;
+  setFilteredData?: any;
 }
 
 const Dashboard = (props: IProps) => {
@@ -24,22 +29,19 @@ const Dashboard = (props: IProps) => {
   const [filteredData, setFilteredData] = useState<Array<object>>(
     props.data.filter((object) => object.placekey == placekey)
   );
-  props = { ...props, filteredData: filteredData, placekey: placekey };
+  const uniqueStores: Array<object> = uniqueValues(props.data, "placekey");
+  props = {
+    ...props,
+    filteredData: filteredData,
+    placekey: placekey,
+    uniqueStores: uniqueStores,
+    setFilteredData: setFilteredData,
+  };
   return (
     <div className="dashboard-container">
       <DefaultHeader />
       <DashboardHeader {...props} />
-      <div className="row horizontal-kpis-container">
-        <KPIsTop {...props} />
-      </div>
-      <div className="row">
-        <div className="col-10">
-          <LinePlotVisits {...props} />
-        </div>
-        <div className="col">
-          <KPIsPlotVisits {...props} />
-        </div>
-      </div>
+      <DashboardStats {...props} />
     </div>
   );
 };
