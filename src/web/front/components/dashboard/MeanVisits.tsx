@@ -14,14 +14,31 @@ const MeanVisits = (props) => {
   );
   const meanMonthVisits = Math.round(meanDailyVisits * 31);
   const meanWeekVisits = Math.round(meanDailyVisits * 7);
+  const meanDailyEstimatedVisits = Math.round(
+    mean(getColumn(props.filteredData, "prediction"))
+  );
+  const meanMonthEstimatedVisits = Math.round(meanDailyEstimatedVisits * 31);
+  const meanWeekEstimatedVisits = Math.round(meanDailyEstimatedVisits * 7);
 
   return (
     <div className="d-flex mean-visits-container justify-content-start">
       <div className="d-flex flex-column">
-        <h5>MEAN VISITS</h5>
-        <MeanKPI label="Day" value={meanDailyVisits} />
-        <MeanKPI label="Week" value={meanWeekVisits} />
-        <MeanKPI label="Month" value={meanMonthVisits} />
+        <div className="d-flex visits-mean-row justify-content-between">
+          <h5 className="visits-mean-label">MEAN VISITS</h5>
+          <h5 className="visits-mean-label">MEAN ESTIMATED VISITS</h5>
+        </div>
+        <div className="d-flex visits-mean-row-justify-content-between">
+          <div className="d-flex flex-column visits-mean-column">
+            <MeanKPI label="Day" value={meanDailyVisits} />
+            <MeanKPI label="Week" value={meanWeekVisits} />
+            <MeanKPI label="Month" value={meanMonthVisits} />
+          </div>
+          <div className="d-flex flex-column visits-mean-column">
+            <MeanKPI label="Day" value={meanDailyEstimatedVisits} />
+            <MeanKPI label="Week" value={meanWeekEstimatedVisits} />
+            <MeanKPI label="Month" value={meanMonthEstimatedVisits} />
+          </div>
+        </div>
       </div>
     </div>
   );

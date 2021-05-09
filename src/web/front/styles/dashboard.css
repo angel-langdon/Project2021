@@ -11,14 +11,6 @@
   width: 100%;
   background-color: black;
 }
-.rounded-rectangle-container {
-  background-color: beige;
-  border-radius: 10px;
-  max-width: 150px;
-  padding: 8px;
-  margin: 10px;
-}
-
 .horizontal-kpis-container {
   padding: 20px;
 }
@@ -31,6 +23,7 @@
 .brand-image-container {
   margin-left: 30px;
   margin-right: 10px;
+  border-radius: 10px;
   background-color: white;
   max-width: 100px;
   max-height: 100px;
@@ -58,6 +51,7 @@
 .mean-kpi {
   background-color: white;
   border-radius: 15px;
+  min-width: 100%;
   margin-bottom: 10px;
   padding: 5px;
 }
@@ -70,4 +64,24 @@
   padding: 0 !important;
   margin: 0 !important;
   color: black;
+}
+.visits-mean-row {
+  width: 160px;
+}
+.visits-mean-column {
+  flex-basis: 100%;
+  flex-wrap: wrap;
+}
+
+.visits-mean-label {
+  flex-wrap: wrap;
+  flex-basis: 100%;
+}
+
+.dashboard-stats-1-row {
+  height: 400px;
+}
+
+.mean-visits-container {
+  flex: 1 0 auto;
 }
