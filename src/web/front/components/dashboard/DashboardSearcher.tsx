@@ -4,10 +4,12 @@ import Autocomplete from "@material-ui/lab/Autocomplete";
 
 export default function DashboardSearcher(props) {
   function changeStore(e, value) {
-    const newPlacekey: string = value.placekey;
-    props.setFilteredData(
-      props.data.filter((object) => object.placekey == newPlacekey)
-    );
+    if (value != null) {
+      const newPlacekey: string = value.placekey;
+      props.setFilteredData(
+        props.data.filter((object) => object.placekey == newPlacekey)
+      );
+    }
   }
   return (
     <Autocomplete

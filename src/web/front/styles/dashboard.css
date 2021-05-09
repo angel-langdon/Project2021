@@ -1,3 +1,7 @@
+:root {
+  --mean-kpi-width: 90px;
+}
+
 .dashboard-container {
   margin: 0;
   position: absolute;
@@ -44,9 +48,26 @@
 }
 
 .dashboard-stats {
-  height: 100%;
+  padding: 20px !important;
   width: 100vw;
   margin: 0;
   padding: 0;
   background-color: aquamarine;
+}
+
+.mean-kpi {
+  background-color: white;
+  border-radius: 15px;
+  margin-bottom: 10px;
+  padding: 5px;
+}
+.mean-kpi-label {
+  padding: 0 !important;
+  margin: 0 !important;
+  color: orange;
+}
+.mean-kpi-value {
+  padding: 0 !important;
+  margin: 0 !important;
+  color: black;
 }
