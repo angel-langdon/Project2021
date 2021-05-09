@@ -1,6 +1,5 @@
 .dashboard-container {
   margin: 0;
-  padding: 50pt;
   height: 100%;
   width: 100%;
   background-color: black;
@@ -15,4 +14,25 @@
 
 .horizontal-kpis-container {
   padding: 20px;
+}
+
+.dashboard-header {
+  padding: 10px;
+  background-color: rgb(13, 74, 121);
+}
+
+.brand-image-container {
+  margin-left: 30px;
+  margin-right: 10px;
+  background-color: white;
+  max-width: 100px;
+  max-height: 100px;
+}
+.brand-image {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.dashboard-header-info {
+  color: aliceblue;
 }
