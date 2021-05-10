@@ -14,7 +14,7 @@ from sklearn.dummy import DummyRegressor
 from sklearn.ensemble import GradientBoostingRegressor, RandomForestRegressor
 from sklearn.linear_model import (BayesianRidge, ElasticNet, HuberRegressor,
                                   Lasso, LinearRegression, Ridge)
-from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.model_selection import (GridSearchCV, RandomizedSearchCV,
                                      train_test_split)
 from sklearn.svm import SVR
@@ -461,6 +461,8 @@ def get_data_with_0_dashboard(df):
         df_to_add['poi_cbg'] = cbg
 
         df2fill = pd.concat([df2fill, df_to_add])
+        
+    
 
     df2fill["month"] = df2fill["date"].dt.month
     df2fill["year"] = df2fill["date"].dt.year
@@ -484,13 +486,68 @@ def get_data_with_0_dashboard(df):
     df2fill.drop('index', axis=1)
     return df2fill
 
-# %%
+def income_visits(df, brand):
+    df = df.copy()
+    
+    if brand == 'subway':
+        df['income_visits'] = round(df['visits'] * 9.5).astype(int)
+        df['min_income_visits'] = round(df['min_visits'] * 9.5).astype(int)
+        df['max_income_visits'] = round(df['max_visits'] * 9.5).astype(int)
+        
+    elif brand == 'Starbucks':
+        df['income_visits'] = round(df['visits'] * 4.10).astype(int)
+        df['min_income_visits'] = round(df['min_visits'] * 4.10).astype(int)
+        df['max_income_visits'] = round(df['max_visits'] * 4.10).astype(int)
+    
+    elif brand == 'Walmart':
+        df['income_visits'] = round(df['visits'] * 55).astype(int)
+        df['min_income_visits'] = round(df['min_visits'] * 55).astype(int)
+        df['max_income_visits'] = round(df['max_visits'] * 55).astype(int)
+    
+    elif brand == 'old_navy':
+        df['income_visits'] = round(df['visits'] * 50).astype(int)
+        df['min_income_visits'] = round(df['min_visits'] * 50).astype(int)
+        df['max_income_visits'] = round(df['max_visits'] * 50).astype(int)
+        
+    return df
 
+def workforce(df, brand):
+    df = df.copy()
+    if brand == 'subway':
+        df['workforce'] = round((df['visits'] * 4)/150).astype(int)
+        df['workforce'] = np.where((df.workforce < 4),4,df.workforce)
+        
+    elif brand == 'Starbucks':
+        df['workforce'] = round((df['visits'] * 4)/210).astype(int)
+        df['workforce'] = np.where((df.workforce < 4),4,df.workforce)
+    
+    elif brand == 'Walmart':
+        df['workforce'] = round((df['visits'] * 50)/2000).astype(int)
+        df['workforce'] = np.where((df.workforce < 50),50,df.workforce)
+       
+    elif brand == 'old_navy':
+        df['workforce'] = round((df['visits'] * 5)/250).astype(int)
+        df['workforce'] = np.where((df.workforce < 5),5,df.workforce) 
+    
+    return df
+
+
+def IC_visits(df, mae):
+    df = df.copy()
+    
+    mean_visits = df['visits'].mean()
+    mae_new = ((df['visits'] * mae) / mean_visits)
+    
+    df['min_visits'] = round(df['visits'] - mae_new)
+    df['max_visits'] = round(df['visits'] + mae_new)
+    
+    return df
+# %%
 
 country = "US"
 city = "Houston"
 state = "TX"
-brand = "subway"
+brand = "Walmart"
 df_original = read_patterns_data(city, state, brand)
 df = explode_visits_by_day(df_original)
 df = filter_columns(df)
@@ -561,6 +618,7 @@ def get_sorted_coefs(columns, coefficients):
 df = df.sort_values(by='date')
 # %%
 df = df.reset_index()
+a = df.copy()
 df = filter_model_columns(df)
 df_model = df.copy()
 # %%
@@ -584,12 +642,23 @@ regr.fit(X_train, y_train)
 y_pred = regr.predict(X_test)
 
 mse = mean_squared_error(y_test, y_pred)
+mae = mean_absolute_error(y_test, y_pred)
 print('-------------------')
 print(mse)
 print(regr.score(X_train, y_train))
 print(regr.score(X_test, y_test))
 # %%
 get_sorted_coefs(df_model.columns, regr.coef_)
+
+#%%
+
+mae = mean_absolute_error(y_test, y_pred)
+
+df = workforce(a, brand)
+df = IC_visits(df, mae)
+df = income_visits(df, brand)
+
+df.to_csv('iahsgdqbsuisa')
 # %%
 """
 SVM -> very very very slow
@@ -697,3 +766,73 @@ plt.ylabel('Deviance')
 fig.tight_layout()
 plt.show()
 
+#%%
+a
+
+#%%
+def income_visits(df, brand):
+    df = df.copy()
+    
+    if brand == 'subway':
+        df['income_visits'] = round(df['visits'] * 9.5).astype(int)
+        df['min_income_visits'] = round(df['min_visits'] * 9.5).astype(int)
+        df['max_income_visits'] = round(df['max_visits'] * 9.5).astype(int)
+        
+    elif brand == 'Starbucks':
+        df['income_visits'] = round(df['visits'] * 4.10).astype(int)
+        df['min_income_visits'] = round(df['min_visits'] * 4.10).astype(int)
+        df['max_income_visits'] = round(df['max_visits'] * 4.10).astype(int)
+    
+    elif brand == 'Walmart':
+        df['income_visits'] = round(df['visits'] * 55).astype(int)
+        df['min_income_visits'] = round(df['min_visits'] * 55).astype(int)
+        df['max_income_visits'] = round(df['max_visits'] * 55).astype(int)
+    
+    elif brand == 'old_navy':
+        df['income_visits'] = round(df['visits'] * 50).astype(int)
+        df['min_income_visits'] = round(df['min_visits'] * 50).astype(int)
+        df['max_income_visits'] = round(df['max_visits'] * 50).astype(int)
+        
+    return df
+
+def workforce(df, brand):
+    df = df.copy()
+    if brand == 'subway':
+        df['workforce'] = round((df['visits'] * 4)/150).astype(int)
+        df['workforce'] = np.where((df.workforce < 4),4,df.workforce)
+        
+    elif brand == 'Starbucks':
+        df['workforce'] = round((df['visits'] * 4)/210).astype(int)
+        df['workforce'] = np.where((df.workforce < 4),4,df.workforce)
+    
+    elif brand == 'Walmart':
+        df['workforce'] = round((df['visits'] * 50)/2000).astype(int)
+        df['workforce'] = np.where((df.workforce < 50),50,df.workforce)
+       
+    elif brand == 'old_navy':
+        df['workforce'] = round((df['visits'] * 5)/250).astype(int)
+        df['workforce'] = np.where((df.workforce < 5),5,df.workforce) 
+    
+    return df
+
+
+def IC_visits(df, mae):
+    df = df.copy()
+    
+    mean_visits = df['visits'].mean()
+    mae_new = ((df['visits'] * mae) / mean_visits)
+    
+    df['min_visits'] = round(df['visits'] - mae_new)
+    df['max_visits'] = round(df['visits'] + mae_new)
+    
+    return df
+#%%
+mae = mean_absolute_error(y_test, y_pred)
+mae
+#%%
+
+b = workforce(a, brand)
+b = IC_visits(b, mae)
+b = income_visits(b, brand)
+b
+# %%
