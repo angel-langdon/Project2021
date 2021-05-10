@@ -114,10 +114,9 @@
 
 .kpi-model-container {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  place-content: flex-end;
   flex-grow: 1;
+  flex-direction: column;
+  place-content: flex-end;
   background-color: white;
   border-radius: var(--kpi-border-radius);
   padding: 10px;
