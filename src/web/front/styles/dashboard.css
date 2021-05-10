@@ -104,12 +104,20 @@
   color: white;
   font-weight: 700;
 }
-.kpi-visits-label {
+.kpi-model-label {
+  font-weight: 400;
 }
-.kpi-vists-value {
+.kpi-model-value {
+  font-weight: 800;
+  color: rgb(255, 111, 0);
 }
 
-.kpi-visits-container {
+.kpi-model-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  place-content: flex-end;
+  flex-grow: 1;
   background-color: white;
   border-radius: 15px;
   padding: 10px;

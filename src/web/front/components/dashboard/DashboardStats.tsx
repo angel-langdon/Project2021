@@ -1,4 +1,5 @@
-import DashboardYesterdayTodayVisits from "./DashboardYesterdayTodayVisits";
+import DashboardAggregatedData from "./DashboardAggregatedData";
+import DashboardModelStats from "./DashboardModelStats";
 import MeanIncome from "./MeanIncome";
 import MeanVisits from "./MeanVisits";
 
@@ -7,7 +8,8 @@ const DashboardStats = (props) => {
     <div className="dashboard-stats-container">
       <MeanVisits {...props} />
       <MeanIncome {...props} />
-      <DashboardYesterdayTodayVisits {...props} />
+      <DashboardModelStats {...props} />
+      <DashboardAggregatedData {...props} />
     </div>
   );
 };
