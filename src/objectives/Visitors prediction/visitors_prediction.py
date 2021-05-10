@@ -547,7 +547,7 @@ def IC_visits(df, mae):
 country = "US"
 city = "Houston"
 state = "TX"
-brand = "Walmart"
+brand = "old_navy"
 df_original = read_patterns_data(city, state, brand)
 df = explode_visits_by_day(df_original)
 df = filter_columns(df)
@@ -652,13 +652,26 @@ get_sorted_coefs(df_model.columns, regr.coef_)
 
 #%%
 
-mae = mean_absolute_error(y_test, y_pred)
+#mae = mean_absolute_error(y_test, y_pred) if you want it from the regression
+#
+#from stacking:
+#   old_navy: 38.02
+#   subway: 33.88
+#   walmart: 233.84
+#   starbucks: 54.13
 
-df = workforce(a, brand)
+mae = 38.02
+df = get_data_with_0_dashboard(a)
+df = workforce(df, brand)
+df['workforce'] = np.where((df.visits == 0),0,df.workforce) 
 df = IC_visits(df, mae)
 df = income_visits(df, brand)
+df = df.drop('index', axis = 1)
+df.to_csv(f'{brand}_dashboard.csv', index=False)
 
-df.to_csv('iahsgdqbsuisa')
+
+#%%
+df
 # %%
 """
 SVM -> very very very slow
