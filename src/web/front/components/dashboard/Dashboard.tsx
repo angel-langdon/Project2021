@@ -14,11 +14,12 @@ interface IProps {
   brandImage: string;
   placekey?: string;
   uniqueStores?: Array<any>;
+  colors: Array<string>;
   dates?: Array<Date>;
   uniqueDates?: Set<Date>;
   minMaxDates?: Array<Date>;
   setFilteredData?: any;
-  setDates: any;
+  setDates?: any;
   setPlacekey?: any;
 }
 

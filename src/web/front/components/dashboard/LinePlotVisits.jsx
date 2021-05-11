@@ -7,9 +7,18 @@ const defaultStyles = {
   title: "Visits per day",
   xaxis: { title: "Date" },
   yaxis: { title: "Nº of Visits" },
-  plot_bgcolor: "#8595a8",
-  font: { color: "#FFF" },
-  paper_bgcolor: "#FFF3",
+  plot_bgcolor: "rgb(0,0,0,0)",
+  legend: {
+    x: 0,
+    y: 1.2,
+    orientation: "h",
+    font: {
+      color: "#000",
+    },
+    bgcolor: "#fff",
+  },
+  font: { color: "#000" },
+  paper_bgcolor: "rgb(0,0,0,0)",
 };
 
 const LinePlotVisits = (props) => {
@@ -25,7 +34,7 @@ const LinePlotVisits = (props) => {
           type: "scatter",
           name: "Real visits",
           mode: "lines",
-          marker: { color: "black" },
+          marker: { color: props.colors[0] },
         },
         {
           x: dates,
@@ -33,7 +42,7 @@ const LinePlotVisits = (props) => {
           type: "scatter",
           name: "Predicted visits",
           mode: "lines",
-          marker: { color: "red" },
+          marker: { color: props.colors[1] },
         },
       ]}
       config={{ responsive: true }}

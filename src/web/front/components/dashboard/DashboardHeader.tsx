@@ -17,7 +17,10 @@ const DashboardHeader = (props) => {
           </div>
         </div>
         <div className="d-flex flex-column justify-content-center">
-          <DashboardSearcher {...props} />
+          <div className="d-flex">
+            <DashboardSearcher {...props} />
+            <div style={{ width: 30 }} />
+          </div>
         </div>
       </div>
     </div>

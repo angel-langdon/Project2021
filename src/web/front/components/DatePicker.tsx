@@ -2,7 +2,7 @@ import TextField from "@material-ui/core/TextField";
 import StaticDateRangePicker from "@material-ui/lab/StaticDateRangePicker";
 import AdapterDateFns from "@material-ui/lab/AdapterDateFns";
 import LocalizationProvider from "@material-ui/lab/LocalizationProvider";
-import { makeStyles } from "@material-ui/core/styles";
+import { MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles";
 import Box from "@material-ui/core/Box";
 import { Fragment } from "react";
 

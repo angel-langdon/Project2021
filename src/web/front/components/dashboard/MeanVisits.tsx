@@ -23,10 +23,16 @@ const MeanVisits = (props) => {
 
   return (
     <Fragment>
-      <h5 className="dashboard-stats-label" style={{ gridArea: "1/1" }}>
+      <h5
+        className="dashboard-stats-label"
+        style={{ gridArea: "1/1", textAlign: "center" }}
+      >
         MEAN VISITS
       </h5>
-      <h5 className="dashboard-stats-label" style={{ gridArea: "1/2" }}>
+      <h5
+        className="dashboard-stats-label"
+        style={{ gridArea: "1/2", textAlign: "center" }}
+      >
         MEAN PREDICTED VISITS
       </h5>
       <MeanKPI
