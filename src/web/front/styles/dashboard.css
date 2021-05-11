@@ -44,10 +44,11 @@
   display: grid;
   grid-template-columns: 1fr 1fr 3fr 2fr 2fr;
   grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
-  padding: 10px !important;
-  grid-gap: 5px;
-  width: 100vw;
-  margin: 0;
+  padding: 15px !important;
+  grid-gap: 10px;
+  width: 100%;
+  height: 100%;
+  margin: 0px;
   background-color: rgba(14, 30, 58, 0.776);
 }
 
@@ -120,4 +121,9 @@
   background-color: white;
   border-radius: var(--kpi-border-radius);
   padding: 10px;
+}
+
+.date-picker {
+  display: flex;
+  flex-grow: 1;
 }

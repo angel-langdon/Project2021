@@ -16,8 +16,11 @@ const DashboardStats = (props) => {
       <MeanIncome {...props} />
       <DashboardModelStats {...props} />
       <DashboardAggregatedData {...props} />
-      <DatePicker {...props} />
-      <LinePlotVisits {...props} />
+      <div className="d-flex" style={{ gridArea: "5/1/8/6" }}>
+        <DatePicker {...props} />
+        <div style={{ width: 10 }}></div>
+        <LinePlotVisits {...props} />
+      </div>
     </div>
   );
 };

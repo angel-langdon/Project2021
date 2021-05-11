@@ -25,7 +25,7 @@ const DatePicker = (props) => {
   }
 
   return (
-    <div className="d-flex" style={{ gridArea: "5/1/9/3" }}>
+    <div className="date-picker">
       <LocalizationProvider dateAdapter={AdapterDateFns}>
         <StaticDateRangePicker
           displayStaticWrapperAs="desktop"

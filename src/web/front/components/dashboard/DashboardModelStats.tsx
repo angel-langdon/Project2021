@@ -77,7 +77,7 @@ const DashboardModelStats = (props) => {
         style={{ gridArea: "4/5" }}
         label="Store specific RMSE"
         value={RMSE}
-        infoText="The RMSE is the square root of the average of squared differences between the predicted visits and the real one. RMSE is similar to MAE.  Higher values are worse"
+        infoText="The RMSE is the square root of the average of squared differences between the predicted visit and the real one. RMSE is similar to MAE.  Higher values are worse"
         example={
           "In this case the specific store RMSE is " + RMSE + " that is, the "
         }
