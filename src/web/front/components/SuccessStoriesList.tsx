@@ -13,21 +13,21 @@ const SuccessStoriesList = () => {
         store="Starbucks"
         img="/images/starbucks-card.jpeg"
         msg="Starbucks Corp is a coffee roaster and retailer of specialty coffee with operations in approximately 82 markets around the world.  With our model we were able to predict the number of visitors pretty good."
-        dashboardUrl="#"
+        dashboardUrl="/dashboard-example-starbucks"
       />
 
-       <SuccessStory
+      <SuccessStory
         store="Walmart"
         img="/images/walmart-card.jpg"
         msg="Walmart Inc. is an American multinational retail corporation that operates a chain of hypermarkets, discount department stores, and grocery stores from the United States."
-        dashboardUrl="#"
+        dashboardUrl="/dashboard-example-walmart"
       />
 
-        <SuccessStory
+      <SuccessStory
         store="Old Navy"
         img="/images/oldnavy-card.jpeg"
         msg="Old Navy is an American clothing and accessories retailing company owned by American multinational corporation Gap Inc.."
-        dashboardUrl="#"
+        dashboardUrl="/dashboard-example-oldnavy"
       />
     </div>
   );
