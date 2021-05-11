@@ -1,5 +1,5 @@
 import { getColumn } from "@/utils/dataUtils";
-import { mape, rSquared, mae } from "@/utils/stats";
+import { rmse, rSquared, mae } from "@/utils/stats";
 import { Fragment, useState } from "react";
 import CardStatsInfo from "../CardStatsInfo";
 
@@ -41,7 +41,7 @@ const DashboardModelStats = (props) => {
   const storePredictedVisits = getColumn(props.filteredData, "prediction");
   const globalR2 = Math.abs(rSquared(predictedVisits, visits)).toFixed(2);
   const MAE = mae(storePredictedVisits, storeVisits).toFixed(2);
-  const MAPE = mape(storePredictedVisits, storeVisits).toFixed(2);
+  const RMSE = rmse(storePredictedVisits, storeVisits).toFixed(2);
   return (
     <Fragment>
       <h5 className="dashboard-stats-label " style={{ gridArea: "1/5/1/6" }}>
@@ -51,14 +51,20 @@ const DashboardModelStats = (props) => {
         style={{ gridArea: "2/5" }}
         label="Global model R2"
         value={globalR2}
-        infoText="asdasda"
-        example="example"
+        infoText="The R-Squared is the coefficient of determination, in other words, it indicates how well the model fits the real data, values  closer to 1 are better and values close to 0 are worse"
+        example={
+          "In this case the global R2 is " +
+          globalR2 +
+          " this indicates that the model explains the " +
+          Math.round(parseFloat(globalR2) * 100) +
+          "% variability of all the visits"
+        }
       ></ModelKPI>
       <ModelKPI
         style={{ gridArea: "3/5" }}
         label="Store specific MAE"
         value={MAE}
-        infoText="The MAE is the mean absolute error, that is the mean absolute difference between the predicted value and the real one."
+        infoText="The MAE is the mean absolute error, that is the mean absolute difference between the predicted visits and the real one. Higher values of MAE are worse"
         example={
           "We have a MAE of " +
           MAE +
@@ -69,15 +75,11 @@ const DashboardModelStats = (props) => {
       ></ModelKPI>
       <ModelKPI
         style={{ gridArea: "4/5" }}
-        label="Store specific MAPE"
-        value={MAPE}
-        infoText="The MAPE is the "
+        label="Store specific RMSE"
+        value={RMSE}
+        infoText="The RMSE is the square root of the average of squared differences between the predicted visits and the real one. RMSE is similar to MAE.  Higher values are worse"
         example={
-          "We have a MAE of " +
-          MAE +
-          " so this means, that for the date range selected the mean visits distance from the predicted and real value is " +
-          MAE +
-          " visits"
+          "In this case the specific store RMSE is " + RMSE + " that is, the "
         }
       ></ModelKPI>
     </Fragment>

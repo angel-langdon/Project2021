@@ -6,12 +6,6 @@ import { makeStyles } from "@material-ui/core/styles";
 import Box from "@material-ui/core/Box";
 import { Fragment } from "react";
 
-const useStyles = makeStyles({
-  root: {
-    minWidth: 200,
-  },
-});
-
 const DatePicker = (props) => {
   function isDateNotInRange(date) {
     return !(date >= props.minMaxDates[0] && date <= props.minMaxDates[1]);
@@ -29,13 +23,11 @@ const DatePicker = (props) => {
       );
     }
   }
-  const classes = useStyles();
 
   return (
     <div className="d-flex" style={{ gridArea: "5/1/9/3" }}>
       <LocalizationProvider dateAdapter={AdapterDateFns}>
         <StaticDateRangePicker
-          className={classes.root}
           displayStaticWrapperAs="desktop"
           shouldDisableDate={isDateNotInRange}
           value={props.dates}

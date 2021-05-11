@@ -3,6 +3,11 @@ import DashboardModelStats from "./DashboardModelStats";
 import MeanIncome from "./MeanIncome";
 import MeanVisits from "./MeanVisits";
 import DatePicker from "@/components/DatePicker";
+import dynamic from "next/dynamic";
+const LinePlotVisits = dynamic(
+  () => import("@/components/dashboard/LinePlotVisits"),
+  { ssr: false }
+);
 
 const DashboardStats = (props) => {
   return (
@@ -12,6 +17,7 @@ const DashboardStats = (props) => {
       <DashboardModelStats {...props} />
       <DashboardAggregatedData {...props} />
       <DatePicker {...props} />
+      <LinePlotVisits {...props} />
     </div>
   );
 };

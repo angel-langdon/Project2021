@@ -16,30 +16,34 @@ const LinePlotVisits = (props) => {
   const visits = getColumn(props.filteredData, "visits");
   const dates = getColumn(props.filteredData, "date");
   const predictedVisits = getColumn(props.filteredData, "prediction");
+  const marginLeft = "100 px";
   return (
-    <Plot
-      data={[
-        {
-          x: dates,
-          y: visits,
-          type: "scatter",
-          name: "Real visits",
-          mode: "lines",
-          marker: { color: "black" },
-        },
-        {
-          x: dates,
-          y: predictedVisits,
-          type: "scatter",
-          name: "Predicted visits",
-          mode: "lines",
-          marker: { color: "red" },
-        },
-      ]}
-      layout={defaultStyles}
-      useResizeHandler={true}
-      style={{ width: "100%", height: "100%" }}
-    />
+    <div className="d-flex" style={{ gridArea: "5/3/9/6" }}>
+      <div style={{ marginLeft }}></div>
+      <Plot
+        data={[
+          {
+            x: dates,
+            y: visits,
+            type: "scatter",
+            name: "Real visits",
+            mode: "lines",
+            marker: { color: "black" },
+          },
+          {
+            x: dates,
+            y: predictedVisits,
+            type: "scatter",
+            name: "Predicted visits",
+            mode: "lines",
+            marker: { color: "red" },
+          },
+        ]}
+        config={{ responsive: true }}
+        layout={defaultStyles}
+        style={{ width: "100%", height: "100%" }}
+      />
+    </div>
   );
 };
 export default LinePlotVisits;

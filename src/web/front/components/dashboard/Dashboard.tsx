@@ -5,10 +5,6 @@ import React from "react";
 import DashboardHeader from "./DashboardHeader";
 import DashboardStats from "@/components/dashboard/DashboardStats";
 import { getColumn, uniqueValues } from "@/utils/dataUtils";
-const LinePlotVisits = dynamic(
-  () => import("@/components/dashboard/LinePlotVisits"),
-  { ssr: false }
-);
 
 // ? for optional parameters
 interface IProps {
