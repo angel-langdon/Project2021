@@ -43,7 +43,7 @@
 .dashboard-stats-container {
   display: grid;
   grid-template-columns: 1fr 1fr 3fr 2fr 2fr;
-  grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
   padding: 10px !important;
   grid-gap: 5px;
   width: 100vw;

@@ -1,5 +1,5 @@
 import { getColumn } from "@/utils/dataUtils";
-import { rmse, rSquared, mae } from "@/utils/stats";
+import { mape, rSquared, mae } from "@/utils/stats";
 import { Fragment, useState } from "react";
 import CardStatsInfo from "../CardStatsInfo";
 
@@ -40,8 +40,8 @@ const DashboardModelStats = (props) => {
   const storeVisits = getColumn(props.filteredData, "visits");
   const storePredictedVisits = getColumn(props.filteredData, "prediction");
   const globalR2 = Math.abs(rSquared(predictedVisits, visits)).toFixed(2);
-  const RMSE = rmse(storePredictedVisits, storeVisits).toFixed(2);
   const MAE = mae(storePredictedVisits, storeVisits).toFixed(2);
+  const MAPE = mape(storePredictedVisits, storeVisits).toFixed(2);
   return (
     <Fragment>
       <h5 className="dashboard-stats-label " style={{ gridArea: "1/5/1/6" }}>
@@ -56,17 +56,29 @@ const DashboardModelStats = (props) => {
       ></ModelKPI>
       <ModelKPI
         style={{ gridArea: "3/5" }}
-        label="Store specific RMSE"
-        value={RMSE}
-        infoText="asdasda"
-        example="example"
+        label="Store specific MAE"
+        value={MAE}
+        infoText="The MAE is the mean absolute error, that is the mean absolute difference between the predicted value and the real one."
+        example={
+          "We have a MAE of " +
+          MAE +
+          " so this means, that for the date range selected the mean visits distance from the predicted and real value is " +
+          MAE +
+          " visits"
+        }
       ></ModelKPI>
       <ModelKPI
         style={{ gridArea: "4/5" }}
-        label="Store specific MAE"
-        value={MAE}
-        infoText="The mae is the ..."
-        example={"We have a mean of " + MAE}
+        label="Store specific MAPE"
+        value={MAPE}
+        infoText="The MAPE is the "
+        example={
+          "We have a MAE of " +
+          MAE +
+          " so this means, that for the date range selected the mean visits distance from the predicted and real value is " +
+          MAE +
+          " visits"
+        }
       ></ModelKPI>
     </Fragment>
   );

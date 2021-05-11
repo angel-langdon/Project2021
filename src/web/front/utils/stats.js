@@ -20,9 +20,17 @@ export function rmse(yPred, yReal) {
 }
 
 export function mae(yPred, yReal) {
-  let regressionSquaredError = 0;
+  let absoluteError = 0;
   for (let i = 0; i < yPred.length; i++) {
-    regressionSquaredError += Math.abs(yPred[i] - yReal[i]);
+    absoluteError += Math.abs(yPred[i] - yReal[i]);
   }
-  return regressionSquaredError / yPred.length;
+  return absoluteError / yPred.length;
+}
+
+export function mape(yPred, yReal) {
+  let absolutePercentageError = 0;
+  for (let i = 0; i < yPred.length; i++) {
+    absolutePercentageError += Math.abs((yPred[i] - yReal[i]) / yReal[i]);
+  }
+  return 100 * (absolutePercentageError / yPred.length);
 }

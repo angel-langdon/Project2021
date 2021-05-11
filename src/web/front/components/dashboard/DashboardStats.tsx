@@ -2,6 +2,7 @@ import DashboardAggregatedData from "./DashboardAggregatedData";
 import DashboardModelStats from "./DashboardModelStats";
 import MeanIncome from "./MeanIncome";
 import MeanVisits from "./MeanVisits";
+import DatePicker from "@/components/DatePicker";
 
 const DashboardStats = (props) => {
   return (
@@ -10,6 +11,7 @@ const DashboardStats = (props) => {
       <MeanIncome {...props} />
       <DashboardModelStats {...props} />
       <DashboardAggregatedData {...props} />
+      <DatePicker {...props} />
     </div>
   );
 };
