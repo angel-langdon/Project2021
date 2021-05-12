@@ -8,6 +8,10 @@ const LinePlotVisits = dynamic(
   () => import("@/components/dashboard/LinePlotVisits"),
   { ssr: false }
 );
+const LinePlotIncome = dynamic(
+  () => import("@/components/dashboard/LinePlotIncome"),
+  { ssr: false }
+);
 
 const DashboardStats = (props) => {
   return (
@@ -20,6 +24,9 @@ const DashboardStats = (props) => {
         <DatePicker {...props} />
         <div style={{ width: 10 }}></div>
         <LinePlotVisits {...props} />
+      </div>
+      <div className="d-flex" style={{ gridArea: "8/1/12/6" }}>
+        <LinePlotIncome {...props} />
       </div>
     </div>
   );
