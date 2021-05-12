@@ -48,8 +48,8 @@
   grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
   padding: 15px !important;
   grid-gap: 10px;
+  max-height: 900px;
   width: 100%;
-  height: 100%;
   margin: 0px;
   background-color: rgb(255, 255, 255);
 }
