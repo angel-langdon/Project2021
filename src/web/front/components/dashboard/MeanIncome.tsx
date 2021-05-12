@@ -28,7 +28,7 @@ const MeanIncome = (props) => {
         className="dashboard-stats-label"
         style={{ gridArea: "1/3", textAlign: "center" }}
       >
-        INCOME
+        ESTIMATED INCOME
       </h5>
       <div
         className="mean-income-container"
@@ -37,17 +37,28 @@ const MeanIncome = (props) => {
       <IncomeKPI
         style={{ gridArea: "2/3" }}
         granule="DAY"
-        value={meanDayIncome.toLocaleString().slice(0, -1) + " $"}
+        value={
+          "$ " +
+          meanDayIncome.toLocaleString(undefined, { maximumFractionDigits: 2 })
+        }
       />
       <IncomeKPI
         style={{ gridArea: "3/3" }}
         granule="WEEK"
-        value={meanWeekIncome.toLocaleString().slice(0, -1) + " $"}
+        value={
+          "$ " +
+          meanWeekIncome.toLocaleString(undefined, { maximumFractionDigits: 2 })
+        }
       />
       <IncomeKPI
         style={{ gridArea: "4/3" }}
         granule="MONTH"
-        value={meanMonthIncome.toLocaleString().slice(0, -1) + " $"}
+        value={
+          "$ " +
+          meanMonthIncome.toLocaleString(undefined, {
+            maximumFractionDigits: 2,
+          })
+        }
       />
     </Fragment>
   );

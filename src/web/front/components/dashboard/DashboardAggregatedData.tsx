@@ -17,7 +17,10 @@ const DashboardAggregatedData = (props) => {
 
   return (
     <Fragment>
-      <h5 className="dashboard-stats-label" style={{ gridArea: "1 / 4" }}>
+      <h5
+        className="dashboard-stats-label"
+        style={{ gridArea: "1/ 4/1/6", textAlign: "center" }}
+      >
         AGGREGATED DATA
       </h5>
       <div style={{ gridArea: "2/4" }} className="min-max-visits d-flex">

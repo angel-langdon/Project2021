@@ -6,8 +6,6 @@
 .dashboard-container {
   margin: 0;
   position: absolute;
-  display: flex;
-  flex-direction: column;
   width: 100%;
 }
 .testing {
@@ -45,10 +43,9 @@
 .dashboard-stats-container {
   display: grid;
   grid-template-columns: 1fr 1fr 3fr 2fr 2fr;
-  grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+  grid-template-rows: repeat(4, 90px) repeat(3, 120px) repeat(3, 120px);
   padding: 15px !important;
   grid-gap: 10px;
-  max-height: 900px;
   width: 100%;
   margin: 0px;
   background-color: rgb(255, 255, 255);

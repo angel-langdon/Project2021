@@ -5,8 +5,8 @@ const defaultStyles = {
   display: "flex",
   autosize: true,
   title: "Visits per day",
-  xaxis: { title: "Date" },
-  yaxis: { title: "Nº of Visits" },
+  xaxis: { title: "Date", showgrid: false },
+  yaxis: { title: "Nº of Visits", showgrid: false },
   plot_bgcolor: "rgb(0,0,0,0)",
   legend: {
     x: 0,
