@@ -1,3 +1,4 @@
+import { getColumn, mean } from "@/utils/dataUtils";
 import { Fragment } from "react";
 
 const IncomeKPI = (props) => {
@@ -17,6 +18,10 @@ const IncomeKPI = (props) => {
 };
 
 const MeanIncome = (props) => {
+  const meanDayIncome = mean(getColumn(props.filteredData, "income_visits"));
+  const meanWeekIncome = meanDayIncome * 7;
+  const meanMonthIncome = meanWeekIncome * 4;
+
   return (
     <Fragment>
       <h5
@@ -29,9 +34,21 @@ const MeanIncome = (props) => {
         className="mean-income-container"
         style={{ gridArea: "2/3/5/3" }}
       ></div>
-      <IncomeKPI style={{ gridArea: "2/3" }} granule="DAY" value="20" />
-      <IncomeKPI style={{ gridArea: "3/3" }} granule="WEEK" value="20" />
-      <IncomeKPI style={{ gridArea: "4/3" }} granule="MONTH" value="20" />
+      <IncomeKPI
+        style={{ gridArea: "2/3" }}
+        granule="DAY"
+        value={meanDayIncome.toLocaleString().slice(0, -1) + " $"}
+      />
+      <IncomeKPI
+        style={{ gridArea: "3/3" }}
+        granule="WEEK"
+        value={meanWeekIncome.toLocaleString().slice(0, -1) + " $"}
+      />
+      <IncomeKPI
+        style={{ gridArea: "4/3" }}
+        granule="MONTH"
+        value={meanMonthIncome.toLocaleString().slice(0, -1) + " $"}
+      />
     </Fragment>
   );
 };

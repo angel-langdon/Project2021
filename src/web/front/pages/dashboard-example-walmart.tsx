@@ -1,15 +1,15 @@
 import Dashboard from "@/components/dashboard/Dashboard";
-import data from "../public/data/starbucks.json";
+import data from "../public/data/walmart.json";
 import { preprocessPatternsData } from "@/utils/dataUtils.js";
 
-export default function DashboardExampleStarbucks() {
+export default function DashboardExampleWalmart() {
   const processedData = preprocessPatternsData(data);
   return (
     <Dashboard
-      store="Starbucks"
+      store="Old Navy"
       data={processedData}
-      brandImage="/images/starbucks-logo.png"
-      colors={["#008A3D", "#000"]}
+      brandImage="/images/walmart-logo.png"
+      colors={["#0056B4", "#FFAA3D"]}
     />
   );
 }
