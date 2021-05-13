@@ -133,7 +133,7 @@ export default function AboutUs() {
                   <ul
                     className="person-linkedin"
                   >
-                   <a href="https://www.linkedin.com/in/ángel-langdon-villamayor-a44b49187/"><i className="fa fa-linkedin" aria-hidden="true"></i></a>
+                   <a href="https://www.linkedin.com/in/angel-langdon-villamayor-a44b49187/"><i className="fa fa-linkedin" aria-hidden="true"></i></a>
                   </ul>
                 </div>
               </div>
