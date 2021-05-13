@@ -1,7 +1,7 @@
 import Plot from "react-plotly.js";
 import { getColumn } from "@/utils/dataUtils";
 
-export let defaultStyles = {
+export const defaultStyles = {
   display: "flex",
   autosize: true,
   title: "Visits per day",

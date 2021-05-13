@@ -2,8 +2,9 @@ import Plot from "react-plotly.js";
 import { getColumn } from "@/utils/dataUtils";
 import { defaultStyles } from "@/components/dashboard/LinePlotVisits";
 
-defaultStyles["yaxis"] = { title: "Estimated Income $", showgrid: false };
-defaultStyles["title"] = "Estimated income per day";
+let customStyles = Object.create(defaultStyles);
+customStyles["yaxis"] = { title: "Estimated Income $", showgrid: false };
+customStyles["title"] = "Estimated income per day";
 
 const LinePlotIncome = (props) => {
   const visits = getColumn(props.filteredData, "income_visits");
@@ -21,7 +22,7 @@ const LinePlotIncome = (props) => {
         },
       ]}
       config={{ responsive: true }}
-      layout={defaultStyles}
+      layout={customStyles}
       style={{ width: "100%", height: "100%" }}
     />
   );
