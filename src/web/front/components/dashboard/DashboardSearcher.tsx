@@ -18,7 +18,8 @@ export default function DashboardSearcher(props) {
     }
   }
   return (
-    <div>
+    <div className="d-flex">
+      <img src="images/map-icon.svg" style={{ width: 40, marginRight: 20 }} />
       <Autocomplete
         id="combo-box-demo"
         options={props.uniqueStores}
