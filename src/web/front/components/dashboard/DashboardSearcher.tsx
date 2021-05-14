@@ -18,20 +18,22 @@ export default function DashboardSearcher(props) {
     }
   }
   return (
-    <Autocomplete
-      id="combo-box-demo"
-      options={props.uniqueStores}
-      getOptionLabel={(option: any) => option.street_address}
-      style={{ width: 200, height: 50 }}
-      renderInput={(params) => (
-        <TextField
-          {...params}
-          label="Search store"
-          variant="outlined"
-          style={{ backgroundColor: "#fff", fontSize: "16pt" }}
-        />
-      )}
-      onChange={changeStore}
-    />
+    <div>
+      <Autocomplete
+        id="combo-box-demo"
+        options={props.uniqueStores}
+        getOptionLabel={(option: any) => option.street_address}
+        style={{ width: 200, height: 50 }}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            label="Search store"
+            variant="outlined"
+            style={{ backgroundColor: "#fff", fontSize: "16pt" }}
+          />
+        )}
+        onChange={changeStore}
+      />
+    </div>
   );
 }
