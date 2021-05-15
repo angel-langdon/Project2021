@@ -27,6 +27,10 @@
       ],
       "@/utils/*":[
         "utils/*"
+      ],
+      "@/images/":[
+        "public/images/*"
+
       ]
     }
   },

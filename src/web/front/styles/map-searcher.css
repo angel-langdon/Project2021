@@ -1,20 +1,11 @@
-.map-parent {
-  height: 100vh;
-  width: 100vw;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: 99999999;
-  position: absolute;
-  align-items: center;
-  justify-content: center;
-  display: flex;
-}
-
 .map-searcher-container {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+
   height: 80vh;
   width: 80vw;
-  z-index: 999999999999999999;
+  z-index: 99;
   background-color: rgb(230, 215, 127);
 }

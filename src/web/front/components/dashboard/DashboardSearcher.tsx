@@ -1,7 +1,5 @@
-import React, { useState } from "react";
 import TextField from "@material-ui/core/TextField";
 import Autocomplete from "@material-ui/core/Autocomplete";
-import MapSearcher from "./MapSearcher";
 
 export default function DashboardSearcher(props) {
   function changeStore(e, value) {
@@ -18,20 +16,10 @@ export default function DashboardSearcher(props) {
       );
     }
   }
-  const [mapVisibility, setMapVisibility] = useState("hidden");
 
   return (
     <div className="d-flex">
-      <img
-        src="images/map-icon.svg"
-        style={{ width: 40, marginRight: 20 }}
-        onClick={() => setMapVisibility("flex")}
-      />
-      <MapSearcher
-        mapVisibility={mapVisibility}
-        setMapVisibility={setMapVisibility}
-        {...props}
-      />
+      <img src="images/map-icon.svg" style={{ width: 40, marginRight: 20 }} />
 
       <Autocomplete
         id="combo-box-demo"
