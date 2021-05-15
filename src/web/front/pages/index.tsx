@@ -1,6 +1,7 @@
 import Footer from "@/components/Footer";
 import NavigationBar from "@/components/NavigationBar";
 import DefaultHeader from "@/components/DefaultHeader";
+import Link from "next/link";
 import SuccessStoriesList from "@/components/SuccessStoriesList";
 
 export default function Home() {
@@ -17,13 +18,13 @@ export default function Home() {
                   <div className="image-holder">
                     <div className="project-slider">
                       <div>
-                        <img src="images/pro1.jpg" />
+                        <img src={require("../public/images/pro1.jpg")} />
                       </div>
                       <div>
-                        <img src="images/pro2.jpg" />
+                        <img src={require("../public/images/pro2.jpg")} />
                       </div>
                       <div>
-                        <img src="images/pro3.jpg" />
+                        <img src={require("../public/images/pro3.jpg")} />
                       </div>
                     </div>
                   </div>
@@ -91,47 +92,15 @@ export default function Home() {
                 <div className="col-xs-12 ">
                   <div className="dw-button">
                     <div className="dw-button-bg" />
-                    <a className="dw-button-link" href="success-stories">
-                      Success stories
-                    </a>
+                    <Link href="/success-stories">
+                      <a className="dw-button-link">Success stories</a>
+                    </Link>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-        {/* 
-    <div id="counts" class="container-fluid">
-  <div class="container">
-      <div class="row">
-          <div class="col-xs-12 col-sm-6 col-md-3 text-center">
-              <div class="count-box">
-                  <h1>7</h1>
-                  <img src="images/countlogo1.png" alt="">
-              </div>
-          </div>
-          <div class="col-xs-12 col-sm-6 col-md-3 text-center">
-              <div class="count-box">
-                  <h1>3</h1>
-                  <img src="images/countlogo2.png" alt="">
-              </div>
-          </div>
-          <div class="col-xs-12 col-sm-6 col-md-3 text-center">
-              <div class="count-box">
-                  <h1>8</h1>
-                  <img src="images/countlogo3.png" alt="">
-              </div>
-          </div>
-          <div class="col-xs-12 col-sm-6 col-md-3 text-center">
-              <div class="count-box">
-                  <h1>5</h1>
-                  <img src="images/countlogo4.png" alt="">
-              </div>
-          </div>
-      </div>
-  </div>
-    </div>
-    */}
         <div id="info1" className="container-fluid">
           <div className="container">
             <div className="row">
@@ -152,12 +121,8 @@ export default function Home() {
               <div className="col-xs-12 col-md-7">
                 <div className="offices-slider">
                   <div>
-                    <img src="images/office1.jpg" />
+                    <img src={require("../public/images/office1.jpg")} />
                   </div>
-                  {/* 
-                  <div>
-                    <img src="images/office2.jpg" />
-                  </div> */}
                 </div>
               </div>
             </div>
@@ -208,85 +173,9 @@ export default function Home() {
                 <h3>Recent Success stories</h3>
               </div>
             </div>
-            {/*}
-            <div className="row">
-              <div className="col-xs-12 text-right">
-                <a className="view-all-link" href="casestudies.html">
-                  <div className="link-text">view all</div>{" "}
-                  <div className="plus-icon">
-                    <span className="plus-line line1" />
-                    <span className="plus-line line2" />
-                  </div>
-                </a>
-              </div>
-            </div>
-            */}
             <div className="row">
               <div className="projects-list">
                 <SuccessStoriesList />
-                {/*  
-                <div className="col-xs-12 col-sm-6 col-md-3 project-box-holder">
-                  <div className="project-box">
-                    <a href="#">
-                      <img className="project-img" src="images/pro3.jpg" />
-                      <div className="box-overlay">
-                        <h4>Text 3</h4>
-                      </div>
-                    </a>
-                  </div>
-                </div>
-                <div className="col-xs-12 col-sm-6 col-md-3 project-box-holder">
-                  <div className="project-box">
-                    <a href="#">
-                      <img className="project-img" src="images/pro4.jpg" />
-                      <div className="box-overlay">
-                        <h4>Text 4</h4>
-                      </div>
-                    </a>
-                  </div>
-                </div>
-                <div className="col-xs-12 col-sm-6 col-md-3 project-box-holder">
-                  <div className="project-box">
-                    <a href="#">
-                      <img className="project-img" src="images/pro5.jpg" />
-                      <div className="box-overlay">
-                        <h4>Text 5</h4>
-                      </div>
-                    </a>
-                  </div>
-                </div> */}
-
-                {/* 
-                <div className="col-xs-12 col-sm-6 col-md-3 project-box-holder">
-                  <div className="project-box">
-                    <a href="#">
-                      <img className="project-img" src="images/pro6.jpg" />
-                      <div className="box-overlay">
-                        <h4>Text 6</h4>
-                      </div>
-                    </a>
-                  </div>
-                </div>
-                <div className="col-xs-12 col-sm-6 col-md-3 project-box-holder">
-                  <div className="project-box">
-                    <a href="#">
-                      <img className="project-img" src="images/pro7.jpg" />
-                      <div className="box-overlay">
-                        <h4>Text 7</h4>
-                      </div>
-                    </a>
-                  </div>
-                </div>
-                <div className="col-xs-12 col-sm-6 col-md-3 project-box-holder">
-                  <div className="project-box">
-                    <a href="#">
-                      <img className="project-img" src="images/pro8.jpg" />
-                      <div className="box-overlay">
-                        <h4>Text 8</h4>
-                      </div>
-                    </a>
-                  </div>
-                </div> */}
               </div>
             </div>
           </div>
@@ -344,32 +233,10 @@ export default function Home() {
                   </p>
                 </div>
               </div>
-              {/* 
-          <div class="col-xs-12 col-sm-6 col-md-4">
-              <div class="service-box">
-                  <div class="service-box-bg"></div>
-                  <div class="service-title"><i class="dw dw-icon4"></i>Data Capture</div>
-                  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris egestas non ante non consequat. Aenean accumsan eros vel elit tristique, non sodales nunc luctus. Etiam vitae odio eget.</p>
-              </div>
-          </div>
-          */}
             </div>
           </div>
         </div>
       </div>
-      {/* 
-                <div id="top-footer" class="container-fluid">
-              <div class="image-bg"></div>
-              <div class="container">
-                  <div class="row">
-                      <div class="col-xs-12">
-                          <h3>Lorem ipsum dolor sit amet, consectetur adipiscing elit</h3>
-                          <div class="dw-botton2"><a href="#">contact us</a></div>
-                      </div>
-                  </div>
-              </div>
-                </div>
-                */}
       <Footer />
     </div>
   );

@@ -1,5 +1,4 @@
 import { getColumn, sum, mean } from "@/utils/dataUtils";
-import { rmse, rSquared, mae } from "@/utils/stats";
 import { Fragment, useState } from "react";
 import CardStatsInfo from "../CardStatsInfo";
 
@@ -15,7 +14,7 @@ export const ModelKPI = (props) => {
           <Fragment>
             <img
               className="model-stat-info"
-              src="/images/info.svg"
+              src={require("../../public/images/info.svg")}
               style={{ maxWidth: 20 }}
               onClick={() => setVisibility("flex")}
             ></img>

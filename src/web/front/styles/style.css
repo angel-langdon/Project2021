@@ -50,19 +50,19 @@ p {
 	2. Header Styles
 -------------------------------------------------------------------*/
 .header-holder {
-  background-image: url("/images/image1.jpg");
+  background-image: url("images/image1.jpg");
   background-position: center;
   background-size: cover;
   position: relative;
 }
 .header-holder.casestudies {
-  background-image: url("/images/image2.jpg");
+  background-image: url("images/image2.jpg");
 }
 .header-holder.theagency {
-  background-image: url("/images/image3.jpg");
+  background-image: url("images/image3.jpg");
 }
 .header-holder.contactus {
-  background-image: url("/images/image4.jpg");
+  background-image: url("images/image4.jpg");
 }
 .color-overlay {
   position: absolute;
@@ -561,7 +561,7 @@ p {
   cursor: pointer;
 }
 #recent-studies .project-box img {
-  width: 260px; 
+  width: 260px;
   height: 200px;
   -webkit-transform-origin: center center;
   -moz-transform-origin: center center;
@@ -665,7 +665,6 @@ p {
 }
 #case-study-popup .popup-content .p-image .image-holder img {
   width: 100%;
-  
 }
 #case-study-popup .popup-content .p-details h3:first-child {
   margin-top: 0;
@@ -963,7 +962,7 @@ p {
   top: 0;
   width: 100%;
   height: 100%;
-  background-image: url("/images/top-footer-bg.jpg");
+  background-image: url("images/top-footer-bg.jpg");
   background-size: cover;
   opacity: 0.3;
 }
@@ -1157,7 +1156,7 @@ select:-webkit-autofill:focus {
   padding-right: 0;
 }
 #story1 .img-col .image-holder {
-  background-image: url("/images/story1.jpg");
+  background-image: url("images/story1.jpg");
   background-position: center;
   background-size: cover;
   transition: none;
@@ -1186,7 +1185,7 @@ select:-webkit-autofill:focus {
   padding-right: 0;
 }
 #story2 .img-col .image-holder {
-  background-image: url("/images/story2.jpg");
+  background-image: url("images/story2.jpg");
   background-position: center;
   background-size: cover;
   transition: none;
@@ -1220,7 +1219,7 @@ select:-webkit-autofill:focus {
   top: 0;
   width: 100%;
   height: 100%;
-  background-image: url("/images/contactbg.jpg");
+  background-image: url("images/contactbg.jpg");
   background-size: cover;
   opacity: 0.45;
 }
@@ -1231,8 +1230,6 @@ select:-webkit-autofill:focus {
   display: inline-block;
   border: 2px solid #ffffff;
   margin-top: 20px;
-}
-#contactus .dw-botton2:hover {
 }
 #contactus .dw-botton2 a {
   display: inline-block;
@@ -1279,7 +1276,7 @@ select:-webkit-autofill:focus {
 }
 #team .info-card .info-card-img img {
   max-width: 400px;
-  /* width: 100%;*/ 
+  /* width: 100%;*/
   height: 360px;
 }
 #team .info-card .info-card-details {

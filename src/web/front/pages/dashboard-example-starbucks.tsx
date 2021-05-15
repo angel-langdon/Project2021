@@ -8,7 +8,7 @@ export default function DashboardExampleStarbucks() {
     <Dashboard
       store="Starbucks"
       data={processedData}
-      brandImage="/images/starbucks-logo.png"
+      brandImage={require("../public/images/starbucks-logo.png")}
       colors={["#008A3D", "#000"]}
     />
   );

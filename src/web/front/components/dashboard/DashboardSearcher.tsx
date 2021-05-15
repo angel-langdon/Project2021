@@ -19,7 +19,10 @@ export default function DashboardSearcher(props) {
 
   return (
     <div className="d-flex">
-      <img src="images/map-icon.svg" style={{ width: 40, marginRight: 20 }} />
+      <img
+        src={require("../../public/images/map-icon.svg")}
+        style={{ width: 40, marginRight: 20 }}
+      />
 
       <Autocomplete
         id="combo-box-demo"

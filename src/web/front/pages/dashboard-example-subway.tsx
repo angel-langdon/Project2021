@@ -8,7 +8,7 @@ const DashboardExampleSubway = () => {
     <Dashboard
       store="Subway"
       data={processedData}
-      brandImage="/images/subway_logo.png"
+      brandImage={require("../public/images/subway_logo.png")}
       colors={["rgb(8, 82, 0)", "rgb(189, 183, 0)"]}
     />
   );

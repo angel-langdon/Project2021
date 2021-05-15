@@ -1,3 +1,4 @@
+import Link from "next/link";
 const NavigationBar = () => {
   return (
     <div id="header" className="container-fluid">
@@ -9,36 +10,49 @@ const NavigationBar = () => {
             <span className="toggle-icon ti3" />
           </div>
           <div className="col-md-3">
-            <a href="/">
-              <img className="logo" src="/images/logo.png" />
-            </a>
+            <Link href="/">
+              <a>
+                <img
+                  className="logo"
+                  src={require("../public/images/logo.png")}
+                />
+              </a>
+            </Link>
           </div>
           <div className="col-md-9 menu-col">
             <div id="menu-holder">
               <ul className="main-menu">
                 <li>
-                  <a href="success-stories">
-                    Success stories
-                    <span className="link-underline" />
-                  </a>
+                  <Link href="/success-stories">
+                    <a>
+                      Success stories
+                      <span className="link-underline" />
+                    </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="about-us">
-                    About us
-                    <span className="link-underline" />
-                  </a>
+                  <Link href="/about-us">
+                    <a>
+                      About us
+                      <span className="link-underline" />
+                    </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="/#services">
-                    Services
-                    <span className="link-underline" />
-                  </a>
+                  <Link href="/#services">
+                    <a>
+                      Services
+                      <span className="link-underline" />
+                    </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="contact">
-                    Contact
-                    <span className="link-underline" />
-                  </a>
+                  <Link href="/contact">
+                    <a>
+                      Contact
+                      <span className="link-underline" />
+                    </a>
+                  </Link>
                 </li>
               </ul>
             </div>

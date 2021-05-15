@@ -8,7 +8,7 @@ export default function DashboardExampleWalmart() {
     <Dashboard
       store="Old Navy"
       data={processedData}
-      brandImage="/images/walmart-logo.png"
+      brandImage={require("../public/images/walmart-logo.png")}
       colors={["#0056B4", "#FFAA3D"]}
     />
   );
