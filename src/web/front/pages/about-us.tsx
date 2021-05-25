@@ -1,6 +1,14 @@
 import NavigationBar from "@/components/NavigationBar";
 import Footer from "@/components/Footer";
 import DefaultHeader from "@/components/DefaultHeader";
+const LinkedInIcon = () => {
+  return (
+    <img
+      src={require("../public/images/linkedin.svg")}
+      style={{ height: 15 }}
+    ></img>
+  );
+};
 
 export default function AboutUs() {
   return (
@@ -30,10 +38,6 @@ export default function AboutUs() {
                   <div className="top-line" />
                 </div>
                 <h3>Teamwork divides the task and multiplies success</h3>
-                {/* 
-                <p>
-                  It is a project created by six students in a third year of DataScience Degree.
-                </p>*/}
               </div>
             </div>
           </div>
@@ -56,7 +60,7 @@ export default function AboutUs() {
                   <div className="person-email">nachonavarrocano@gmail.com</div>
                   <ul className="person-linkedin">
                     <a href="https://www.linkedin.com/in/ignacio-cano/">
-                      <i className="fa fa-linkedin" aria-hidden="true"></i>
+                      <LinkedInIcon></LinkedInIcon>
                     </a>
                   </ul>
                 </div>
@@ -75,7 +79,7 @@ export default function AboutUs() {
                   </div>
                   <ul className="person-linkedin">
                     <a href="https://www.linkedin.com/in/alvaro-mazcu-herreros/">
-                      <i className="fa fa-linkedin" aria-hidden="true"></i>
+                      <LinkedInIcon></LinkedInIcon>
                     </a>
                   </ul>
                 </div>
@@ -94,7 +98,7 @@ export default function AboutUs() {
                   </div>
                   <ul className="person-linkedin">
                     <a href="https://www.linkedin.com/in/lisagilyarovskaya">
-                      <i className="fa fa-linkedin" aria-hidden="true"></i>
+                      <LinkedInIcon></LinkedInIcon>
                     </a>
                   </ul>
                 </div>
@@ -113,7 +117,7 @@ export default function AboutUs() {
                   <div className="person-email">miquelmarin43@gmail.com</div>
                   <ul className="person-linkedin">
                     <a href="https://www.linkedin.com/in/miquel-marin-colome/">
-                      <i className="fa fa-linkedin" aria-hidden="true"></i>
+                      <LinkedInIcon></LinkedInIcon>
                     </a>
                   </ul>
                 </div>
@@ -132,7 +136,7 @@ export default function AboutUs() {
                   <div className="person-email">supername1337@gmail.com</div>
                   <ul className="person-linkedin">
                     <a href="https://www.linkedin.com/in/angel-langdon-villamayor-a44b49187/">
-                      <i className="fa fa-linkedin" aria-hidden="true"></i>
+                      <LinkedInIcon></LinkedInIcon>
                     </a>
                   </ul>
                 </div>
@@ -147,11 +151,6 @@ export default function AboutUs() {
                   <div className="person-name">Iker Rodríguez Martínez</div>
                   <div className="person-title">Commercial Agent</div>
                   <div className="person-email">ikrodmar@upv.edu.es</div>
-                  <ul className="person-linkedin">
-                    <a href="#">
-                      <i className="fa fa-linkedin" aria-hidden="true"></i>
-                    </a>
-                  </ul>
                 </div>
               </div>
             </div>

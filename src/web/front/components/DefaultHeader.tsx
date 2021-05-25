@@ -4,6 +4,8 @@ const DefaultHeader = () => {
   return (
     <Head>
       <title>Entre Datos</title>
+      <link rel="shorcut icon" href={require("../public/favicon.png")}></link>
+      <link rel="icon" href={require("../public/favicon.png")}></link>
       <meta
         name="viewport"
         content="width=device-width, initial-scale=1"
